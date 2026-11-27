@@ -1,0 +1,9 @@
+.city-league{margin:16px 0;padding:16px;border:1px solid rgba(217,185,115,.35);border-radius:18px;background:rgba(15,51,43,.75);color:#fff4db}
+.city-league h3{margin:0 0 8px;color:#f2d89a}
+.city-league-status{font-size:13px;opacity:.8}
+.city-league-list{display:grid;gap:8px;margin:12px 0}
+.city-league-item{padding:10px 12px;border:1px solid rgba(230,204,151,.22);border-radius:12px;background:rgba(0,0,0,.13)}
+.city-league-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.city-league-heading span,.city-league-score{font-size:12px;opacity:.82}
+.city-league-score{margin-top:5px}
+.city-league-refresh{min-height:44px;padding:10px 14px;border:1px solid #d5b879;border-radius:12px;background:#d5b879;color:#16372e;font-weight:700}
