@@ -94,7 +94,7 @@ as $$
  from public.city_exile_appeals a join public.city_exile_history h on h.id=a.history_id
  join public.cities c on c.id=h.city_id
  where a.status='pending' and public.game_is_owner()
- order by submitted_at desc limit 100;
+ order by 6 desc limit 100;
 $$;
 revoke all on function public.game_owner_queue() from public,anon;
 grant execute on function public.game_owner_queue() to authenticated;
