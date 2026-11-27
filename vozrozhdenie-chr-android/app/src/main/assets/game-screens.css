@@ -1,0 +1,128 @@
+.game-shell {
+  height: 100vh;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: radial-gradient(ellipse at top, #213943, #0c151d 650px);
+}
+.game-shell main {
+  width: 100%;
+  max-width: 880px;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 8px;
+  margin: 0 auto;
+  padding: max(8px, env(safe-area-inset-top)) 12px 8px;
+}
+.game-shell main > .game-header {
+  margin: 0;
+  padding: 8px 12px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 8px;
+  background: #15242c;
+  border: 1px solid #a8cfbd32;
+}
+.game-header small { color: #e6c385; }
+.game-header h1 { margin: 2px 0 0; font: 700 clamp(1.3rem, 5.5vw, 2.25rem) Georgia, serif; }
+.game-header #route { margin: 0; text-align: right; }
+.game-shell .stats.chr-sticky-stats {
+  position: static;
+  margin: 0;
+  grid-template-columns: 1.45fr repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  padding: 4px;
+}
+.game-shell .stats.chr-sticky-stats > div { padding: 5px 4px; font-size: .66rem; }
+.game-shell .stats.chr-sticky-stats strong { font-size: clamp(.8rem, 3.9vw, 1.25rem); }
+.game-screens { min-height: 0; }
+.game-screens > section {
+  height: 100%;
+  margin: 0;
+  padding: 11px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: linear-gradient(155deg, #1b3039, #10232b);
+  animation: screen-arrive .2s ease-out both;
+}
+.game-screens > section[hidden] { display: none; }
+@keyframes screen-arrive {
+  from { opacity: .45; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.game-screens #town {
+  display: grid;
+  grid-template-rows: minmax(82px, 1fr) auto auto auto;
+  align-content: start;
+  gap: 8px;
+}
+.game-screens #town[hidden] { display: none; }
+.city-hero {
+  position: relative;
+  min-height: 82px;
+  border-radius: 11px;
+  background: linear-gradient(0deg, #0d191dba, transparent 55%),
+    url("city-panorama.webp") 50% 47% / cover;
+  border: 1px solid #e7c38749;
+}
+.city-picker { position: absolute; inset: auto 7px 7px; display: flex; gap: 6px; }
+.city-picker select { margin: 0; min-width: 0; max-width: none; flex: 1; background: #11222bf0; }
+.city-picker button, .city-picker select { min-height: 36px; padding: 6px 10px; }
+.game-screens .development { margin: 0; }
+.game-screens progress { display: block; height: 7px; margin: 5px 0; }
+.game-screens .development button { min-height: 36px; margin-top: 3px; padding: 6px 9px; }
+.game-screens #map { gap: 4px; padding: 5px; background: #293c40; }
+.game-screens .plot {
+  min-height: clamp(35px, 7dvh, 63px);
+  padding: 3px;
+  gap: 1px;
+  color: #ecdfc1;
+  border: 1px solid #9caa983e;
+  background: linear-gradient(#364b4e, #26383c);
+}
+.game-screens .plot span { font-size: clamp(12px, 2dvh, 20px); }
+.game-screens .plot.built { background: linear-gradient(#5d543b, #373d34); border-color: #bda36a; }
+.game-screens #details { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
+.game-screens #details p { margin: 0; font-size: .73rem; }
+.game-screens #details button { margin: 0; min-height: 34px; padding: 5px 9px; }
+.game-screens .tapwrap { padding: clamp(9px, 5dvh, 50px) 0; }
+.game-screens #tap { width: clamp(125px, min(43vw, 29dvh), 210px); }
+.game-screens .tap-emblem { animation: crystal-glow 3s ease-in-out infinite alternate; }
+@keyframes crystal-glow {
+  from { box-shadow: 0 0 10px #7ee5cc65, inset 0 0 5px #cfffe0; }
+  to { box-shadow: 0 0 23px #7ee5cc90, inset 0 0 12px #cfffe0; }
+}
+.game-shell .game-nav {
+  position: static;
+  place-self: center;
+  transform: none;
+  width: min(100%, 880px);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1px;
+  padding: 3px 3px max(4px, env(safe-area-inset-bottom));
+  overflow: visible;
+  background: #0d1b24;
+}
+.game-nav button {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  min-height: 46px;
+  padding: 2px 0;
+  font-size: clamp(.51rem, 2.1vw, .72rem);
+  color: #cad3cd;
+}
+.game-nav button span { font-size: 1.2rem; line-height: 1; }
+.game-nav button[aria-current="page"] {
+  background: #23423e;
+  color: #ffdda1;
+  box-shadow: inset 0 2px #8dd7bf;
+}
+.game-shell #notice { bottom: max(59px, calc(54px + env(safe-area-inset-bottom))); }
+@media (prefers-reduced-motion: reduce) {
+  .game-screens > section, .game-screens .tap-emblem { animation: none; }
+}

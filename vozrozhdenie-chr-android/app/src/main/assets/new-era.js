@@ -4,12 +4,20 @@ const $=id=>document.getElementById(id);
 const key='chr_new_era_settings_v1',defaults={sound:true,music:false,volume:60,vibration:true};
 let settings;try{settings={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(e){settings={...defaults}}
 const persist=()=>localStorage.setItem(key,JSON.stringify(settings));
-const main=document.querySelector('main'),nav=document.querySelector('nav');
-const section=(id,title)=>{const s=document.createElement('section');s.id=id;const h=document.createElement('h2');h.textContent=title;s.append(h);main.insertBefore(s,$('notice'));return s};
-const achievements=section('achievements','🏅 Достижения');
-const settingsPanel=section('settings','⚙ Настройки');
-const addNav=(id,label)=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>$(id).scrollIntoView({behavior:'smooth'});nav.append(b)};
-addNav('achievements','🏅 Награды');addNav('settings','⚙ Настройки');
+const screens = document.querySelector('.game-screens');
+function section(id, title) {
+  const panel = document.createElement('section');
+  panel.id = id;
+  panel.dataset.screen = '';
+  panel.hidden = true;
+  const heading = document.createElement('h2');
+  heading.textContent = title;
+  panel.append(heading);
+  screens.append(panel);
+  return panel;
+}
+const achievements = section('achievements', 'Достижения');
+const settingsPanel = section('settings', 'Настройки');
 const checkbox=(title,field)=>{const l=document.createElement('label');l.textContent=title;const c=document.createElement('input');c.type='checkbox';c.checked=!!settings[field];c.onchange=()=>{settings[field]=c.checked;persist();if(field==='music')updateMusic()};l.append(c);settingsPanel.append(l)};
 checkbox('Звуковые эффекты','sound');checkbox('Фоновая музыка','music');checkbox('Вибрация','vibration');
 const l=document.createElement('label');l.textContent='Громкость';const slider=document.createElement('input');slider.type='range';slider.min=0;slider.max=100;slider.value=settings.volume;slider.oninput=()=>{settings.volume=Number(slider.value);persist();updateMusic()};l.append(slider);settingsPanel.append(l);

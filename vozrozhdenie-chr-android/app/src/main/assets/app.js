@@ -127,7 +127,7 @@ $('next-city').onclick = () => visitCity(cities[cities.indexOf(s.city) + 1]);
 $('walk').onclick = () => $('walk-view').dispatchEvent(new CustomEvent('walkstart', {
   detail: { city: s.city, level: s.level, built: buildings.map(building => s.built.includes(building[0])) }
 }));
-$('tap').onclick=()=>{if(!s.city)return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=power()*(combo>=10?2:1);s.coins+=n;s.contribution+=n;daily().taps++;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost())return;s.coins-=cost();s.tapLevel++;save();render()};document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>$(b.dataset.go).scrollIntoView({behavior:'smooth'}));const gained=collect();$('offline').textContent='Офлайн-доход: +'+fmt(gained)+' монет (до 24 часов)';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
+$('tap').onclick=()=>{if(!s.city)return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=power()*(combo>=10?2:1);s.coins+=n;s.contribution+=n;daily().taps++;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost())return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Офлайн-доход: +'+fmt(gained)+' монет (до 24 часов)';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
   if (document.hidden || !s.city) return;
   const wholeCoins = Math.floor(s.coins);
   const questDay = s.daily?.date;

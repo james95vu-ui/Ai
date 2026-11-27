@@ -11,6 +11,7 @@
   };
   const held = new Map();
   const near = .18;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let player, surfaces, obstacles, drag, frame, lastTime, cityLevel;
 
   function addFace(points, color, ground = false) {
@@ -33,9 +34,18 @@
   }
 
   function tree(x, z, size) {
-    block(x - .13, z - .13, .26, .26, size, ['#594736', '#765842', '#80634b']);
-    block(x - size / 2, z - size / 2, size, size, size,
-      ['#377854', '#256344', '#75a86b'], size * .55);
+    block(x - .1, z - .1, .2, .2, size * .95, ['#554637', '#755946', '#80634b']);
+    const greens = ['#315d45', '#3d7151', '#467e57', '#57875c'];
+    for (let tier = 0; tier < 2; tier++) {
+      const base = size * (.55 + tier * .38);
+      const radius = size * (.66 - tier * .12);
+      const apex = [x, base + size * .92, z];
+      const rim = Array.from({length: 8}, (_, i) => {
+        const angle = i * Math.PI / 4;
+        return [x + Math.cos(angle) * radius, base, z + Math.sin(angle) * radius];
+      });
+      rim.forEach((point, i) => addFace([point, apex, rim[(i + 1) % 8]], greens[i % greens.length]));
+    }
   }
 
   function stoneTower(x, z) {
@@ -45,6 +55,13 @@
       const width = 1.25 - inset * 2;
       block(x + inset, z + inset, width, width, .28,
         ['#766754', '#655447', '#a08a70'], 4.8 + step * .28);
+    }
+    for (const y of [1.25, 2.45, 3.55]) {
+      for (const [edge, flip] of [[z - .012, false], [z + 1.262, true]]) {
+        const opening = [[x + .54, y, edge], [x + .54, y + .49, edge],
+          [x + .71, y + .49, edge], [x + .71, y, edge]];
+        addFace(flip ? opening.reverse() : opening, '#635344');
+      }
     }
     obstacles.push({left: x, right: x + 1.25, front: z, back: z + 1.25});
   }
@@ -109,6 +126,11 @@
       if (modern) {
         block(left + .55, front + .55, width - 1.1, depth - 1.1, .95,
           ['#527f88', '#3e6975', '#83a5a6'], height + .28);
+        for (const fraction of [.16, .5, .84]) {
+          const rail = left + width * fraction - .055;
+          block(rail, front - .06, .11, .06, height,
+            ['#9fb7b4', '#657f83', '#b7c9c5'], .04);
+        }
         if (level === 10) {
           block(left + width * .49, front + depth * .49, .18, .18, 1.35,
             ['#abddcf', '#649997', '#d1fcda'], height + 1.23);
@@ -143,12 +165,16 @@
   }
 
   function paint() {
-    const width = Math.min(1200, canvas.clientWidth), height = Math.min(1000, canvas.clientHeight);
+    const width = canvas.clientWidth, height = canvas.clientHeight;
     if (!width || !height) return;
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
+    const scale = Math.min(window.devicePixelRatio || 1, 2.5, 2048 / Math.max(width, height));
+    const pixelWidth = Math.max(1, Math.round(width * scale));
+    const pixelHeight = Math.max(1, Math.round(height * scale));
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
     }
+    ctx.setTransform(pixelWidth / width, 0, 0, pixelHeight / height, 0, 0);
     const horizon = height * (.43 + player.pitch);
     const focal = Math.max(width * .66, height * .47);
     const sky = ctx.createLinearGradient(0, 0, 0, height);
@@ -174,7 +200,7 @@
     for (const face of surfaces) {
       const points = clip(face.points.map(([x, y, z]) => {
         const dx = x - player.x, dz = z - player.z;
-        return [dx * cos - dz * sin, y - 1.65, dx * sin + dz * cos];
+        return [dx * cos - dz * sin, y - 1.65 - player.bob, dx * sin + dz * cos];
       }));
       if (points.length < 3) continue;
       const pixels = points.map(([x, y, z]) => [width / 2 + x * focal / z, horizon - y * focal / z]);
@@ -206,6 +232,7 @@
     const dt = Math.min(.05, (now - lastTime) / 1000);
     lastTime = now;
     const moves = new Set(held.values());
+    const beforeX = player.x, beforeZ = player.z;
     if (moves.size) {
       const forward = Number(moves.has('forward')) - Number(moves.has('back'));
       const right = Number(moves.has('right')) - Number(moves.has('left'));
@@ -214,6 +241,12 @@
       const z = player.z + (forward * Math.cos(player.yaw) - right * Math.sin(player.yaw)) * step;
       if (canMove(x, player.z)) player.x = x;
       if (canMove(player.x, z)) player.z = z;
+    }
+    const distance = Math.hypot(player.x - beforeX, player.z - beforeZ);
+    player.stride += distance;
+    const bob = distance && !reducedMotion.matches ? Math.sin(player.stride * 7) * .033 : 0;
+    if (distance || bob !== player.bob) {
+      player.bob = bob;
       paint();
     }
     frame = requestAnimationFrame(tick);
@@ -222,7 +255,7 @@
   dialog.addEventListener('walkstart', ({detail}) => {
     if (!ctx || dialog.open) return;
     makeCity(detail.city, detail.level, detail.built);
-    player = {x: -6, z: -19, yaw: .19, pitch: 0};
+    player = {x: -6, z: -19, yaw: .19, pitch: 0, bob: 0, stride: 0};
     document.getElementById('walk-title').textContent = detail.city;
     document.getElementById('walk-level').textContent = 'Уровень ' + detail.level + ' из 10';
     dialog.showModal();
