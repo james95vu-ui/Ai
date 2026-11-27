@@ -1,10 +1,39 @@
-vozrozhdenie-chr-android/<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#F4D77D" android:pathData="M68,22a14,14 0,1 0,0.1 0z"/>
-    <path android:fillColor="#E7B95C" android:pathData="M68,11a25,25 0,0 0,-22 37a22,22 0,0 1,32 -29a24,24 0,0 0,-10 -8z"/>
-    <path android:fillColor="#477E68" android:pathData="M5,73L32,35L45,52L62,25L103,76L103,92L5,92z"/>
-    <path android:fillColor="#EAF3E6" android:pathData="M25,45L32,35L39,45L34,43L32,40L30,43z M54,37L62,25L72,38L64,34L62,31L59,35z"/>
-    <path android:fillColor="#245744" android:pathData="M5,79L35,53L49,67L70,47L103,80L103,98L5,98z"/>
-    <path android:fillColor="#C8ED83" android:pathData="M0,89Q27,79 54,89T108,89L108,108L0,108z"/>
-    <path android:fillColor="#F4F0DF" android:pathData="M0,96Q27,86 54,96T108,96L108,101Q81,91 54,101T0,101z"/>
+
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Восходящее солнце -->
+    <path
+        android:fillColor="#F4D77D"
+        android:pathData="M68,12 C81,12 91,22 91,35 C91,48 81,58 68,58 C55,58 45,48 45,35 C45,22 55,12 68,12 Z"/>
+
+    <!-- Дальние горы -->
+    <path
+        android:fillColor="#477E68"
+        android:pathData="M5,76 L32,35 L45,52 L62,25 L103,76 L103,92 L5,92 Z"/>
+
+    <!-- Снежные вершины -->
+    <path
+        android:fillColor="#EAF3E6"
+        android:pathData="M25,45 L32,35 L39,45 L34,43 L32,40 L30,43 Z M54,37 L62,25 L72,38 L64,34 L62,31 L59,35 Z"/>
+
+    <!-- Передние горы -->
+    <path
+        android:fillColor="#245744"
+        android:pathData="M5,79 L35,53 L49,67 L70,47 L103,80 L103,98 L5,98 Z"/>
+
+    <!-- Зелёная долина -->
+    <path
+        android:fillColor="#C8ED83"
+        android:pathData="M0,89 C27,79 54,99 81,89 C92,85 101,86 108,89 L108,108 L0,108 Z"/>
+
+    <!-- Светлая линия долины -->
+    <path
+        android:fillColor="#F4F0DF"
+        android:pathData="M0,96 C27,86 54,106 81,96 C92,92 101,93 108,96 L108,101 C81,91 54,111 27,101 L0,101 Z"/>
+
 </vector>
