@@ -6,3 +6,5 @@
 .city-governance textarea{min-height:84px;resize:vertical}
 .city-governance button{min-height:43px;border:0;border-radius:9px;background:#d5b879;color:#16372e;font-weight:700}
 .city-governance button:disabled{opacity:.5}
+
+.city-governance [hidden]{display:none!important}
