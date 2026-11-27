@@ -41,7 +41,7 @@
      try{
       const name=item.kind==='complaint'?'game_owner_review_complaint':'game_owner_review_appeal';
       const body=item.kind==='complaint'?{p_complaint_id:item.item_id,p_approve:accepted,p_note:note.value.trim()}:{p_appeal_id:item.item_id,p_accept:accepted,p_note:note.value.trim()};
-      await rpc(name,body);status.textContent='Решение сохранено';await load();
+      await rpc(name,body);status.textContent='Решение сохранено';card.remove();
      }catch(e){status.textContent='Ошибка решения: '+e.message}
      finally{approve.disabled=reject.disabled=false}
     }
