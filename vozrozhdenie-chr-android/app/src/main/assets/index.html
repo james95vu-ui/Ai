@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="update-03.css">
 <link rel="stylesheet" href="new-era.css">
+<link rel="stylesheet" href="walk.css">
 <style>
 .stats::before{display:none!important}
 #intro{position:fixed;inset:0;z-index:9999;overflow-y:auto;background:linear-gradient(180deg,#102d27,#071b18);color:#fff4df;display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box}
@@ -47,17 +48,21 @@
       <p class="intro-description">Твоя история начинается здесь</p>
       <label for="intro-name">Твоё имя</label>
       <input id="intro-name" maxlength="30" autocomplete="nickname" placeholder="Введи имя игрока">
-      <label for="intro-city">Выбери свой город</label>
-      <select id="intro-city"><option value="">Выбрать город</option></select>
+      <p class="intro-description">Первый город маршрута — Урус-Мартан.</p>
       <button id="intro-start" type="button">НАЧАТЬ ИГРУ</button>
       <p id="intro-error" role="status"></p>
     </div>
   </div>
 </div>
 <main>
-<header><small>ВОЗРОЖДЕНИЕ · ЧЕЧЕНСКАЯ РЕСПУБЛИКА</small><h1 id="city">Твой город</h1><select id="cities" aria-label="Город"></select><button id="join">Выбрать город</button></header>
+<header><small>ВОЗРОЖДЕНИЕ · ЧЕЧЕНСКАЯ РЕСПУБЛИКА</small><h1 id="city">Твой город</h1><select id="cities" aria-label="Город"></select><button id="join">Перейти</button><p id="route"></p></header>
 <section class="stats"><div class="balance">Баланс<strong id="coins"></strong></div><div>Доход / час<strong id="income"></strong></div><div>Уровень<strong id="level"></strong></div><div>Вклад<strong id="contribution"></strong></div></section>
-<section id="town"><h2>Живой город</h2><p>Выбери участок для строительства</p><div class="landscape"><svg viewBox="0 0 360 100" preserveAspectRatio="none"><rect width="360" height="100" fill="#bce0c7"/><circle cx="292" cy="24" r="17" fill="#ffe3a1"/><path d="M0 100V75L65 14 112 67 178 4 260 77 310 33 360 74V100Z" fill="#759e8a"/><path d="M0 100V85L80 50 145 87 240 44 360 90V100Z" fill="#4d806a"/></svg><div id="map"></div></div><div id="details"></div></section>
+<section id="town"><h2>Живой город</h2><div class="development">
+  <p id="development-text"></p>
+  <progress id="city-development" max="1" value="0" aria-label="Развитие города"></progress>
+  <button id="walk" type="button">Прогулка 3D</button>
+  <button id="next-city" type="button" hidden></button>
+</div><div class="landscape"><svg viewBox="0 0 360 100" preserveAspectRatio="none"><rect width="360" height="100" fill="#bce0c7"/><circle cx="292" cy="24" r="17" fill="#ffe3a1"/><path d="M0 100V75L65 14 112 67 178 4 260 77 310 33 360 74V100Z" fill="#759e8a"/><path d="M0 100V85L80 50 145 87 240 44 360 90V100Z" fill="#4d806a"/></svg><div id="map"></div></div><div id="details"></div></section>
 <section id="earn"><h2>Заработок</h2><div class="tapwrap"><button id="tap"><span>◉</span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><div class="passive-income">
   <div><strong>Пассивный доход</strong><span id="income-next"></span></div>
   <progress id="income-progress" aria-label="Прогресс до следующей монеты" max="1" value="0"></progress>
@@ -66,6 +71,21 @@
 <section id="quests"><h2>Ежедневные задания</h2><div id="tasks"></div></section>
 <section id="team"><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><button id="refresh">Обновить рейтинг</button><div id="ranking"></div></section>
 <p id="notice" role="status"></p>
+<dialog id="walk-view" aria-labelledby="walk-title">
+  <div class="walk-scene">
+    <canvas id="walk-canvas" aria-label="Улицы города"></canvas>
+    <header class="walk-header"><div><h2 id="walk-title"></h2><p id="walk-level"></p></div><button id="walk-close" type="button">Выйти</button></header>
+    <div class="walk-controls">
+      <div class="walk-pad" aria-label="Управление движением">
+        <button type="button" data-move="forward" aria-label="Вперёд">↑</button>
+        <button type="button" data-move="left" aria-label="Влево">←</button>
+        <button type="button" data-move="back" aria-label="Назад">↓</button>
+        <button type="button" data-move="right" aria-label="Вправо">→</button>
+      </div>
+      <p>Проведи пальцем по городу, чтобы осмотреться</p>
+    </div>
+  </div>
+</dialog>
 </main>
 <nav><button data-go="town">🏡 Город</button><button data-go="earn">◉ Монеты</button><button data-go="quests">✓ Задания</button><button data-go="team">★ Рейтинг</button></nav>
 <script src="config.js"></script>
@@ -75,24 +95,24 @@
 (function(){
 'use strict';
 var gameKey='vozrozhdenie_demo_v1',nameKey='chr_player_name_v1';
-var intro=document.getElementById('intro'),city=document.getElementById('intro-city'),name=document.getElementById('intro-name');
+var intro=document.getElementById('intro'),name=document.getElementById('intro-name');
 var saved={};
 try{saved=JSON.parse(localStorage.getItem(gameKey)||'{}')||{}}catch(e){}
 if(saved.city){intro.hidden=true;return}
 var gameCities=document.getElementById('cities');
-for(var i=0;i<gameCities.options.length;i++){var o=document.createElement('option');o.value=gameCities.options[i].value; o.textContent=gameCities.options[i].textContent;city.appendChild(o)}
 name.value=localStorage.getItem(nameKey)||'';
 intro.hidden=false;
 document.getElementById('intro-start').addEventListener('click',function(){
  var player=name.value.trim();
  if(!player){document.getElementById('intro-error').textContent='Введи своё имя';return}
- if(!city.value){document.getElementById('intro-error').textContent='Выбери город';return}
  localStorage.setItem(nameKey,player);
- gameCities.value=city.value;
+ var firstCity=gameCities.options[0].value;
+ gameCities.value=firstCity;
  document.getElementById('join').click();
- try{var after=JSON.parse(localStorage.getItem(gameKey)||'{}');if(after.city===city.value){intro.hidden=true}else{document.getElementById('intro-error').textContent='Не удалось выбрать город'}}catch(e){document.getElementById('intro-error').textContent='Не удалось сохранить город'}
+ try{var after=JSON.parse(localStorage.getItem(gameKey)||'{}');if(after.city===firstCity){intro.hidden=true}else{document.getElementById('intro-error').textContent='Не удалось выбрать город'}}catch(e){document.getElementById('intro-error').textContent='Не удалось сохранить город'}
 });
 })();
 </script>
 <script src="update-03.js"></script>
+<script src="walk.js"></script>
 </body></html>
