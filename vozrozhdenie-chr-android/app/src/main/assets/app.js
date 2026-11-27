@@ -2,7 +2,7 @@
 const balanceFormat = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const cities = ['Урус-Мартан', 'Гудермес', 'Шали', 'Аргун', 'Ойсхара', 'Ачхой-Мартан', 'Курчалой', 'Шелковская', 'Наурская', 'Грозный'];
 const thresholds = [0, 5, 12, 22, 35, 52, 74, 102, 137, 180];
-const buildings=[['Городской парк','🌳',500,20,1],['Новая школа','🏫',900,35,1],['Мастерская','🏭',1400,50,1],['Жилой дом','🏠',1800,75,2],['Больница','🏥',2500,110,3],['Мечеть','🕌',3000,130,3],['Рынок','🏪',3800,180,4],['Стадион','🏟️',5000,240,5],['Библиотека','📚',6500,320,6]];const fresh=()=>({city:null,coins:1250,income:60,level:1,contribution:120,built:[],tapLevel:0,lastCollectedAt:Date.now(),daily:{}});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){s=fresh()}if(!Array.isArray(s.built))s.built=[];for(const k of ['coins','income','level','contribution','tapLevel','lastCollectedAt'])if(!Number.isFinite(s[k]))s[k]=fresh()[k];let combo=0,lastTap=0,selected=0,timer;const save=()=>localStorage.setItem(KEY,JSON.stringify(s));const day=()=>new Date().toISOString().slice(0,10);function daily(){if(s.daily?.date!==day())s.daily={date:day(),taps:0,builds:0,claimed:[]};return s.daily}function collect(){const now=Date.now(),gain=s.city?Math.max(0,Math.min(now-s.lastCollectedAt,86400000))*s.income/3600000:0;s.coins+=gain;if(Math.abs(s.coins-Math.round(s.coins))<1e-8)s.coins=Math.round(s.coins);s.lastCollectedAt=Math.max(now,s.lastCollectedAt);save();return gain}function notice(t){$('notice').textContent=t;clearTimeout(timer);timer=setTimeout(()=>$('notice').textContent='',2500)}function power(){return 10+5*s.tapLevel}function cost(){return Math.floor(200*1.7**s.tapLevel)}// Keep the existing active-city fields for saved games and achievement readers.
+const buildings=[['Городской парк','🌳',500,20,1],['Новая школа','🏫',900,35,1],['Мастерская','🏭',1400,50,1],['Жилой дом','🏠',1800,75,2],['Больница','🏥',2500,110,3],['Мечеть','🕌',3000,130,3],['Рынок','🏪',3800,180,4],['Стадион','🏟️',5000,240,5],['Библиотека','📚',6500,320,6]];const fresh=()=>({city:null,coins:1250,income:60,level:1,contribution:120,built:[],tapLevel:0,lastCollectedAt:Date.now(),daily:{}});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){s=fresh()}if(!Array.isArray(s.built))s.built=[];for(const k of ['coins','income','level','contribution','tapLevel','lastCollectedAt'])if(!Number.isFinite(s[k]))s[k]=fresh()[k];let combo=0,lastTap=0,selected=0,timer;const save=()=>localStorage.setItem(KEY,JSON.stringify(s));const day=()=>new Date().toISOString().slice(0,10);function daily(){if(s.daily?.date!==day())s.daily={date:day(),taps:0,builds:0,claimed:[]};return s.daily}function collect(){const now=Date.now(),gain=s.city?Math.max(0,Math.min(now-s.lastCollectedAt,86400000))*hourlyIncome()/3600000:0;s.coins+=gain;if(Math.abs(s.coins-Math.round(s.coins))<1e-8)s.coins=Math.round(s.coins);s.lastCollectedAt=Math.max(now,s.lastCollectedAt);save();return gain}function notice(t){$('notice').textContent=t;clearTimeout(timer);timer=setTimeout(()=>$('notice').textContent='',2500)}function power(){return 10+5*s.tapLevel}function cost(){return Math.floor(200*1.7**s.tapLevel)}// Keep the existing active-city fields for saved games and achievement readers.
 if (!s.campaign || typeof s.campaign !== 'object' || Array.isArray(s.campaign)) {
   s.campaign = {};
   if (s.city) {
@@ -11,6 +11,98 @@ if (!s.campaign || typeof s.campaign !== 'object' || Array.isArray(s.campaign)) 
     s.level = restoredLevel;
   }
 }
+
+const tycoon = Tycoon.normalize(s, Date.now());
+
+function hourlyIncome() {
+  const income = s.income + Tycoon.hourlyBonus(tycoon, s.campaign, buildings);
+  return income * (tycoon.technologies.includes('yield') ? 1.15 : 1);
+}
+
+function useEnergy(amount) {
+  if (Tycoon.spendEnergy(tycoon, amount, Date.now())) return true;
+  notice('Не хватает энергии');
+  return false;
+}
+
+function prestigeReward() {
+  return cities.filter(city => cityLevel(s.campaign[city]?.taps || 0) === 10).length;
+}
+
+function showTycoon() {
+  Tycoon.recharge(tycoon, Date.now());
+  $('energy').textContent = tycoon.energy + ' / ' + Tycoon.energyCap(tycoon);
+  $('energy-bar').max = Tycoon.energyCap(tycoon);
+  $('energy-bar').value = tycoon.energy;
+  $('tap').disabled = !s.city || tycoon.energy < 1;
+  $('upgrade').disabled = !s.city || s.coins < cost() || tycoon.energy < 3;
+  const minutes = Math.ceil(Math.max(0, tycoon.nextChest - Date.now()) / 60000);
+  $('chest').disabled = !s.city || minutes > 0;
+  $('chest').textContent = minutes ? 'Следующий сундук через ' + minutes + ' мин' : 'Открыть сундук';
+}
+
+function renderPrestige() {
+  $('prestige-points').textContent = 'Очки престижа: ' + tycoon.points;
+  const reward = prestigeReward();
+  $('prestige').disabled = !reward;
+  $('prestige').textContent = reward ? 'Начать заново · +' + reward + ' очков' : 'Заверши хотя бы один город';
+  const tree = $('technology-tree');
+  tree.replaceChildren();
+  for (const perk of Tycoon.tech) {
+    const row = document.createElement('div');
+    row.className = 'task';
+    const description = document.createElement('div');
+    description.textContent = perk.name;
+    const effect = document.createElement('small');
+    const prerequisite = Tycoon.tech.find(tech => tech.id === perk.requires);
+    effect.textContent = perk.effect + (prerequisite ? ' · после «' + prerequisite.name + '»' : '');
+    description.append(effect);
+    const button = document.createElement('button');
+    const owned = tycoon.technologies.includes(perk.id);
+    button.textContent = owned ? 'Изучено' : perk.price + ' очк.';
+    button.disabled = owned || tycoon.points < perk.price ||
+      (!!perk.requires && !tycoon.technologies.includes(perk.requires));
+    button.onclick = () => {
+      if (button.disabled || !button.isConnected) return;
+      collect();
+      tycoon.points -= perk.price;
+      tycoon.technologies.push(perk.id);
+      save();
+      render();
+    };
+    row.append(description, button);
+    tree.append(row);
+  }
+}
+
+$('chest').onclick = () => {
+  if (!s.city) return;
+  const reward = Tycoon.chest(tycoon, Date.now(), Math.random());
+  if (!reward) return;
+  s.coins += reward.coins;
+  save();
+  render();
+  notice('Сундук: +' + reward.coins + ' монет' + (reward.energy ? ' и +' + reward.energy + ' энергии' : ''));
+};
+
+$('prestige').onclick = () => {
+  const reward = prestigeReward();
+  if (!reward || !confirm('Сбросить города, постройки, менеджеров, монеты и текущие задания за ' + reward + ' очк. престижа?')) return;
+  const firstCity = cities[0];
+  Object.assign(s, fresh(), {city: firstCity, campaign: {
+    [firstCity]: {taps: 0, built: []}
+  }});
+  s.built = s.campaign[firstCity].built;
+  tycoon.points += reward;
+  tycoon.energy = Tycoon.energyCap(tycoon);
+  tycoon.energyAt = Date.now();
+  combo = 0;
+  lastTap = 0;
+  selected = 0;
+  save();
+  render();
+  notice('Получено очков престижа: ' + reward);
+};
 
 function cityLevel(taps) {
   return thresholds.filter(threshold => taps >= threshold).length;
@@ -100,8 +192,8 @@ function showIncome() {
   const progress = $('income-progress');
   const label = $('income-next');
   progress.value = s.city ? Math.max(0, s.coins - wholeCoins) : 0;
-  label.textContent = s.city && s.income > 0
-    ? 'Следующая монета через ' + Math.max(1, Math.ceil((1 - progress.value) * 3600 / s.income - 1e-6)) + ' с'
+  label.textContent = s.city && hourlyIncome() > 0
+    ? 'Следующая монета через ' + Math.max(1, Math.ceil((1 - progress.value) * 3600 / hourlyIncome() - 1e-6)) + ' с'
     : 'Выбери город для начисления';
 }
 function showTapGain(amount) {
@@ -117,17 +209,89 @@ function showTapGain(amount) {
   }
   $('tap').animate?.([{ transform: 'scale(.95)' }, { transform: 'scale(1)' }], { duration: 160 });
 }
-function stats(){showIncome();showCampaign();for(const k of ['income','level','contribution'])$(k).textContent=fmt(s[k]);$('city').textContent=s.city||'Выбери свой город';$('power').textContent='+'+fmt(power()*(combo>=10?2:1))+' монет';$('combo').textContent=combo>=10?'Комбо ×2!':'Комбо '+combo+' / 10';$('bar').value=combo;$('upgrade').textContent='Улучшить нажатие: '+fmt(cost())+' ◉';$('upgrade').disabled=!s.city||s.coins<cost();$('tap').disabled=!s.city}function updateBuildButton() {
-  const building = buildings[selected];
-  const button = $('details').querySelector('button');
-  button.disabled = s.built.includes(building[0]) || !s.city || s.level < building[4] || s.coins < building[2];
+function stats() {
+  showIncome();
+  showCampaign();
+  for (const key of ['level', 'contribution']) $(key).textContent = fmt(s[key]);
+  $('income').textContent = fmt(hourlyIncome());
+  $('city').textContent = s.city || 'Выбери свой город';
+  $('power').textContent = '+' + fmt(power() * (combo >= 10 ? 2 : 1)) + ' монет';
+  $('combo').textContent = combo >= 10 ? 'Комбо ×2!' : 'Комбо ' + combo + ' / 10';
+  $('bar').value = combo;
+  $('upgrade').textContent = 'Улучшить нажатие: ' + fmt(cost()) + ' ◉ · 3 энергии';
+  showTycoon();
 }
-function map(){const el=$('map');el.replaceChildren();buildings.forEach((b,i)=>{const btn=document.createElement('button');btn.className='plot'+(s.built.includes(b[0])?' built':'')+(selected===i?' selected':'');const icon=document.createElement('span');icon.textContent=s.built.includes(b[0])?b[1]:'＋';btn.append(icon,document.createTextNode(b[0]));btn.onclick=()=>{selected=i;map()};el.append(btn)});const b=buildings[selected],done=s.built.includes(b[0]);$('details').replaceChildren();const p=document.createElement('p');p.textContent=b[0]+' · '+fmt(b[2])+' монет · +'+b[3]+'/час · уровень '+b[4];const btn=document.createElement('button');btn.textContent=done?'Построено ✓':'Построить';btn.onclick=()=>{collect();if(s.built.includes(b[0])||s.coins<b[2]||s.level<b[4])return;s.coins-=b[2];buildProject(b);save();render();notice('Построено: '+b[0]);};$('details').append(p,btn);updateBuildButton()}function tasks(){const d=daily(),list=[['login','Ежедневный вход',1,1,500],['tap','Сделай 100 нажатий',d.taps,100,250],['build','Построй здание',d.builds,1,400]];$('tasks').replaceChildren();for(const [id,title,n,target,reward] of list){const row=document.createElement('div');row.className='task';const label=document.createElement('div');label.textContent=title;const sub=document.createElement('small');sub.textContent=Math.min(n,target)+' / '+target+' · +'+reward+' ◉';label.append(sub);const btn=document.createElement('button');btn.textContent=d.claimed.includes(id)?'Получено':'Забрать';btn.disabled=!s.city||n<target||d.claimed.includes(id);btn.onclick=()=>{const current=daily();if(current.date!==d.date||current.claimed.includes(id))return;current.claimed.push(id);s.coins+=reward;save();render()};row.append(label,btn);$('tasks').append(row)}}function render(){renderCityOptions();stats();map();tasks()}$('join').onclick = () => visitCity($('cities').value);
+
+function projectActions(project) {
+  const [name, , basePrice, , minimumLevel] = project;
+  const city = s.campaign[s.city];
+  const level = city?.upgrades?.[name] || 0;
+  const built = s.built.includes(name);
+  return built ? [
+    {label: level >= Tycoon.maxUpgrade ? 'Макс. уровень' : 'Улучшить · ' + fmt(Tycoon.price(basePrice, level)),
+      cost: Tycoon.price(basePrice, level), energy: 3, locked: level >= Tycoon.maxUpgrade,
+      apply() { (city.upgrades ||= {})[name] = level + 1; }},
+    {label: city?.managers?.[name] ? 'Менеджер нанят' : 'Нанять · ' + fmt(basePrice * 3),
+      cost: basePrice * 3, energy: 0, locked: !!city?.managers?.[name],
+      apply() { (city.managers ||= {})[name] = true; }}
+  ] : [{label: 'Построить · ' + fmt(basePrice), cost: basePrice, energy: 5,
+    locked: s.level < minimumLevel, apply() { buildProject(project); }}];
+}
+
+function updateBuildButton() {
+  const buttons = $('details').querySelectorAll('button');
+  projectActions(buildings[selected]).forEach((action, index) => {
+    buttons[index].disabled = !s.city || action.locked || s.coins < action.cost || tycoon.energy < action.energy;
+  });
+}
+
+function map() {
+  const el = $('map');
+  el.replaceChildren();
+  buildings.forEach((project, i) => {
+    const button = document.createElement('button');
+    const built = s.built.includes(project[0]);
+    button.className = 'plot' + (built ? ' built' : '') + (selected === i ? ' selected' : '');
+    const icon = document.createElement('span');
+    icon.textContent = built ? project[1] : '＋';
+    button.append(icon, document.createTextNode(project[0]));
+    button.onclick = () => { selected = i; map(); };
+    el.append(button);
+  });
+
+  const project = buildings[selected];
+  const city = s.campaign[s.city];
+  const level = city?.upgrades?.[project[0]] || 0;
+  const details = $('details');
+  details.replaceChildren();
+  const description = document.createElement('p');
+  description.textContent = project[0] + (s.built.includes(project[0])
+    ? ' · улучшений: ' + level + ' · базовый доход +' + project[3] + '/час'
+    : ' · уровень города ' + project[4] + ' · +'+ project[3] + '/час');
+  details.append(description);
+  for (const action of projectActions(project)) {
+    const button = document.createElement('button');
+    button.textContent = action.label + (!action.locked && action.energy ? ' · ⚡' + action.energy : '');
+    button.onclick = () => {
+      if (button.disabled || !button.isConnected) return;
+      collect();
+      if (s.coins < action.cost || !useEnergy(action.energy)) return;
+      s.coins -= action.cost;
+      action.apply();
+      save();
+      render();
+    };
+    details.append(button);
+  }
+  updateBuildButton();
+}
+
+function tasks(){const d=daily(),list=[['login','Ежедневный вход',1,1,500],['tap','Сделай 100 нажатий',d.taps,100,250],['build','Построй здание',d.builds,1,400]];$('tasks').replaceChildren();for(const [id,title,n,target,reward] of list){const row=document.createElement('div');row.className='task';const label=document.createElement('div');label.textContent=title;const sub=document.createElement('small');sub.textContent=Math.min(n,target)+' / '+target+' · +'+reward+' ◉';label.append(sub);const btn=document.createElement('button');btn.textContent=d.claimed.includes(id)?'Получено':'Забрать';btn.disabled=!s.city||n<target||d.claimed.includes(id);btn.onclick=()=>{const current=daily();if(current.date!==d.date||current.claimed.includes(id))return;current.claimed.push(id);s.coins+=reward;save();render()};row.append(label,btn);$('tasks').append(row)}}function render(){renderCityOptions();stats();map();tasks();renderPrestige()}$('join').onclick = () => visitCity($('cities').value);
 $('next-city').onclick = () => visitCity(cities[cities.indexOf(s.city) + 1]);
 $('walk').onclick = () => $('walk-view').dispatchEvent(new CustomEvent('walkstart', {
   detail: { city: s.city, level: s.level, built: buildings.map(building => s.built.includes(building[0])) }
 }));
-$('tap').onclick=()=>{if(!s.city)return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=power()*(combo>=10?2:1);s.coins+=n;s.contribution+=n;daily().taps++;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost())return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Офлайн-доход: +'+fmt(gained)+' монет (до 24 часов)';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
+$('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=power()*(combo>=10?2:1);s.coins+=n;s.contribution+=n;daily().taps++;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost()||!useEnergy(3))return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Офлайн-доход: +'+fmt(gained)+' монет (до 24 часов)';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
   if (document.hidden || !s.city) return;
   const wholeCoins = Math.floor(s.coins);
   const questDay = s.daily?.date;
@@ -138,6 +302,8 @@ $('tap').onclick=()=>{if(!s.city)return;const now=Date.now();combo=now-lastTap<1
     updateBuildButton();
   } else {
     showIncome();
+    showTycoon();
+    updateBuildButton();
   }
 }, 1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){const n=collect();$('offline').textContent='Начислено: +'+fmt(n)+' монет';render()}});
 // Online leaderboard uses server-recorded community contributions, not editable local balances.

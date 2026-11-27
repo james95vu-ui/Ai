@@ -17,6 +17,11 @@ function section(id, title) {
   return panel;
 }
 const achievements = section('achievements', 'Достижения');
+achievements.insertAdjacentHTML('beforeend', `<div class="tycoon-card">
+  <h3>Престиж и технологии</h3><p id="prestige-points"></p>
+  <p>Заверши города и начни новый цикл, чтобы получить очки. Изученные технологии действуют во всех городах.</p>
+  <button id="prestige" type="button"></button><div id="technology-tree"></div>
+</div>`);
 const settingsPanel = section('settings', 'Настройки');
 const checkbox=(title,field)=>{const l=document.createElement('label');l.textContent=title;const c=document.createElement('input');c.type='checkbox';c.checked=!!settings[field];c.onchange=()=>{settings[field]=c.checked;persist();if(field==='music')updateMusic()};l.append(c);settingsPanel.append(l)};
 checkbox('Звуковые эффекты','sound');checkbox('Фоновая музыка','music');checkbox('Вибрация','vibration');

@@ -68,13 +68,74 @@
   <button id="walk" type="button">Прогулка 3D</button>
   <button id="next-city" type="button" hidden></button>
 </div><div class="landscape"><div id="map"></div></div><div id="details"></div></section>
-<section id="earn" data-screen hidden><h2>Заработок</h2><div class="tapwrap"><button id="tap"><span class="tap-emblem" aria-hidden="true"></span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><div class="passive-income">
+<section id="earn" data-screen hidden><h2>Заработок</h2><div class="energy-status">Энергия <strong id="energy"></strong></div><progress id="energy-bar" aria-label="Энергия" value="0"></progress><div class="tapwrap"><button id="tap"><span class="tap-emblem" aria-hidden="true"></span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><div class="passive-income">
   <div><strong>Пассивный доход</strong><span id="income-next"></span></div>
   <progress id="income-progress" aria-label="Прогресс до следующей монеты" max="1" value="0"></progress>
   <p id="offline"></p>
 </div></section>
-<section id="quests" data-screen hidden><h2>Ежедневные задания</h2><div id="tasks"></div></section>
-<section id="team" data-screen hidden><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><button id="refresh">Обновить рейтинг</button><div id="ranking"></div></section>
+<section id="quests" data-screen hidden><h2>Ежедневные задания</h2><div id="tasks"></div><div class="tycoon-card">
+  <h3>Сундук</h3><p>250 монет (65%) · 400 и 12 энергии (25%) · 800 и 25 энергии (10%). Бесплатно раз в 4 часа.</p>
+  <button id="chest" type="button"></button>
+</div></section>
+<section id="team" data-screen hidden><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><button id="refresh">Обновить рейтинг</button><div id="ranking"></div>
+<div class="tycoon-card" id="social">
+  <h3>Сообщество</h3>
+  <p id="social-status" role="status"></p>
+  <form id="social-login">
+    <label>Электронная почта <input name="email" type="email" autocomplete="email" required></label>
+    <button type="submit">Получить код</button>
+  </form>
+  <form id="social-verify" hidden>
+    <label>Код из письма <input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" required></label>
+    <button type="submit">Войти</button>
+  </form>
+  <div id="social-online" hidden>
+    <div class="social-tabs" aria-label="Сообщество">
+      <button type="button" data-social-tab="trade" aria-pressed="true">Обмен</button>
+      <button type="button" data-social-tab="clans" aria-pressed="false">Кланы</button>
+      <button type="button" data-social-tab="chat" aria-pressed="false">Чат</button>
+    </div>
+    <button type="button" id="social-refresh">Обновить данные</button>
+    <button type="button" id="social-logout">Выйти</button>
+    <div id="social-trade">
+      <p id="wallet-summary"></p>
+      <label>ID для обмена <input id="wallet-id" readonly></label>
+      <button type="button" id="wallet-activate">Активировать кошелёк</button>
+      <div id="wallet-actions" hidden>
+        <form id="gift-form">
+          <label>ID получателя <input name="player" required maxlength="36"></label>
+          <label>Кредиты <input name="coins" type="number" min="20" max="500" required></label>
+          <label>Материалы к получению <input name="materials" type="number" min="0" max="20" value="0" required></label>
+          <p>Сбор за день: 5% с первых 200 кредитов, 12% со следующих 500, 25% с остатка. Ноль материалов означает подарок.</p>
+          <button type="submit">Отправить</button>
+        </form>
+        <form id="materials-form">
+          <label>Купить материалы · 12 кредитов за единицу <input name="materials" type="number" min="1" max="20" value="1" required></label>
+          <button type="submit">Купить</button>
+        </form>
+        <div id="trade-offers"></div>
+      </div>
+    </div>
+    <div id="social-clans" hidden>
+      <p id="clan-current"></p>
+      <form id="clan-form">
+        <label>Название клана <input name="name" required minlength="3" maxlength="30"></label>
+        <button type="submit">Создать · 150 кредитов</button>
+      </form>
+      <button type="button" id="clan-leave" hidden>Выйти из клана</button>
+      <div id="clan-list"></div>
+    </div>
+    <div id="social-chat" hidden>
+      <label>Канал <select id="chat-channel"><option value="public">Общий</option><option value="clan">Клан</option></select></label>
+      <div id="chat-messages"></div>
+      <form id="chat-form">
+        <label>Сообщение <input name="message" required maxlength="300"></label>
+        <button type="submit">Отправить</button>
+      </form>
+      <div id="moderation-queue" hidden></div>
+    </div>
+  </div>
+</div></section>
 </div>
 <p id="notice" role="status"></p>
 <dialog id="walk-view" aria-labelledby="walk-title">
@@ -102,9 +163,11 @@
   <button type="button" data-go="settings" aria-controls="settings"><span aria-hidden="true">⚙</span>Настройки</button>
 </nav>
 <script src="config.js"></script>
-<script src="app.js"></script>
+<script src="tycoon.js"></script>
 <script src="new-era.js"></script>
+<script src="app.js"></script>
 <script src="game-screens.js"></script>
+<script src="social.js"></script>
 <script>
 (function(){
 'use strict';
