@@ -1,1 +1,93 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Возрождение ЧР</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="new-era.css"></head><body><main><header><small>ВОЗРОЖДЕНИЕ ЧР · НОВАЯ ЭПОХА</small><h1 id="city">Твой город</h1><select id="cities"></select><button id="join">Выбрать город</button></header><section class="stats"><div>Монеты<strong id="coins"></strong></div><div>Доход / час<strong id="income"></strong></div><div>Уровень<strong id="level"></strong></div><div>Вклад<strong id="contribution"></strong></div></section><section id="town"><h2>Живой город</h2><p>Выбери участок для строительства</p><div class="landscape"><svg viewBox="0 0 360 100" preserveAspectRatio="none"><rect width="360" height="100" fill="
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Возрождение — Чеченская Республика</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="new-era.css">
+<style>
+.stats::before{display:none!important}
+#intro{position:fixed;inset:0;z-index:9999;overflow-y:auto;background:linear-gradient(180deg,#102d27,#071b18);color:#fff4df;display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box}
+#intro[hidden]{display:none!important}
+.intro-card{width:min(100%,460px);border:1px solid #c8a86980;border-radius:26px;overflow:hidden;background:#163b32;box-shadow:0 20px 70px #0008}
+.intro-art{height:210px;background:linear-gradient(#183d38,#3f7768);overflow:hidden}
+.intro-art svg{width:100%;height:100%;display:block}
+.intro-content{padding:24px 24px 28px;text-align:center}
+.intro-ornament{color:#dfbe77;letter-spacing:6px;font-size:15px;margin:0 0 12px}
+.intro-content h1{font-family:Georgia,serif;font-size:clamp(29px,7vw,40px);letter-spacing:2px;margin:0;color:#fff8e9}
+.intro-subtitle{font-family:Georgia,serif;color:#e9c77d;font-size:clamp(15px,4vw,20px);letter-spacing:1px;margin:6px 0 12px}
+.intro-description{color:#c4d8cf;font-size:14px;margin:0 0 22px}
+.intro-content label{display:block;text-align:left;color:#edce91;font-weight:600;margin:13px 0 6px}
+.intro-content input,.intro-content select{box-sizing:border-box;width:100%;padding:14px 12px;border:1px solid #bca26d;border-radius:12px;background:#0c2923;color:white;font-size:16px;min-height:48px}
+.intro-content select option{color:#102d27;background:white}
+#intro-start{width:100%;margin-top:22px;border:0;border-radius:13px;background:#dfbe77;color:#17342c;padding:16px;font-size:17px;font-weight:800}
+#intro-error{color:#ffb8ac;min-height:1.3em;margin:9px 0 0}
+</style>
+</head>
+<body>
+<div id="intro" hidden>
+  <div class="intro-card">
+    <div class="intro-art" aria-hidden="true">
+      <svg viewBox="0 0 460 210" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#143e42"/><stop offset="1" stop-color="#7fb5a2"/></linearGradient></defs>
+        <rect width="460" height="210" fill="url(#sky)"/>
+        <circle cx="360" cy="49" r="25" fill="#f3d48d"/>
+        <path d="M0 170 78 59 130 134 217 21 312 148 391 62 460 151V210H0Z" fill="#6b998b"/>
+        <path d="M0 194 92 116 156 166 235 92 345 175 417 114 460 156V210H0Z" fill="#335f52"/>
+        <path d="M0 210V177l76-27 91 40 89-28 94 33 110-32v47Z" fill="#1d4b3b"/>
+        <g fill="#e9d9b1" stroke="#c9ad73" stroke-width="1.5"><rect x="180" y="126" width="93" height="66" rx="4"/><path d="M171 126h111l-55-36Z"/><rect x="221" y="77" width="11" height="34"/><path d="M226 65l-11 15h22Z"/><rect x="198" y="149" width="18" height="43"/><rect x="237" y="149" width="18" height="43"/></g>
+        <path d="M0 203h460" stroke="#d8b875" stroke-width="4"/>
+      </svg>
+    </div>
+    <div class="intro-content">
+      <p class="intro-ornament">✦ ◇ ✦ ◇ ✦</p>
+      <h1>ВОЗРОЖДЕНИЕ</h1>
+      <p class="intro-subtitle">ЧЕЧЕНСКАЯ РЕСПУБЛИКА</p>
+      <p class="intro-description">Твоя история начинается здесь</p>
+      <label for="intro-name">Твоё имя</label>
+      <input id="intro-name" maxlength="30" autocomplete="nickname" placeholder="Введи имя игрока">
+      <label for="intro-city">Выбери свой город</label>
+      <select id="intro-city"><option value="">Выбрать город</option></select>
+      <button id="intro-start" type="button">НАЧАТЬ ИГРУ</button>
+      <p id="intro-error" role="status"></p>
+    </div>
+  </div>
+</div>
+<main>
+<header><small>ВОЗРОЖДЕНИЕ · ЧЕЧЕНСКАЯ РЕСПУБЛИКА</small><h1 id="city">Твой город</h1><select id="cities"></select><button id="join">Выбрать город</button></header>
+<section class="stats"><div>Монеты<strong id="coins"></strong></div><div>Доход / час<strong id="income"></strong></div><div>Уровень<strong id="level"></strong></div><div>Вклад<strong id="contribution"></strong></div></section>
+<section id="town"><h2>Живой город</h2><p>Выбери участок для строительства</p><div class="landscape"><svg viewBox="0 0 360 100" preserveAspectRatio="none"><rect width="360" height="100" fill="#bce0c7"/><circle cx="292" cy="24" r="17" fill="#ffe3a1"/><path d="M0 100V75L65 14 112 67 178 4 260 77 310 33 360 74V100Z" fill="#759e8a"/><path d="M0 100V85L80 50 145 87 240 44 360 90V100Z" fill="#4d806a"/></svg><div id="map"></div></div><div id="details"></div></section>
+<section id="earn"><h2>Заработок</h2><div class="tapwrap"><button id="tap"><span>◉</span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop"></div></div><div id="combo"></div><progress id="bar" max="10" value="0"></progress><button id="upgrade"></button><p id="offline"></p></section>
+<section id="quests"><h2>Ежедневные задания</h2><div id="tasks"></div></section>
+<section id="team"><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><button id="refresh">Обновить рейтинг</button><div id="ranking"></div></section>
+<p id="notice" role="status"></p>
+</main>
+<nav><button data-go="town">🏡 Город</button><button data-go="earn">◉ Монеты</button><button data-go="quests">✓ Задания</button><button data-go="team">★ Рейтинг</button></nav>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="new-era.js"></script>
+<script>
+(function(){
+'use strict';
+var gameKey='vozrozhdenie_demo_v1',nameKey='chr_player_name_v1';
+var intro=document.getElementById('intro'),city=document.getElementById('intro-city'),name=document.getElementById('intro-name');
+var saved={};
+try{saved=JSON.parse(localStorage.getItem(gameKey)||'{}')||{}}catch(e){}
+if(saved.city){intro.hidden=true;return}
+var gameCities=document.getElementById('cities');
+for(var i=0;i<gameCities.options.length;i++){var o=document.createElement('option');o.value=gameCities.options[i].value; o.textContent=gameCities.options[i].textContent;city.appendChild(o)}
+name.value=localStorage.getItem(nameKey)||'';
+intro.hidden=false;
+document.getElementById('intro-start').addEventListener('click',function(){
+ var player=name.value.trim();
+ if(!player){document.getElementById('intro-error').textContent='Введи своё имя';return}
+ if(!city.value){document.getElementById('intro-error').textContent='Выбери город';return}
+ localStorage.setItem(nameKey,player);
+ gameCities.value=city.value;
+ document.getElementById('join').click();
+ try{var after=JSON.parse(localStorage.getItem(gameKey)||'{}');if(after.city===city.value){intro.hidden=true}else{document.getElementById('intro-error').textContent='Не удалось выбрать город'}}catch(e){document.getElementById('intro-error').textContent='Не удалось сохранить город'}
+});
+})();
+</script>
+</body></html>
