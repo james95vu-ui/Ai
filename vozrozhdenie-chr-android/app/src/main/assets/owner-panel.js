@@ -9,6 +9,41 @@
  center.innerHTML='<h4>Центр управления</h4><div class="owner-stats"></div><form class="owner-search"><label>Найти игрока по email или UUID<input name="query" required minlength="3"></label><button>Найти</button></form><div class="owner-players"></div><form class="owner-action"><label>Действие<select name="action"><option value="add_coins">Добавить / списать монеты</option><option value="set_coins">Установить баланс монет</option><option value="add_materials">Добавить / списать материалы</option><option value="set_materials">Установить материалы</option><option value="appoint_mayor">Назначить мэра</option><option value="announce">Опубликовать объявление</option><option value="close_announcement">Закрыть объявление</option></select></label><label>Игрок UUID / заголовок / ID объявления<input name="target" required></label><label>Количество / текст объявления<input name="value"></label><label>Причина действия<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Выполнить с подтверждением</button></form><h4>Последние действия</h4><button type="button" class="owner-audit-refresh">Показать журнал</button><div class="owner-audit"></div>';
  root.insertBefore(center,root.querySelector('.owner-queue'));
 
+ const sanctions=document.createElement('section');sanctions.className='owner-sanctions-center';
+ sanctions.innerHTML='<h4>🚫 Санкции игроков</h4><form class="owner-sanction-form"><label>UUID игрока<input name="player" required></label><label>Область<select name="scope"><option value="public_chat">Публичные чаты</option><option value="gameplay">Игровая блокировка (частичная интеграция)</option></select></label><label>Срок в часах (1–8760)<input name="hours" type="number" min="1" max="8760" value="24" required></label><label>Причина<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Назначить санкцию</button></form><button type="button" class="owner-sanctions-list">Посмотреть санкции</button><div class="owner-sanctions-results"></div><form class="owner-revoke-form"><label>ID санкции для отмены<input name="id" type="number" min="1" required></label><label>Причина отмены<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Отменить санкцию</button></form><h4>⚙️ Настройки игры</h4><form class="owner-settings-form"><label>Настройка<select name="key"><option value="welcome_message">Приветственное сообщение</option><option value="maintenance_notice">Сообщение о работах</option><option value="chat_slow_mode_seconds">Задержка чата (0–300 секунд)</option><option value="events_enabled">Игровые события (true/false)</option></select></label><label>Значение<input name="value" required></label><label>Причина<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Сохранить настройку</button></form>';
+ center.append(sanctions);
+ const sanctionForm=sanctions.querySelector('.owner-sanction-form');
+ sanctionForm.addEventListener('submit',async e=>{
+  e.preventDefault();const el=e.currentTarget.elements;
+  if(!confirm('Назначить санкцию игроку?'))return;
+  try{const id=await rpc('game_owner_sanction',{p_player:el.player.value.trim(),p_scope:el.scope.value,p_hours:Number(el.hours.value),p_reason:el.reason.value.trim()});status.textContent='Санкция №'+id+' создана'}
+  catch(error){status.textContent='Ошибка санкции: '+error.message}
+ });
+ sanctions.querySelector('.owner-sanctions-list').addEventListener('click',async()=>{
+  const results=sanctions.querySelector('.owner-sanctions-results');results.replaceChildren();
+  try{
+   const records=await rpc('game_owner_sanctions',{p_player:null});
+   for(const record of records){const p=document.createElement('p');p.textContent='#'+record.id+' · '+record.player+' · '+record.scope+' · до '+new Date(record.ends_at).toLocaleString('ru-RU')+(record.revoked_at?' · отменена':'')+' · '+record.reason;results.append(p)}
+   if(!records.length)results.textContent='Санкций нет';
+  }catch(error){status.textContent=error.message}
+ });
+ sanctions.querySelector('.owner-revoke-form').addEventListener('submit',async e=>{
+  e.preventDefault();const el=e.currentTarget.elements;
+  if(!confirm('Отменить санкцию №'+el.id.value+'?'))return;
+  try{await rpc('game_owner_revoke_sanction',{p_id:Number(el.id.value),p_reason:el.reason.value.trim()});status.textContent='Санкция отменена'}
+  catch(error){status.textContent=error.message}
+ });
+ sanctions.querySelector('.owner-settings-form').addEventListener('submit',async e=>{
+  e.preventDefault();const el=e.currentTarget.elements,key=el.key.value,raw=el.value.value.trim();
+  let value=raw;
+  if(key==='chat_slow_mode_seconds'){value=Number(raw);if(!Number.isInteger(value)||value<0||value>300){status.textContent='Введите целое число 0–300';return}}
+  if(key==='events_enabled'){if(raw!=='true'&&raw!=='false'){status.textContent='Введите true или false';return}value=raw==='true'}
+  if(!confirm('Сохранить настройку «'+key+'»?'))return;
+  try{await rpc('game_owner_set_setting',{p_key:key,p_value:value,p_reason:el.reason.value.trim()});status.textContent='Настройка сохранена'}
+  catch(error){status.textContent=error.message}
+ });
+
+
  const buildings=document.createElement('section');buildings.className='owner-project-center';
  buildings.innerHTML='<h4>🏗️ Управление стройками</h4><form class="owner-project-search"><label>Город<select name="city"><option value="">Все города</option></select></label><button>Показать проекты</button></form><div class="owner-project-list"></div><form class="owner-project-action"><label>ID проекта<input name="project" inputmode="numeric" required></label><label>Действие<select name="action"><option value="rename">Переименовать</option><option value="set_cost">Изменить стоимость</option><option value="complete">Завершить строительство</option><option value="set_upgrade">Установить уровень 1–5</option></select></label><label>Новое значение (кроме завершения)<input name="value"></label><label>Причина<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Применить с подтверждением</button></form>';
  center.append(buildings);
