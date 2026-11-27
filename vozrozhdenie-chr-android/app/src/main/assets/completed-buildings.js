@@ -29,8 +29,30 @@
     const tile=document.createElement('div');tile.className='completed-tile';
     const emoji=document.createElement('span');emoji.className='completed-icon';emoji.textContent=icon(building.title);
     const title=document.createElement('span');title.textContent=building.title;
-    const caption=document.createElement('small');caption.textContent='Участников: '+Number(building.workers).toLocaleString('ru-RU');
-    tile.append(emoji,title,caption);map.append(tile);
+    const caption=document.createElement('small');caption.textContent='Ур. '+building.upgrade_level+'/5 · участников: '+Number(building.workers).toLocaleString('ru-RU');
+    tile.append(emoji,title,caption);
+    if(building.next_upgrade_cost!==null){
+     const bar=document.createElement('progress');bar.max=Number(building.next_upgrade_cost);bar.value=Number(building.upgrade_progress);bar.setAttribute('aria-label','Прогресс улучшения');
+     const info=document.createElement('small');info.textContent=Number(building.upgrade_progress).toLocaleString('ru-RU')+' / '+Number(building.next_upgrade_cost).toLocaleString('ru-RU')+' очков';
+     const form=document.createElement('form');form.className='completed-upgrade-form';
+     const input=document.createElement('input');input.type='number';input.min='1';input.max=String(Math.min(100000,Number(building.next_upgrade_cost)-Number(building.upgrade_progress)));input.value='1';input.required=true;input.setAttribute('aria-label','Очки для улучшения');
+     const button=document.createElement('button');button.type='submit';button.textContent='Улучшить';
+     form.append(input,button);
+     form.addEventListener('submit',async event=>{
+      event.preventDefault();
+      const points=Number(input.value);
+      if(!Number.isSafeInteger(points)||points<1||points>Number(input.max)){status.textContent='Недопустимый размер вклада';return}
+      button.disabled=true;
+      try{
+       await rpc('city_upgrade_building',{p_project_id:building.building_id,p_points:points},session.access_token,cfg);
+       status.textContent='Очки на улучшение приняты';
+       await load();
+      }catch(e){status.textContent='Не удалось улучшить здание: '+e.message}
+      finally{button.disabled=false}
+     });
+     tile.append(bar,info,form);
+    }
+    map.append(tile);
    }
    status.textContent=me[0].city_name+' · построено '+buildings.length+' из 100 объектов';
    if(!buildings.length){const empty=document.createElement('p');empty.textContent='Здесь появятся здания, которые жители достроят вместе.';map.append(empty)}
