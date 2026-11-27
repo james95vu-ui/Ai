@@ -4,3 +4,14 @@
 .owner-item form,.owner-item label{display:grid;gap:8px}.owner-item textarea{min-height:80px;padding:10px;border:1px solid #bca26d;border-radius:9px;background:#101c26;color:white}
 .owner-panel button{min-height:42px;padding:9px;margin:4px 0;border:0;border-radius:9px;background:#d5b879;color:#16372e;font-weight:700}
 .owner-panel button:disabled{opacity:.5}
+
+.owner-control-center{border-bottom:1px solid #bca26d77;padding:8px 0 16px}
+.owner-control-center h4{margin:14px 0 8px;color:#edce8f}
+.owner-control-center form,.owner-control-center label{display:grid;gap:8px;margin:10px 0}
+.owner-control-center input,.owner-control-center select,.owner-control-center textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid #bca26d;border-radius:9px;background:#101c26;color:white;font-size:15px}
+.owner-control-center textarea{min-height:75px}
+.owner-players{display:grid;gap:6px}
+.owner-players button{text-align:left;overflow-wrap:anywhere}
+.owner-stats,.owner-audit{font-size:13px;overflow-wrap:anywhere}
+.owner-cities{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:4px}
+.owner-cities p{margin:3px 0}
