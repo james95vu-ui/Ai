@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="update-03.css">
 <link rel="stylesheet" href="new-era.css">
 <link rel="stylesheet" href="walk.css">
+<link rel="stylesheet" href="city-theme.css">
 <style>
 .stats::before{display:none!important}
 #intro{position:fixed;inset:0;z-index:9999;overflow-y:auto;background:linear-gradient(180deg,#102d27,#071b18);color:#fff4df;display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box}
@@ -58,12 +59,12 @@
 <header><small>ВОЗРОЖДЕНИЕ · ЧЕЧЕНСКАЯ РЕСПУБЛИКА</small><h1 id="city">Твой город</h1><select id="cities" aria-label="Город"></select><button id="join">Перейти</button><p id="route"></p></header>
 <section class="stats"><div class="balance">Баланс<strong id="coins"></strong></div><div>Доход / час<strong id="income"></strong></div><div>Уровень<strong id="level"></strong></div><div>Вклад<strong id="contribution"></strong></div></section>
 <section id="town"><h2>Живой город</h2><div class="development">
-  <p id="development-text"></p>
+  <div class="development-heading"><p id="development-text"></p><span id="development-stage"></span></div>
   <progress id="city-development" max="1" value="0" aria-label="Развитие города"></progress>
   <button id="walk" type="button">Прогулка 3D</button>
   <button id="next-city" type="button" hidden></button>
 </div><div class="landscape"><svg viewBox="0 0 360 100" preserveAspectRatio="none"><rect width="360" height="100" fill="#bce0c7"/><circle cx="292" cy="24" r="17" fill="#ffe3a1"/><path d="M0 100V75L65 14 112 67 178 4 260 77 310 33 360 74V100Z" fill="#759e8a"/><path d="M0 100V85L80 50 145 87 240 44 360 90V100Z" fill="#4d806a"/></svg><div id="map"></div></div><div id="details"></div></section>
-<section id="earn"><h2>Заработок</h2><div class="tapwrap"><button id="tap"><span>◉</span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><div class="passive-income">
+<section id="earn"><h2>Заработок</h2><div class="tapwrap"><button id="tap"><span class="tap-emblem" aria-hidden="true"></span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><div class="passive-income">
   <div><strong>Пассивный доход</strong><span id="income-next"></span></div>
   <progress id="income-progress" aria-label="Прогресс до следующей монеты" max="1" value="0"></progress>
   <p id="offline"></p>

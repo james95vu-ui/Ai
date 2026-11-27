@@ -1,0 +1,60 @@
+:root {
+  --green: #a6ead8;
+  --gold: #f2ca84;
+  --muted: #b9cbd0;
+  --line: #8cd6c72c;
+}
+body { background: radial-gradient(ellipse at top, #203d42, #101b24 640px); }
+main > header, main > section:not(.stats) {
+  background: linear-gradient(145deg, #233942, #14262d);
+}
+main > header { border-left: 3px solid #7fb9aa; }
+.stats.chr-sticky-stats { background: #14262d; }
+.stats.chr-sticky-stats > div { background: #223b43; }
+.stats.chr-sticky-stats .balance { background: linear-gradient(135deg, #493c2b, #37514f); }
+.stats.chr-sticky-stats .balance strong { color: #ffdf9c; }
+.development-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+#development-stage { color: #a6ead8; font-size: .77rem; font-weight: 700; }
+#town[data-level="9"] #development-stage, #town[data-level="10"] #development-stage { color: var(--gold); }
+#city-development, #income-progress, #bar { accent-color: #89d0bb; }
+.tapwrap {
+  background: radial-gradient(ellipse at center, #5db7b933, transparent 66%);
+}
+#tap {
+  position: relative;
+  isolation: isolate;
+  border: 2px solid #d1ae68;
+  background: radial-gradient(circle at 50% 40%, #3e6264, #1b373e 60%, #152832);
+  box-shadow: 0 6px #725632, inset 0 0 0 5px #d1ae6833, 0 0 28px #65b7b23b;
+  color: #ffe1a2;
+  gap: 8px;
+}
+#tap::before {
+  position: absolute;
+  inset: 9px;
+  border: 1px solid #8fdcc65c;
+  border-radius: 50%;
+  content: "";
+  z-index: -1;
+}
+#tap .tap-emblem {
+  width: 46px;
+  height: 46px;
+  transform: rotate(45deg);
+  border: 1px solid #bdeee0;
+  border-radius: 9px;
+  background: conic-gradient(from 35deg, #9de9d2, #4caaa5, #1d6475, #83d2c4, #c0f5de, #9de9d2);
+  box-shadow: 0 0 18px #7ee5cc73, inset 0 0 8px #cfffe0;
+  margin: 3px 0 8px;
+}
+#tap small { color: #b8e8d7; }
+#pop span { color: #fff2c2; }
+.passive-income, nav { background: #11232c; }
+.walk-header { background: linear-gradient(#122731f0, #12273100); }
+.walk-pad button { background: #d2ede2; color: #203a3b; }

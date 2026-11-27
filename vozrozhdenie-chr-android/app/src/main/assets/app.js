@@ -61,6 +61,8 @@ function showCampaign() {
   $('next-city').textContent = nextCity ? 'Перейти: ' + nextCity : '';
   $('walk').disabled = !s.city;
   $('town').dataset.level = s.level;
+  $('development-stage').textContent = s.level >= 9 ? 'Новый город'
+    : s.level >= 6 ? 'Рост' : s.level >= 3 ? 'Обновление' : 'Восстановление';
 }
 
 function renderCityOptions() {
