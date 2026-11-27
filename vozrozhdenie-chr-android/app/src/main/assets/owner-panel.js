@@ -3,7 +3,12 @@
  const root=document.createElement('section');
  root.className='owner-panel';root.hidden=true;
  root.innerHTML='<h3>🛡️ Панель владельца</h3><p class="owner-status" role="status">Проверка полномочий…</p><button type="button" class="owner-refresh">Обновить жалобы и апелляции</button><div class="owner-queue"></div>';
- const town=document.getElementById('town');if(!town)return;town.append(root);
+ const town=document.getElementById('town');if(!town)return;
+ const main=document.querySelector('main');const nav=document.querySelector('.game-nav');
+ const screen=document.createElement('section');screen.id='owner-admin';screen.dataset.screen='';screen.hidden=true;screen.className='owner-admin-screen';
+ screen.append(root);main.append(screen);
+ const tab=document.createElement('button');tab.type='button';tab.dataset.go='owner-admin';tab.setAttribute('aria-controls','owner-admin');tab.innerHTML='<span aria-hidden="true">🛡</span>Админ';tab.hidden=true;nav.append(tab);
+ let lastToken='';
 
  const center=document.createElement('div');center.className='owner-control-center';
  center.innerHTML='<h4>Центр управления</h4><div class="owner-stats"></div><form class="owner-search"><label>Найти игрока по email или UUID<input name="query" required minlength="3"></label><button>Найти</button></form><div class="owner-players"></div><form class="owner-action"><label>Действие<select name="action"><option value="add_coins">Добавить / списать монеты</option><option value="set_coins">Установить баланс монет</option><option value="add_materials">Добавить / списать материалы</option><option value="set_materials">Установить материалы</option><option value="appoint_mayor">Назначить мэра</option><option value="announce">Опубликовать объявление</option><option value="close_announcement">Закрыть объявление</option></select></label><label>Игрок UUID / заголовок / ID объявления<input name="target" required></label><label>Количество / текст объявления<input name="value"></label><label>Причина действия<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Выполнить с подтверждением</button></form><h4>Последние действия</h4><button type="button" class="owner-audit-refresh">Показать журнал</button><div class="owner-audit"></div>';
@@ -154,12 +159,12 @@
  }
  async function load(){
   if(busy||document.hidden)return;
-  if(!auth()){root.hidden=true;return}
+  if(!auth()){root.hidden=true;tab.hidden=true;if(!screen.hidden){nav.querySelector('[data-go="town"]')?.click()}return}
   busy=true;refresh.disabled=true;
   try{
    const isOwner=await rpc('game_is_owner',{});
-   if(!isOwner){root.hidden=true;queue.replaceChildren();return}
-   root.hidden=false;
+   if(!isOwner){root.hidden=true;tab.hidden=true;queue.replaceChildren();if(!screen.hidden){nav.querySelector('[data-go="town"]')?.click()}return}
+   root.hidden=false;tab.hidden=false;
    await loadStats();
    if(!citySelector.options.length||citySelector.options.length===1)await loadProjectCities();
    const items=await rpc('game_owner_queue',{});
@@ -194,7 +199,8 @@
   finally{busy=false;refresh.disabled=false}
  }
  refresh.addEventListener('click',load);
- document.querySelector('[data-go="town"]')?.addEventListener('click',()=>setTimeout(load,0));
+ tab.addEventListener('click',()=>setTimeout(load,0));
  window.addEventListener('online',load);
- if(!town.hidden)load();
+ load();
+ window.setInterval(()=>{const token=auth()?.session?.access_token||'';if(token!==lastToken){lastToken=token;load()}},10000);
 })();
