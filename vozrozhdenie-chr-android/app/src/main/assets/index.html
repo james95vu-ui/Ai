@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Возрождение — Чеченская Республика</title>
 <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="new-era.css">
 <link rel="stylesheet" href="update-03.css">
+<link rel="stylesheet" href="new-era.css">
 <style>
 .stats::before{display:none!important}
 #intro{position:fixed;inset:0;z-index:9999;overflow-y:auto;background:linear-gradient(180deg,#102d27,#071b18);color:#fff4df;display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box}
@@ -15,7 +15,6 @@
 .intro-art{height:210px;background:linear-gradient(#183d38,#3f7768);overflow:hidden}
 .intro-art svg{width:100%;height:100%;display:block}
 .intro-content{padding:24px 24px 28px;text-align:center}
-.intro-ornament{color:#dfbe77;letter-spacing:6px;font-size:15px;margin:0 0 12px}
 .intro-content h1{font-family:Georgia,serif;font-size:clamp(29px,7vw,40px);letter-spacing:2px;margin:0;color:#fff8e9}
 .intro-subtitle{font-family:Georgia,serif;color:#e9c77d;font-size:clamp(15px,4vw,20px);letter-spacing:1px;margin:6px 0 12px}
 .intro-description{color:#c4d8cf;font-size:14px;margin:0 0 22px}
@@ -42,7 +41,7 @@
       </svg>
     </div>
     <div class="intro-content">
-      <p class="intro-ornament">✦ ◇ ✦ ◇ ✦</p>
+      
       <h1>ВОЗРОЖДЕНИЕ</h1>
       <p class="intro-subtitle">ЧЕЧЕНСКАЯ РЕСПУБЛИКА</p>
       <p class="intro-description">Твоя история начинается здесь</p>
@@ -56,10 +55,14 @@
   </div>
 </div>
 <main>
-<header><small>ВОЗРОЖДЕНИЕ · ЧЕЧЕНСКАЯ РЕСПУБЛИКА</small><h1 id="city">Твой город</h1><select id="cities"></select><button id="join">Выбрать город</button></header>
-<section class="stats"><div>Монеты<strong id="coins"></strong></div><div>Доход / час<strong id="income"></strong></div><div>Уровень<strong id="level"></strong></div><div>Вклад<strong id="contribution"></strong></div></section>
+<header><small>ВОЗРОЖДЕНИЕ · ЧЕЧЕНСКАЯ РЕСПУБЛИКА</small><h1 id="city">Твой город</h1><select id="cities" aria-label="Город"></select><button id="join">Выбрать город</button></header>
+<section class="stats"><div class="balance">Баланс<strong id="coins"></strong></div><div>Доход / час<strong id="income"></strong></div><div>Уровень<strong id="level"></strong></div><div>Вклад<strong id="contribution"></strong></div></section>
 <section id="town"><h2>Живой город</h2><p>Выбери участок для строительства</p><div class="landscape"><svg viewBox="0 0 360 100" preserveAspectRatio="none"><rect width="360" height="100" fill="#bce0c7"/><circle cx="292" cy="24" r="17" fill="#ffe3a1"/><path d="M0 100V75L65 14 112 67 178 4 260 77 310 33 360 74V100Z" fill="#759e8a"/><path d="M0 100V85L80 50 145 87 240 44 360 90V100Z" fill="#4d806a"/></svg><div id="map"></div></div><div id="details"></div></section>
-<section id="earn"><h2>Заработок</h2><div class="tapwrap"><button id="tap"><span>◉</span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop"></div></div><div id="combo"></div><progress id="bar" max="10" value="0"></progress><button id="upgrade"></button><p id="offline"></p></section>
+<section id="earn"><h2>Заработок</h2><div class="tapwrap"><button id="tap"><span>◉</span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><div class="passive-income">
+  <div><strong>Пассивный доход</strong><span id="income-next"></span></div>
+  <progress id="income-progress" aria-label="Прогресс до следующей монеты" max="1" value="0"></progress>
+  <p id="offline"></p>
+</div></section>
 <section id="quests"><h2>Ежедневные задания</h2><div id="tasks"></div></section>
 <section id="team"><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><button id="refresh">Обновить рейтинг</button><div id="ranking"></div></section>
 <p id="notice" role="status"></p>

@@ -18,7 +18,12 @@ let audioCtx,osc,gain;function ctx(){try{return audioCtx||(audioCtx=new(window.A
 function sound(){if(!settings.sound||!settings.volume)return;const a=ctx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type='sine';o.frequency.setValueAtTime(640,t);o.frequency.exponentialRampToValueAtTime(900,t+.09);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.001,settings.volume/100*.055),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.13)}catch(e){}}
 function updateMusic(){if(!settings.music||!settings.volume||document.hidden){if(osc){try{osc.stop()}catch(e){}osc.disconnect();osc=null}return}const a=ctx();if(!a||osc)return;try{osc=a.createOscillator();gain=a.createGain();osc.type='sine';osc.frequency.value=174.61;gain.gain.value=settings.volume/100*.008;osc.connect(gain).connect(a.destination);osc.start()}catch(e){osc=null}}
 document.addEventListener('visibilitychange',updateMusic);
-const tap=$('tap');tap.addEventListener('click',()=>{sound();if(settings.vibration&&navigator.vibrate)navigator.vibrate(12)});
+$('tap').addEventListener('click', () => {
+  sound();
+  if (!settings.vibration) return;
+  if (window.CityHaptics) window.CityHaptics.tap();
+  else navigator.vibrate?.(16);
+});
 $('join').addEventListener('click',sound);$('upgrade').addEventListener('click',sound);
 const oldKey='vozrozhdenie_demo_v1';
 const awards=[['Первый шаг','Выбери город',s=>!!s.city],['Строитель','Построй первое здание',s=>(s.built||[]).length>=1],['Архитектор','Построй 5 зданий',s=>(s.built||[]).length>=5],['Мастер дохода','Достигни 500 монет в час',s=>s.income>=500],['Герой города','Достигни 5 уровня',s=>s.level>=5],['Тысяча вкладов','Набери 1000 очков вклада',s=>s.contribution>=1000]];
