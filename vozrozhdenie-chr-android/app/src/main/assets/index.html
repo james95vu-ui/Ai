@@ -78,7 +78,7 @@
   <h3>Сундук</h3><p>250 монет (65%) · 400 и 12 энергии (25%) · 800 и 25 энергии (10%). Бесплатно раз в 4 часа.</p>
   <button id="chest" type="button"></button>
 </div></section>
-<section id="team" data-screen hidden><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><button id="refresh">Обновить рейтинг</button><div id="ranking"></div>
+<section id="team" data-screen hidden><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><button id="refresh">Обновить рейтинг</button><div id="ranking"></div><div class="tycoon-card"><h3>🏆 Лучшие игроки</h3><p id="player-ranking-status">Для рейтинга игроков требуется подтверждённый онлайн-вход.</p><button id="player-ranking-refresh" type="button">Обновить игроков</button><div id="player-ranking" aria-live="polite"></div></div>
 <div class="tycoon-card" id="social">
   <h3>Сообщество</h3>
   <p id="social-status" role="status"></p>
@@ -171,6 +171,7 @@
 <script src="app.js"></script>
 <script src="game-screens.js"></script>
 <script src="social.js"></script>
+<script src="player-ranking.js"></script>
 <script>
 (function(){
 'use strict';
