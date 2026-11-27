@@ -126,3 +126,37 @@
 @media (prefers-reduced-motion: reduce) {
   .game-screens > section, .game-screens .tap-emblem { animation: none; }
 }
+
+.energy-status { display: flex; justify-content: space-between; color: #a6ead8; font-size: .82rem; }
+#energy-bar { accent-color: #e0b971; }
+.tycoon-card {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #142831;
+}
+.tycoon-card h3 { margin: 0 0 7px; }
+.game-screens #details { flex-wrap: wrap; justify-content: flex-start; }
+.game-screens #details p { flex: 1 0 min(100%, 165px); }
+#social form { display: grid; gap: 6px; margin: 9px 0; padding: 8px 0; }
+#social [hidden] { display: none; }
+#social label { display: grid; gap: 4px; font-size: .8rem; color: var(--muted); }
+#social input, #social select {
+  width: 100%; max-width: none; min-height: 36px; padding: 7px 9px;
+  font: inherit; font-size: max(16px, 1rem); color: #f7f5e8; background: #102229;
+  border: 1px solid var(--line); border-radius: 7px;
+}
+#social button { min-height: 36px; margin: 4px 4px 4px 0; padding: 6px 9px; font-size: .77rem; }
+#social .social-tabs button[aria-pressed="true"] { background: #edca8c; color: #18302e; }
+.social-row { padding: 5px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.social-row p { margin: 5px 0; }
+#chat-messages { max-height: 235px; overflow: auto; overscroll-behavior: contain; }
+@media (prefers-reduced-motion: no-preference) {
+  .game-nav button { transition: color .18s ease, background-color .18s ease, box-shadow .18s ease; }
+  .game-screens .tycoon-card { animation: tycoon-card-enter .25s ease-out both; }
+  @keyframes tycoon-card-enter {
+    from { opacity: .35; translate: 0 5px; }
+    to { opacity: 1; translate: 0; }
+  }
+}
