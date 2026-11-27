@@ -26,13 +26,13 @@ async function load(){
  if(!room||loading||document.hidden||town.hidden)return;
  loading=true;
  try{
-  const rows=await request('game_public_messages?select=id,author,body,created_at&room_id=eq.'+room+'&hidden=eq.false&order=created_at.desc&limit=50');
+  const rows=await request('rpc/game_chat_messages',{p_room_id:room,p_limit:50});
   list.replaceChildren();
   for(const item of rows.reverse()){
    const p=document.createElement('p'),strong=document.createElement('strong'),text=document.createElement('span');
-   strong.textContent=item.author.slice(0,8)+' · ';text.textContent=item.body;
+   strong.textContent=item.author_name+' · ';text.textContent=item.body;
    const report=document.createElement('button');report.type='button';report.textContent='Пожаловаться';
-   report.addEventListener('click',async()=>{const reason=prompt('Причина жалобы (15–1000 символов):');if(reason===null)return;if(reason.trim().length<15){status.textContent='Минимум 15 символов';return}if(!confirm('Отправить жалобу?'))return;try{await request('rpc/game_report_public_message',{p_message_id:item.id,p_reason:reason.trim()});status.textContent='Жалоба отправлена'}catch(e){status.textContent=e.message}});
+   report.addEventListener('click',async()=>{const reason=prompt('Причина жалобы (15–1000 символов):');if(reason===null)return;if(reason.trim().length<15){status.textContent='Минимум 15 символов';return}if(!confirm('Отправить жалобу?'))return;try{await request('rpc/game_report_public_message',{p_message_id:item.message_id,p_reason:reason.trim()});status.textContent='Жалоба отправлена'}catch(e){status.textContent=e.message}});
    p.append(strong,text,report);list.append(p);
   }
   list.scrollTop=list.scrollHeight;
