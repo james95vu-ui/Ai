@@ -4,7 +4,7 @@
  if(!town)return;
  const root=document.createElement('section');
  root.className='community-build';
- root.innerHTML='<h3>🏗️ Общие стройки</h3><p class="build-status" role="status">Войди в онлайн-аккаунт для совместного строительства.</p><div class="build-controls"><label>Объект <select class="build-project"></select></label><div class="build-progress" hidden><progress max="100" value="0"></progress><p class="build-details"></p></div><form class="build-form"><label>Вложить заработанные очки <input type="number" min="1" max="100000" value="1" required></label><button type="submit">Внести вклад</button></form><button type="button" class="build-refresh">Обновить стройки</button></div>';
+ root.innerHTML='<h3>🏗️ Общие стройки</h3><p class="build-status" role="status">Войди в онлайн-аккаунт для совместного строительства.</p><div class="build-controls"><label>Объект <select class="build-project"></select></label><div class="build-progress" hidden><progress max="100" value="0"></progress><p class="build-details"></p></div><form class="build-form"><label>Вложить заработанные очки <input type="number" min="1" max="100000" value="1" required></label><button type="submit">Внести вклад</button></form><button type="button" class="build-refresh">Обновить стройки</button><button type="button" class="build-open-chat">💬 Чат выбранной стройки</button></div>';
  town.append(root);
  const status=root.querySelector('.build-status'),select=root.querySelector('.build-project'),details=root.querySelector('.build-details'),bar=root.querySelector('progress'),progress=root.querySelector('.build-progress'),form=root.querySelector('.build-form'),refreshButton=root.querySelector('.build-refresh');
  const key='vozrozhdenie_social_session_v1',fmt=n=>Number(n).toLocaleString('ru-RU');
@@ -41,6 +41,7 @@
   finally{busy=false;refreshButton.disabled=false}
  }
  select.addEventListener('change',display);
+ root.querySelector('.build-open-chat').addEventListener('click',()=>{const item=rows.find(p=>String(p.project_id)===select.value);if(!item){status.textContent='Сначала выбери проект';return}if(typeof window.openCityProjectChat==='function')window.openCityProjectChat(item.project_id);else status.textContent='Чат ещё загружается'});
  refreshButton.addEventListener('click',load);
  form.addEventListener('submit',async event=>{
   event.preventDefault();if(busy)return;
