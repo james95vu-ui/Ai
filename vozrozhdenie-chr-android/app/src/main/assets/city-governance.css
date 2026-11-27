@@ -1,0 +1,8 @@
+.city-governance{margin:14px 12px;padding:15px;border:1px solid #c9ab7099;border-radius:17px;background:#153b32;color:#fff0d5}
+.city-governance h3{margin:0;color:#eacb8a}.city-governance h4{margin:10px 0;font-size:14px}
+.governance-status{font-size:13px}.city-governance form{display:grid;gap:8px;margin:12px 0}
+.city-governance label{display:grid;gap:5px;font-size:13px}
+.city-governance input,.city-governance textarea{box-sizing:border-box;width:100%;padding:10px;border:1px solid #c9ab70;border-radius:9px;background:#0b241e;color:white;font-size:15px}
+.city-governance textarea{min-height:84px;resize:vertical}
+.city-governance button{min-height:43px;border:0;border-radius:9px;background:#d5b879;color:#16372e;font-weight:700}
+.city-governance button:disabled{opacity:.5}
