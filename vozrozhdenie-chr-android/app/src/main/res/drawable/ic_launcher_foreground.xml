@@ -1,4 +1,4 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+vozrozhdenie-chr-android/<vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
     <path android:fillColor="#F4D77D" android:pathData="M68,22a14,14 0,1 0,0.1 0z"/>
     <path android:fillColor="#E7B95C" android:pathData="M68,11a25,25 0,0 0,-22 37a22,22 0,0 1,32 -29a24,24 0,0 0,-10 -8z"/>
