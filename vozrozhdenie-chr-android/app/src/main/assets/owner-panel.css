@@ -1,0 +1,6 @@
+.owner-panel{margin:14px 12px;padding:15px;border:2px solid #bca26d;border-radius:17px;background:#1a2934;color:#fff3dd}
+.owner-panel[hidden]{display:none!important}.owner-panel h3{margin:0 0 8px;color:#edce8f}
+.owner-status,.owner-item{font-size:13px}.owner-item{border:1px solid #bca26d77;border-radius:12px;padding:12px;margin:12px 0}
+.owner-item form,.owner-item label{display:grid;gap:8px}.owner-item textarea{min-height:80px;padding:10px;border:1px solid #bca26d;border-radius:9px;background:#101c26;color:white}
+.owner-panel button{min-height:42px;padding:9px;margin:4px 0;border:0;border-radius:9px;background:#d5b879;color:#16372e;font-weight:700}
+.owner-panel button:disabled{opacity:.5}
