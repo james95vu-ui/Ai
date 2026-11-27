@@ -1,0 +1,15 @@
+
+/* Update 0.3: compact always-visible metrics and touch-safe tapping */
+.stats.chr-sticky-stats{
+  position:sticky;top:0;z-index:60;
+  background:#102d27;
+  border:1px solid #bca16a66;
+  border-radius:12px;
+  box-shadow:0 5px 18px #0005;
+  padding:8px 6px;
+}
+.stats.chr-sticky-stats>div{min-width:0;font-size:11px}
+.stats.chr-sticky-stats strong{display:block;font-size:clamp(13px,3.4vw,19px);overflow-wrap:anywhere}
+#tap{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.chr-reset{background:#87352f!important;color:white!important;border:1px solid #e1a6a0!important;margin-top:10px}
+.chr-ranking-hint{font-size:12px;opacity:.8}
