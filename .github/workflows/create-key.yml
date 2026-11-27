@@ -1,0 +1,31 @@
+
+name: Create Android Signing Key
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate keystore
+        run: |
+          keytool -genkeypair \
+            -keystore signing.jks \
+            -alias vozrozhdenie \
+            -keyalg RSA \
+            -keysize 3072 \
+            -validity 10000 \
+            -storepass "$STORE_PASS" \
+            -keypass "$STORE_PASS" \
+            -dname "CN=Vozrozhdenie CHR"
+        env:
+          STORE_PASS: ${{ secrets.APK_KEYSTORE_PASSWORD }}
+
+      - name: Upload keystore
+        uses: actions/upload-artifact@v4
+        with:
+          name: signing-keystore
+          path: signing.jks
+          retention-days: 1
+          
