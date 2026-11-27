@@ -9,6 +9,39 @@
  center.innerHTML='<h4>Центр управления</h4><div class="owner-stats"></div><form class="owner-search"><label>Найти игрока по email или UUID<input name="query" required minlength="3"></label><button>Найти</button></form><div class="owner-players"></div><form class="owner-action"><label>Действие<select name="action"><option value="add_coins">Добавить / списать монеты</option><option value="set_coins">Установить баланс монет</option><option value="add_materials">Добавить / списать материалы</option><option value="set_materials">Установить материалы</option><option value="appoint_mayor">Назначить мэра</option><option value="announce">Опубликовать объявление</option><option value="close_announcement">Закрыть объявление</option></select></label><label>Игрок UUID / заголовок / ID объявления<input name="target" required></label><label>Количество / текст объявления<input name="value"></label><label>Причина действия<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Выполнить с подтверждением</button></form><h4>Последние действия</h4><button type="button" class="owner-audit-refresh">Показать журнал</button><div class="owner-audit"></div>';
  root.insertBefore(center,root.querySelector('.owner-queue'));
 
+ const buildings=document.createElement('section');buildings.className='owner-project-center';
+ buildings.innerHTML='<h4>🏗️ Управление стройками</h4><form class="owner-project-search"><label>Город<select name="city"><option value="">Все города</option></select></label><button>Показать проекты</button></form><div class="owner-project-list"></div><form class="owner-project-action"><label>ID проекта<input name="project" inputmode="numeric" required></label><label>Действие<select name="action"><option value="rename">Переименовать</option><option value="set_cost">Изменить стоимость</option><option value="complete">Завершить строительство</option><option value="set_upgrade">Установить уровень 1–5</option></select></label><label>Новое значение (кроме завершения)<input name="value"></label><label>Причина<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Применить с подтверждением</button></form>';
+ center.append(buildings);
+ const citySelector=buildings.querySelector('select[name="city"]'),projectList=buildings.querySelector('.owner-project-list'),projectForm=buildings.querySelector('.owner-project-action');
+ async function loadProjectCities(){
+  const data=await rpc('game_owner_dashboard',{});
+  citySelector.replaceChildren();const all=document.createElement('option');all.value='';all.textContent='Все города';citySelector.append(all);
+  for(const city of data.cities){const option=document.createElement('option');option.value=city.id;option.textContent=city.name;citySelector.append(option)}
+ }
+ buildings.querySelector('.owner-project-search').addEventListener('submit',async e=>{
+  e.preventDefault();projectList.replaceChildren();
+  try{
+   const projects=await rpc('game_owner_projects',{p_city_id:citySelector.value||null});
+   for(const p of projects){
+    const button=document.createElement('button');button.type='button';
+    button.textContent='#'+p.project_id+' · '+p.title+' · '+p.contributed_points+'/'+p.required_points+' · улучшение '+p.upgrade_level;
+    button.addEventListener('click',()=>{projectForm.elements.project.value=p.project_id});projectList.append(button)
+   }
+   status.textContent='Загружено проектов: '+projects.length;
+  }catch(error){status.textContent=error.message}
+ });
+ projectForm.addEventListener('submit',async e=>{
+  e.preventDefault();const fields=e.currentTarget.elements;
+  const action=fields.action.value,id=Number(fields.project.value),value=fields.value.value.trim(),reason=fields.reason.value.trim();
+  if(!Number.isSafeInteger(id)||id<1){status.textContent='Неверный ID проекта';return}
+  if(!confirm('Подтвердить изменение проекта #'+id+'? Это повлияет на общий город.'))return;
+  try{
+   const result=await rpc('game_owner_project_action',{p_project_id:id,p_action:action,p_value:value,p_reason:reason});
+   status.textContent='Проект обновлён: '+JSON.stringify(result);
+  }catch(error){status.textContent='Ошибка: '+error.message}
+ });
+
+
  const moderation=document.createElement('section');moderation.className='owner-room-center';
  moderation.innerHTML='<h4>💬 Комнаты и модерация</h4><button type="button" class="owner-load-rooms">Обновить список комнат</button><div class="owner-room-list"></div><div class="owner-room-messages"></div><form class="owner-room-action"><label>Комната ID<input name="room" required inputmode="numeric"></label><label>Действие<select name="action"><option value="disable_room">Закрыть комнату</option><option value="enable_room">Открыть комнату</option><option value="hide_message">Скрыть сообщение</option><option value="mute_player">Ограничить сообщения игрока</option><option value="unmute_player">Снять ограничение</option></select></label><label>ID сообщения / UUID игрока / UUID:часы<input name="subject"></label><label>Причина<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Применить с подтверждением</button></form>';
  center.append(moderation);
@@ -93,6 +126,7 @@
    if(!isOwner){root.hidden=true;queue.replaceChildren();return}
    root.hidden=false;
    await loadStats();
+   if(!citySelector.options.length||citySelector.options.length===1)await loadProjectCities();
    const items=await rpc('game_owner_queue',{});
    queue.replaceChildren();
    status.textContent=items.length?'На проверке: '+items.length:'Нет жалоб и апелляций на проверке';
