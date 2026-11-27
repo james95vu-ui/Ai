@@ -28,3 +28,8 @@
 .owner-sanctions-center input,.owner-sanctions-center select,.owner-sanctions-center textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid #bca26d;border-radius:9px;background:#101c26;color:white}
 .owner-sanctions-center textarea{min-height:75px}
 .owner-sanctions-results{max-height:250px;overflow-y:auto;font-size:12px;overflow-wrap:anywhere}
+
+.owner-admin-screen[hidden],.game-nav [data-go="owner-admin"][hidden]{display:none!important}
+.owner-admin-screen{padding:10px 0 90px;min-height:60vh}
+.owner-admin-screen .owner-panel{margin:8px 12px}
+.game-nav [data-go="owner-admin"]{color:#f3d48d}
