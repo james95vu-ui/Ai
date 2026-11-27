@@ -14,6 +14,36 @@
  center.innerHTML='<h4>Центр управления</h4><div class="owner-stats"></div><form class="owner-search"><label>Найти игрока по email или UUID<input name="query" required minlength="3"></label><button>Найти</button></form><div class="owner-players"></div><form class="owner-action"><label>Действие<select name="action"><option value="add_coins">Добавить / списать монеты</option><option value="set_coins">Установить баланс монет</option><option value="add_materials">Добавить / списать материалы</option><option value="set_materials">Установить материалы</option><option value="appoint_mayor">Назначить мэра</option><option value="announce">Опубликовать объявление</option><option value="close_announcement">Закрыть объявление</option></select></label><label>Игрок UUID / заголовок / ID объявления<input name="target" required></label><label>Количество / текст объявления<input name="value"></label><label>Причина действия<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Выполнить с подтверждением</button></form><h4>Последние действия</h4><button type="button" class="owner-audit-refresh">Показать журнал</button><div class="owner-audit"></div>';
  root.insertBefore(center,root.querySelector('.owner-queue'));
 
+ const reports=document.createElement('section');reports.className='owner-chat-reports';
+ reports.innerHTML='<h4>🚩 Жалобы на сообщения</h4><button type="button" class="owner-chat-report-refresh">Обновить жалобы</button><div class="owner-chat-report-list"></div>';
+ center.append(reports);
+ async function loadChatReports(){
+  const list=reports.querySelector('.owner-chat-report-list');list.replaceChildren();
+  try{
+   const items=await rpc('game_owner_chat_reports',{});
+   if(!items.length){list.textContent='Новых жалоб нет';return}
+   for(const item of items){
+    const card=document.createElement('article');card.className='owner-item';
+    const description=document.createElement('p');description.textContent='Жалоба #'+item.report_id+' · Комната #'+item.room_id+' · Автор '+item.author+' · Заявитель '+item.reporter+' · Сообщение: '+item.body+' · Причина: '+item.reason;
+    const note=document.createElement('textarea');note.placeholder='Причина решения (10–1000 символов)';note.minLength=10;note.maxLength=1000;
+    const hide=document.createElement('button');hide.type='button';hide.textContent='Скрыть сообщение';
+    const reject=document.createElement('button');reject.type='button';reject.textContent='Отклонить жалобу';
+    async function decide(shouldHide){
+     if(note.value.trim().length<10){status.textContent='Напиши причину решения';return}
+     if(!confirm('Подтвердить решение по жалобе #'+item.report_id+'?'))return;
+     hide.disabled=reject.disabled=true;
+     try{await rpc('game_owner_review_chat_report',{p_report_id:item.report_id,p_hide:shouldHide,p_reason:note.value.trim()});card.remove();status.textContent='Жалоба рассмотрена'}
+     catch(error){status.textContent=error.message}
+     finally{hide.disabled=reject.disabled=false}
+    }
+    hide.addEventListener('click',()=>decide(true));reject.addEventListener('click',()=>decide(false));
+    card.append(description,note,hide,reject);list.append(card);
+   }
+  }catch(error){status.textContent='Ошибка загрузки жалоб: '+error.message}
+ }
+ reports.querySelector('.owner-chat-report-refresh').addEventListener('click',loadChatReports);
+
+
  const sanctions=document.createElement('section');sanctions.className='owner-sanctions-center';
  sanctions.innerHTML='<h4>🚫 Санкции игроков</h4><form class="owner-sanction-form"><label>UUID игрока<input name="player" required></label><label>Область<select name="scope"><option value="public_chat">Публичные чаты</option><option value="gameplay">Игровая блокировка (частичная интеграция)</option></select></label><label>Срок в часах (1–8760)<input name="hours" type="number" min="1" max="8760" value="24" required></label><label>Причина<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Назначить санкцию</button></form><button type="button" class="owner-sanctions-list">Посмотреть санкции</button><div class="owner-sanctions-results"></div><form class="owner-revoke-form"><label>ID санкции для отмены<input name="id" type="number" min="1" required></label><label>Причина отмены<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Отменить санкцию</button></form><h4>⚙️ Настройки игры</h4><form class="owner-settings-form"><label>Настройка<select name="key"><option value="welcome_message">Приветственное сообщение</option><option value="maintenance_notice">Сообщение о работах</option><option value="chat_slow_mode_seconds">Задержка чата (0–300 секунд)</option><option value="events_enabled">Игровые события (true/false)</option></select></label><label>Значение<input name="value" required></label><label>Причина<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Сохранить настройку</button></form>';
  center.append(sanctions);
@@ -166,6 +196,7 @@
    if(!isOwner){root.hidden=true;tab.hidden=true;queue.replaceChildren();if(!screen.hidden){nav.querySelector('[data-go="town"]')?.click()}return}
    root.hidden=false;tab.hidden=false;
    await loadStats();
+   await loadChatReports();
    if(!citySelector.options.length||citySelector.options.length===1)await loadProjectCities();
    const items=await rpc('game_owner_queue',{});
    queue.replaceChildren();
