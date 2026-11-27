@@ -1,6 +1,8 @@
 -- Mayor decision after ten independently validated complaints.
 -- Validation is deliberately NOT available to mayors or ordinary players.
 begin;
+alter table public.city_resident_complaints drop constraint if exists city_resident_complaints_status_check;
+alter table public.city_resident_complaints add constraint city_resident_complaints_status_check check(status in ('pending','validated','rejected','reviewed'));
 create table if not exists public.city_exile_history (
  id bigint generated always as identity primary key,
  city_id text not null references public.cities(id),
@@ -68,7 +70,7 @@ begin
  values(city_key,p_accused,actor,case when p_exile then 'exile' else 'retain' end,reports,btrim(p_note))
  returning id into history_key;
  -- Consume reviewed complaints whether mayor exiles or retains.
- update public.city_resident_complaints set status='rejected'
+ update public.city_resident_complaints set status='reviewed'
  where city_id=city_key and accused=p_accused and status='validated';
  if p_exile then
   insert into public.city_exile_bans(player,city_id,banned_until,history_id)
