@@ -2,12 +2,12 @@
   'use strict';
 
   const nav = document.querySelector('.game-nav');
-  const panels = [...document.querySelectorAll('[data-screen]')];
-  const buttons = [...nav.querySelectorAll('[data-go]')];
 
   nav.addEventListener('click', event => {
     const button = event.target.closest('[data-go]');
     if (!button || button.hasAttribute('aria-current')) return;
+    const panels = [...document.querySelectorAll('[data-screen]')];
+    const buttons = [...nav.querySelectorAll('[data-go]')];
     const target = panels.find(panel => panel.id === button.dataset.go);
     if (!target) return;
 
