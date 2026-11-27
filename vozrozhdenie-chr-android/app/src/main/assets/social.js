@@ -26,6 +26,23 @@
     return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join('-');
   }
 
+  function verification(credential) {
+    const input = credential.trim();
+    if (/^[0-9]{6,10}$/.test(input)) return {email, token: input, type: 'email'};
+
+    let link;
+    try { link = new URL(input); }
+    catch (_) { throw Error('Вставь код или скопируй адрес кнопки из письма'); }
+    const tokens = link.searchParams.getAll('token');
+    const type = link.searchParams.get('type');
+    if (link.origin !== new URL(config.url).origin || link.pathname !== '/auth/v1/verify' ||
+        link.username || link.password || tokens.length !== 1 || !/^[a-zA-Z0-9_-]{16,256}$/.test(tokens[0]) ||
+        !['email', 'signup', 'magiclink'].includes(type)) {
+      throw Error('Нужна ссылка подтверждения из письма этой игры');
+    }
+    return {token_hash: tokens[0], type: 'email'};
+  }
+
   async function request(path, data, token = config.key) {
     const response = await fetch(config.url.replace(/\/$/, '') + path, {
       method: 'POST',
@@ -209,10 +226,15 @@
     await request('/auth/v1/otp', {email: values.email, create_user: true});
     email = values.email;
     displaySession();
-    return 'Код отправлен на почту';
+    return 'Письмо отправлено. Введи код или вставь ссылку из письма';
   });
   onSubmit('social-verify', async values => {
-    store(await request('/auth/v1/verify', {email, token: values.code.trim(), type: 'email'}));
+    const result = await request('/auth/v1/verify', verification(values.credential));
+    if (!result?.access_token || result.user?.email?.toLowerCase() !== email.trim().toLowerCase()) {
+      throw Error('Вставь письмо для адреса, который указал в игре');
+    }
+    store(result);
+    get('social-verify').reset();
     email = null;
     displaySession();
     await refresh();

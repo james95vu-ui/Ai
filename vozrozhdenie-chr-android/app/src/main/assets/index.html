@@ -86,7 +86,8 @@
     <button type="submit">Получить код</button>
   </form>
   <form id="social-verify" hidden>
-    <label>Код из письма <input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" required></label>
+    <label>Код или ссылка из письма <input name="credential" type="password" autocomplete="one-time-code" maxlength="2048" required></label>
+    <p>Если в письме только кнопка, зажми её, выбери «Копировать ссылку» и вставь сюда.</p>
     <button type="submit">Войти</button>
   </form>
   <div id="social-online" hidden>
