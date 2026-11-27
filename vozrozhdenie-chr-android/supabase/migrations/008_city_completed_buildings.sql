@@ -1,12 +1,12 @@
 -- Completed community projects are permanent city assets, not player property.
 begin;
 create or replace function public.city_completed_buildings(p_city_id text)
-returns table(building_id bigint,slot integer,title text,completed_at timestamptz,
+returns table(building_id bigint,slot integer,title text,project_created_at timestamptz,
  total_points bigint,workers bigint)
 language sql stable security definer set search_path=''
 as $$
  select p.id,p.slot,p.title,
- p.created_at, -- project creation date; completion time added by later event migration
+ p.created_at,
  p.contributed_points,
  (select count(*) from public.city_project_contributions x
   where x.project_id=p.id and x.points>0)
