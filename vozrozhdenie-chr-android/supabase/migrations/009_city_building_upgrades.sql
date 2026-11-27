@@ -157,7 +157,8 @@ $$;
 revoke all on function public.city_project_contribute(bigint,bigint) from public,anon;
 grant execute on function public.city_project_contribute(bigint,bigint) to authenticated;
 
-create or replace function public.city_completed_buildings(p_city_id text)
+drop function if exists public.city_completed_buildings(text);
+create function public.city_completed_buildings(p_city_id text)
 returns table(building_id bigint,slot integer,title text,project_created_at timestamptz,
  total_points bigint,workers bigint,upgrade_level integer,
  upgrade_progress bigint,next_upgrade_cost bigint)
