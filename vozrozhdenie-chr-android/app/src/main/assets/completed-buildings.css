@@ -1,0 +1,8 @@
+.completed-buildings{margin:14px 12px;padding:15px;border:1px solid #c9ab7099;border-radius:17px;background:#153b32;color:#fff0d5}
+.completed-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.completed-head h3{margin:0;color:#eacb8a;font-size:16px}
+.completed-refresh{border:1px solid #d5b879;border-radius:10px;background:#d5b879;color:#16372e;min-height:40px;padding:8px;font-weight:700}
+.completed-status{font-size:13px;opacity:.85}
+.completed-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px}
+.completed-tile{min-height:110px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;padding:10px;border:1px solid #d8c08a66;border-radius:12px;background:#0d2a25;text-align:center;font-size:12px}
+.completed-icon{font-size:31px}.completed-tile small{opacity:.7}
