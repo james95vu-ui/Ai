@@ -25,3 +25,12 @@ progress{border-radius:999px;overflow:hidden}
 #intro-start{box-shadow:inset 0 2px #fff7,0 6px 0 #93753d,0 12px 24px #0005}
 @media(hover:hover){.game-screens .plot:hover{transform:translateY(-2px);border-color:#e4c88b88}.city-hero:hover{background-position:52% 45%}button:not(:disabled):hover{filter:brightness(1.07)}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Phase 1 of gradual 3D migration: lightweight perspective on city plots */
+.game-screens #town .landscape{perspective:900px;perspective-origin:50% 35%;overflow:visible;background:transparent}
+.game-screens #town #map{position:relative;transform-style:preserve-3d;transform:rotateX(var(--city-tilt-x,8deg)) rotateY(var(--city-tilt-y,0deg));transition:transform .28s ease-out;border-radius:15px;box-shadow:0 12px 28px #0006,inset 0 1px #fff2;background:linear-gradient(135deg,#45634f,#253f42)}
+.game-screens #town .plot{transform-style:preserve-3d;transform:translateZ(7px);box-shadow:0 7px 0 #142a2c,0 10px 14px #0005,inset 0 1px #fff3}
+.game-screens #town .plot.built{transform:translateZ(13px);box-shadow:0 10px 0 #463b2a,0 14px 17px #0006,inset 0 1px #fff3}
+.game-screens #town .plot.selected{transform:translateZ(19px)}
+.game-screens #town .plot:active{transform:translateZ(2px) scale(.98)}
+@media(prefers-reduced-motion:reduce){.game-screens #town #map{transform:none}.game-screens #town .plot,.game-screens #town .plot.built,.game-screens #town .plot.selected{transform:none}}
