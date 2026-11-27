@@ -102,7 +102,7 @@
  });
  projectForm.addEventListener('submit',async e=>{
   e.preventDefault();const fields=e.currentTarget.elements;
-  const action=fields.action.value,id=Number(fields.project.value),value=fields.value.value.trim(),reason=fields.reason.value.trim();
+  const action=fields.namedItem('action').value,id=Number(fields.namedItem('project').value),value=fields.namedItem('value').value.trim(),reason=fields.namedItem('reason').value.trim();
   if(!Number.isSafeInteger(id)||id<1){status.textContent='Неверный ID проекта';return}
   if(!confirm('Подтвердить изменение проекта #'+id+'? Это повлияет на общий город.'))return;
   try{
@@ -155,7 +155,7 @@
  center.querySelector('.owner-search').addEventListener('submit',async e=>{
   e.preventDefault();const button=e.currentTarget.querySelector('button');button.disabled=true;
   try{
-   const found=await rpc('game_owner_find_player',{p_query:e.currentTarget.elements.query.value.trim()});
+   const found=await rpc('game_owner_find_player',{p_query:e.currentTarget.elements.namedItem('query').value.trim()});
    players.replaceChildren();
    for(const p of found){const row=document.createElement('button');row.type='button';row.textContent=(p.email||p.player_id)+' · '+(p.city||'без города')+' · монеты: '+(p.coins??0)+' · материалы: '+(p.materials??0)+' · тапы: '+(p.taps??0);row.addEventListener('click',()=>{center.querySelector('.owner-action').elements.target.value=p.player_id});players.append(row)}
    if(!found.length)players.textContent='Игрок не найден';
@@ -164,7 +164,7 @@
  });
  center.querySelector('.owner-action').addEventListener('submit',async e=>{
   e.preventDefault();const form=e.currentTarget,fields=form.elements;
-  const action=fields.action.value,target=fields.target.value.trim(),value=fields.value.value.trim(),reason=fields.reason.value.trim();
+  const action=fields.namedItem('action').value,target=fields.namedItem('target').value.trim(),value=fields.namedItem('value').value.trim(),reason=fields.namedItem('reason').value.trim();
   if(!confirm('Подтвердить административное действие «'+action+'»? Оно изменит реальные данные игры.'))return;
   const button=form.querySelector('button');button.disabled=true;
   try{const result=await rpc('game_owner_action',{p_action:action,p_target:target,p_value:value,p_reason:reason});status.textContent='Действие выполнено: '+JSON.stringify(result);await loadStats()}
@@ -195,9 +195,9 @@
    const isOwner=await rpc('game_is_owner',{});
    if(!isOwner){root.hidden=true;tab.hidden=true;queue.replaceChildren();if(!screen.hidden){nav.querySelector('[data-go="town"]')?.click()}return}
    root.hidden=false;tab.hidden=false;
-   await loadStats();
+   try{await loadStats()}catch(error){stats.textContent='Не удалось загрузить статистику: '+error.message}
    await loadChatReports();
-   if(!citySelector.options.length||citySelector.options.length===1)await loadProjectCities();
+   if(!citySelector.options.length||citySelector.options.length===1){try{await loadProjectCities()}catch(error){status.textContent='Ошибка списка городов: '+error.message}}
    const items=await rpc('game_owner_queue',{});
    queue.replaceChildren();
    status.textContent=items.length?'На проверке: '+items.length:'Нет жалоб и апелляций на проверке';
@@ -226,7 +226,7 @@
     reject.addEventListener('click',()=>decide(false));
     form.append(label,approve,reject);card.append(title,player,description,form);queue.append(card);
    }
-  }catch(e){root.hidden=true;status.textContent='Не удалось проверить полномочия: '+e.message}
+  }catch(e){status.textContent='Ошибка загрузки панели: '+e.message}
   finally{busy=false;refresh.disabled=false}
  }
  refresh.addEventListener('click',load);
