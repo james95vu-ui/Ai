@@ -11,7 +11,7 @@
   };
   const held = new Map();
   const near = .18;
-  let player, surfaces, obstacles, drag, frame, lastTime;
+  let player, surfaces, obstacles, drag, frame, lastTime, cityLevel;
 
   function addFace(points, color, ground = false) {
     surfaces.push({points, color, ground});
@@ -38,12 +38,24 @@
       ['#377854', '#256344', '#75a86b'], size * .55);
   }
 
+  function stoneTower(x, z) {
+    block(x, z, 1.25, 1.25, 4.8, ['#bda37d', '#8c785f', '#dbc49c']);
+    for (let step = 0; step < 3; step++) {
+      const inset = .15 + step * .16;
+      const width = 1.25 - inset * 2;
+      block(x + inset, z + inset, width, width, .28,
+        ['#766754', '#655447', '#a08a70'], 4.8 + step * .28);
+    }
+    obstacles.push({left: x, right: x + 1.25, front: z, back: z + 1.25});
+  }
+
   function makeCity(city, level, built) {
+    cityLevel = level;
     surfaces = [];
     obstacles = [];
     const hue = [...city].reduce((sum, letter) => sum + letter.charCodeAt(0), 0) % 65 + 12;
     ground(-70, -70, 140, 140, '#779369');
-    ground(-23, -23, 46, 46, level >= 3 ? '#748183' : '#a39476', .01);
+    ground(-23, -23, 46, 46, level >= 8 ? '#43565c' : level >= 3 ? '#748183' : '#a39476', .01);
     for (let i = -2; i < 3; i++) {
       const lane = i * 12 + 6;
       if (Math.abs(lane) > 22) continue;
@@ -53,11 +65,23 @@
         ground(offset, lane - .08, 1.6, .16, '#e7dcb0', .025);
       }
     }
+    if (level >= 7) {
+      for (const x of [-18, -6, 6, 18]) {
+        for (const z of [-18, -6, 6, 18]) {
+          block(x - 1.45, z - 1.45, .12, .12, 2.9, ['#5c6b67', '#42544e', '#c2ddd0']);
+          block(x - 1.57, z - 1.57, .36, .36, .14, ['#f5da96', '#ffe8a8', '#fffade'], 2.85);
+        }
+      }
+    }
     for (let i = 0; i < 9; i++) {
       const x = (i % 3 - 1) * 12;
       const z = (Math.floor(i / 3) - 1) * 12;
       ground(x - 4.65, z - 4.65, 9.3, 9.3, built[i] ? '#d5c3a0' : '#87966a', .04);
       if (!built[i]) {
+        if (level <= 2) {
+          block(x - 1.7, z + 1.3, 2.6, .42, .55, ['#a89981', '#817662', '#b5a58c']);
+          block(x + .9, z - .35, .65, .66, .33, ['#a89981', '#817662', '#b5a58c']);
+        }
         tree(x + 2, z + 2, 1.1);
         continue;
       }
@@ -67,23 +91,39 @@
           for (const dz of [-2.6, 2.6]) tree(x + dx, z + dz, 1.7);
         }
         ground(x - .55, z - 4.3, 1.1, 8.6, '#e7d6ad', .07);
+        if (level >= 5) stoneTower(x + 1.05, z - 1.7);
+        if (level >= 8) {
+          ground(x - 3.8, z - 1.3, 2, 2.6, '#e8d2a4', .08);
+          ground(x - 3.55, z - 1.05, 1.5, 2.1, '#5da9ab', .09);
+        }
         continue;
       }
-      const width = i % 2 ? 6.2 : 5.4, depth = 5.2, height = [0, 3.4, 3.1, 5.4, 4.7, 4.1, 2.8, 3.6, 5.1][i];
+      const modern = level >= 8 && [3, 4, 7, 8].includes(i);
+      const width = i % 2 ? 6.2 : 5.4, depth = 5.2;
+      const height = [0, 3.4, 3.1, 5.4, 4.7, 4.1, 2.8, 3.6, 5.1][i] +
+        (modern ? (level - 7) * (i === 8 ? 1.7 : .95) : 0);
       const left = x - width / 2, front = z - depth / 2;
-      const roof = 'hsl(' + (hue + i * 4) + ',34%,42%)';
-      block(left, front, width, depth, height, ['#e4cba3', '#c1ab8d', roof], .04);
+      const roof = modern ? '#718f93' : 'hsl(' + (hue + i * 4) + ',34%,42%)';
+      block(left, front, width, depth, height, modern ? ['#69979c', '#497582', roof] : ['#e4cba3', '#c1ab8d', roof], .04);
       block(left - .15, front - .15, width + .3, depth + .3, .28, [roof, roof, roof], height);
+      if (modern) {
+        block(left + .55, front + .55, width - 1.1, depth - 1.1, .95,
+          ['#527f88', '#3e6975', '#83a5a6'], height + .28);
+        if (level === 10) {
+          block(left + width * .49, front + depth * .49, .18, .18, 1.35,
+            ['#abddcf', '#649997', '#d1fcda'], height + 1.23);
+        }
+      }
       obstacles.push({left, right: left + width, front, back: front + depth});
       for (let col = 1; col <= 3; col++) {
         for (let floor = 0; floor < Math.floor(height / 1.5); floor++) {
           const winX = left + width * col / 4 - .35;
           const y = .9 + floor * 1.45;
           addFace([[winX, y, front - .02], [winX, y + .66, front - .02],
-            [winX + .7, y + .66, front - .02], [winX + .7, y, front - .02]], '#416569');
+            [winX + .7, y + .66, front - .02], [winX + .7, y, front - .02]], modern ? (floor % 2 ? '#b0dfd2' : '#84b6b8') : '#416569');
           const back = front + depth + .02;
           addFace([[winX + .7, y, back], [winX + .7, y + .66, back],
-            [winX, y + .66, back], [winX, y, back]], '#416569');
+            [winX, y + .66, back], [winX, y, back]], modern ? (floor % 2 ? '#b0dfd2' : '#84b6b8') : '#416569');
         }
       }
       if (level >= 6) tree(x + 3.5, z + 3.5, 1.45);
@@ -112,8 +152,8 @@
     const horizon = height * (.43 + player.pitch);
     const focal = Math.max(width * .66, height * .47);
     const sky = ctx.createLinearGradient(0, 0, 0, height);
-    sky.addColorStop(0, '#6da2aa');
-    sky.addColorStop(1, '#edddaa');
+    sky.addColorStop(0, cityLevel >= 9 ? '#426783' : '#6da2aa');
+    sky.addColorStop(1, cityLevel >= 9 ? '#e6b98f' : '#edddaa');
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, width, height);
     for (let layer = 0; layer < 2; layer++) {
