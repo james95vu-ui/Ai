@@ -8,6 +8,39 @@
  const center=document.createElement('div');center.className='owner-control-center';
  center.innerHTML='<h4>Центр управления</h4><div class="owner-stats"></div><form class="owner-search"><label>Найти игрока по email или UUID<input name="query" required minlength="3"></label><button>Найти</button></form><div class="owner-players"></div><form class="owner-action"><label>Действие<select name="action"><option value="add_coins">Добавить / списать монеты</option><option value="set_coins">Установить баланс монет</option><option value="add_materials">Добавить / списать материалы</option><option value="set_materials">Установить материалы</option><option value="appoint_mayor">Назначить мэра</option><option value="announce">Опубликовать объявление</option><option value="close_announcement">Закрыть объявление</option></select></label><label>Игрок UUID / заголовок / ID объявления<input name="target" required></label><label>Количество / текст объявления<input name="value"></label><label>Причина действия<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Выполнить с подтверждением</button></form><h4>Последние действия</h4><button type="button" class="owner-audit-refresh">Показать журнал</button><div class="owner-audit"></div>';
  root.insertBefore(center,root.querySelector('.owner-queue'));
+
+ const moderation=document.createElement('section');moderation.className='owner-room-center';
+ moderation.innerHTML='<h4>💬 Комнаты и модерация</h4><button type="button" class="owner-load-rooms">Обновить список комнат</button><div class="owner-room-list"></div><div class="owner-room-messages"></div><form class="owner-room-action"><label>Комната ID<input name="room" required inputmode="numeric"></label><label>Действие<select name="action"><option value="disable_room">Закрыть комнату</option><option value="enable_room">Открыть комнату</option><option value="hide_message">Скрыть сообщение</option><option value="mute_player">Ограничить сообщения игрока</option><option value="unmute_player">Снять ограничение</option></select></label><label>ID сообщения / UUID игрока / UUID:часы<input name="subject"></label><label>Причина<textarea name="reason" minlength="10" maxlength="1000" required></textarea></label><button>Применить с подтверждением</button></form>';
+ center.append(moderation);
+ const roomList=moderation.querySelector('.owner-room-list'),roomMessages=moderation.querySelector('.owner-room-messages'),roomForm=moderation.querySelector('.owner-room-action');
+ moderation.querySelector('.owner-load-rooms').addEventListener('click',async()=>{
+  try{
+   const rooms=await rpc('game_owner_rooms',{});roomList.replaceChildren();
+   for(const room of rooms){
+    const button=document.createElement('button');button.type='button';
+    button.textContent='#'+room.room_id+' · '+room.city_name+' · '+room.title+' · '+room.kind+' · '+(room.enabled?'открыта':'закрыта')+' · сообщений: '+room.message_count;
+    button.addEventListener('click',async()=>{
+     roomForm.elements.room.value=room.room_id;
+     roomMessages.replaceChildren();
+     if(room.kind!=='text'){roomMessages.textContent='Голосовая комната: аудиосервис пока не подключён';return}
+     try{
+      const messages=await rpc('game_owner_room_messages',{p_room_id:room.room_id,p_limit:50});
+      for(const m of messages){const row=document.createElement('button');row.type='button';row.textContent='#'+m.message_id+' · '+m.author+' · '+(m.hidden?'[скрыто] ':'')+m.body;row.addEventListener('click',()=>{roomForm.elements.action.value='hide_message';roomForm.elements.subject.value=m.message_id});roomMessages.append(row)}
+      if(!messages.length)roomMessages.textContent='Сообщений пока нет';
+     }catch(e){status.textContent=e.message}
+    });roomList.append(button);
+   }
+  }catch(e){status.textContent='Не удалось загрузить комнаты: '+e.message}
+ });
+ roomForm.addEventListener('submit',async e=>{
+  e.preventDefault();const el=e.currentTarget.elements;
+  if(!confirm('Подтвердить действие модерации?'))return;
+  try{
+   await rpc('game_owner_room_action',{p_action:el.action.value,p_room_id:Number(el.room.value),p_subject:el.subject.value.trim(),p_reason:el.reason.value.trim()});
+   status.textContent='Действие модерации выполнено';
+  }catch(error){status.textContent='Ошибка модерации: '+error.message}
+ });
+
  const stats=center.querySelector('.owner-stats'),players=center.querySelector('.owner-players'),audit=center.querySelector('.owner-audit');
  async function loadStats(){
   const d=await rpc('game_owner_dashboard',{});
