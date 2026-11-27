@@ -25,15 +25,15 @@ async function load(){
   const rooms=await request('game_public_rooms?select=id,title,city_id&kind=eq.text&enabled=eq.true&city_id=eq.'+encodeURIComponent(cityId)+'&project_id=is.null&limit=1');
   if(!rooms.length){currentRoom=null;status.textContent='Городской чат пока недоступен';return}
   currentRoom=rooms[0].id;status.textContent=rooms[0].title;
-  const rows=await request('game_public_messages?select=id,author,body,created_at&room_id=eq.'+currentRoom+'&hidden=eq.false&order=created_at.desc&limit=50');
+  const rows=await request('rpc/game_chat_messages',{p_room_id:currentRoom,p_limit:50});
   messages.replaceChildren();
   for(const item of rows.reverse()){
    const p=document.createElement('p');p.className='public-chat-message';
-   const head=document.createElement('strong');head.textContent=item.author.slice(0,8)+' · '+new Date(item.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})+' ';
+   const head=document.createElement('strong');head.textContent=item.author_name+' · '+new Date(item.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})+' ';
    const text=document.createElement('span');text.textContent=item.body;
    p.append(head,text);
    const report=document.createElement('button');report.type='button';report.className='public-chat-report';report.textContent='Пожаловаться';
-   report.addEventListener('click',async()=>{const reason=prompt('Причина жалобы (15–1000 символов):');if(reason===null)return;if(reason.trim().length<15){status.textContent='Опиши причину подробнее (минимум 15 символов)';return}if(!confirm('Отправить жалобу на сообщение?'))return;try{await request('rpc/game_report_public_message',{p_message_id:item.id,p_reason:reason.trim()});status.textContent='Жалоба отправлена на проверку'}catch(e){status.textContent=e.message}});
+   report.addEventListener('click',async()=>{const reason=prompt('Причина жалобы (15–1000 символов):');if(reason===null)return;if(reason.trim().length<15){status.textContent='Опиши причину подробнее (минимум 15 символов)';return}if(!confirm('Отправить жалобу на сообщение?'))return;try{await request('rpc/game_report_public_message',{p_message_id:item.message_id,p_reason:reason.trim()});status.textContent='Жалоба отправлена на проверку'}catch(e){status.textContent=e.message}});
    p.append(report);messages.append(p);
   }
   messages.scrollTop=messages.scrollHeight;
