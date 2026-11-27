@@ -307,4 +307,27 @@ $('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();comb
   }
 }, 1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){const n=collect();$('offline').textContent='Начислено: +'+fmt(n)+' монет';render()}});
 // Online leaderboard uses server-recorded community contributions, not editable local balances.
-const cfg=window.GAME_CONFIG||{};let session=null;try{session=JSON.parse(localStorage.getItem("vozrozhdenie_online_session")||"null")}catch(e){}async function api(path,method='GET',body){const r=await fetch(cfg.url.replace(/\/$/,'')+path,{method,headers:{apikey:cfg.key,Authorization:'Bearer '+(session?.access_token||cfg.key),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}async function ranking(){if(!cfg.url||!cfg.key){notice('Сначала настрой Supabase');return}try{const rows=await api('/rest/v1/rpc/city_ranking','POST',{});$('ranking').replaceChildren();rows.forEach((r,i)=>{const div=document.createElement('div');div.className='rank';div.textContent=(i+1)+'. '+r.city+' · '+r.members+' игроков';$('ranking').append(div)});$('network').textContent='Онлайн-рейтинг подключён';}catch(e){notice('Не удалось загрузить рейтинг: '+e.message)}}$('refresh').onclick=ranking;$('connect').onclick=async()=>{if(!cfg.url||!cfg.key){notice('Нужно настроить config.js');return}if(!s.city){notice('Сначала выбери город');return}try{if(session?.refresh_token){try{session=await api('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:session.refresh_token})}catch(e){session=null}}if(!session){session=await api('/auth/v1/signup','POST',{})}localStorage.setItem('vozrozhdenie_online_session',JSON.stringify(session));await api('/rest/v1/rpc/join_city','POST',{p_city:s.city});$('network').textContent='Ты в онлайн-команде '+s.city;await ranking()}catch(e){notice('Ошибка подключения: '+e.message)}};render();})();
+const cfg=window.GAME_CONFIG||{};let session=null;try{session=JSON.parse(localStorage.getItem("vozrozhdenie_online_session")||"null")}catch(e){}async function api(path,method='GET',body){const r=await fetch(cfg.url.replace(/\/$/,'')+path,{method,headers:{apikey:cfg.key,Authorization:'Bearer '+(session?.access_token||cfg.key),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}async function ranking(){if(!cfg.url||!cfg.key){notice('Сначала настрой Supabase');return}try{const rows=await api('/rest/v1/rpc/city_ranking','POST',{});$('ranking').replaceChildren();rows.forEach((r,i)=>{const div=document.createElement('div');div.className='rank';div.textContent=(i+1)+'. '+r.city+' · '+r.members+' игроков';$('ranking').append(div)});$('network').textContent='Онлайн-рейтинг подключён';}catch(e){notice('Не удалось загрузить рейтинг: '+e.message)}}$('refresh').onclick=ranking;$('connect').onclick=async()=>{if(!cfg.url||!cfg.key){notice('Нужно настроить config.js');return}if(!s.city){notice('Сначала выбери город');return}try{if(session?.refresh_token){try{session=await api('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:session.refresh_token})}catch(e){session=null}}if(!session){session=await api('/auth/v1/signup','POST',{})}localStorage.setItem('vozrozhdenie_online_session',JSON.stringify(session));await api('/rest/v1/rpc/join_city','POST',{p_city:s.city});$('network').textContent='Ты в онлайн-команде '+s.city;await ranking()}catch(e){notice('Ошибка подключения: '+e.message)}};
+let onlineBusy=false;
+async function autoOnline(){
+ if(onlineBusy||document.hidden||!cfg.url||!cfg.key)return;
+ onlineBusy=true;
+ try{
+  await ranking();
+  if(session?.refresh_token&&s.city){
+   try{
+    const renewed=await api('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:session.refresh_token});
+    if(renewed?.access_token){
+     session=renewed;
+     localStorage.setItem('vozrozhdenie_online_session',JSON.stringify(session));
+     await api('/rest/v1/rpc/join_city','POST',{p_city:s.city});
+     $('network').textContent='Онлайн: '+s.city+' · рейтинг обновлён';
+    }
+   }catch(e){$('network').textContent='Рейтинг доступен · для команды потребуется вход';}
+  }
+ }finally{onlineBusy=false}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoOnline()});
+window.addEventListener('online',autoOnline);
+setInterval(()=>{if(!document.hidden)autoOnline()},60000);
+render();autoOnline();})();
