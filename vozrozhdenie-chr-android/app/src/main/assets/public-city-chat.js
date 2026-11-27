@@ -31,7 +31,10 @@ async function load(){
    const p=document.createElement('p');p.className='public-chat-message';
    const head=document.createElement('strong');head.textContent=item.author.slice(0,8)+' · '+new Date(item.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})+' ';
    const text=document.createElement('span');text.textContent=item.body;
-   p.append(head,text);messages.append(p);
+   p.append(head,text);
+   const report=document.createElement('button');report.type='button';report.className='public-chat-report';report.textContent='Пожаловаться';
+   report.addEventListener('click',async()=>{const reason=prompt('Причина жалобы (15–1000 символов):');if(reason===null)return;if(reason.trim().length<15){status.textContent='Опиши причину подробнее (минимум 15 символов)';return}if(!confirm('Отправить жалобу на сообщение?'))return;try{await request('rpc/game_report_public_message',{p_message_id:item.id,p_reason:reason.trim()});status.textContent='Жалоба отправлена на проверку'}catch(e){status.textContent=e.message}});
+   p.append(report);messages.append(p);
   }
   messages.scrollTop=messages.scrollHeight;
  }catch(error){status.textContent=error.message}
