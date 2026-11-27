@@ -1,0 +1,9 @@
+.city-appeals{margin:14px 12px;padding:15px;border:1px solid #c9ab7099;border-radius:17px;background:#153b32;color:#fff0d5}
+.city-appeals h3{margin:0 0 8px;color:#eacb8a}
+.appeal-status,.appeal-card{font-size:13px}
+.appeal-card{border:1px solid #d5b87966;border-radius:10px;padding:10px;margin:10px 0}
+.appeal-card p{margin:7px 0}
+.appeal-card form,.appeal-card label{display:grid;gap:8px}
+.appeal-card textarea{min-height:80px;padding:10px;border:1px solid #c9ab70;border-radius:9px;background:#0b241e;color:white;font-size:15px}
+.city-appeals button{min-height:42px;padding:9px;border:0;border-radius:9px;background:#d5b879;color:#16372e;font-weight:700}
+.city-appeals button:disabled{opacity:.5}
