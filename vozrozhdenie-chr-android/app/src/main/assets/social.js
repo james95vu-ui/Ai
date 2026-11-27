@@ -5,12 +5,26 @@
   const config = window.GAME_CONFIG || {};
   const key = 'vozrozhdenie_social_session_v1';
   const pendingKey = key + '_pending';
+  const loginKey = key + '_login';
+  const redirect = 'com.vozrozhdenie.chr://auth/callback';
+  const nativeLogin = typeof window.CityAuth?.createChallenge === 'function';
   const sections = ['trade', 'clans', 'chat'];
   const status = get('social-status');
   let session, email, active = 'trade', busy = false;
-  let player, community;
+  let player, community, waitingLogin, queuedReturn;
 
   try { session = JSON.parse(localStorage.getItem(key)); } catch (_) { session = null; }
+  try {
+    waitingLogin = JSON.parse(localStorage.getItem(loginKey));
+    email = waitingLogin?.email;
+  } catch (_) { waitingLogin = null; }
+
+  function saveLogin(login) {
+    waitingLogin = login;
+    email = login?.email;
+    if (login) localStorage.setItem(loginKey, JSON.stringify(login));
+    else localStorage.removeItem(loginKey);
+  }
 
   function store(value) {
     session = value;
@@ -92,6 +106,7 @@
     get('social-login').hidden = !!session;
     get('social-verify').hidden = !!session || !email;
     get('social-online').hidden = !session;
+    get('social-return-hint').hidden = !!session || !waitingLogin?.verifier;
   }
 
   function run(operation) {
@@ -102,7 +117,14 @@
       status.textContent = message || 'Данные обновлены';
     }).catch(error => {
       status.textContent = error.message;
-    }).finally(() => { busy = false; });
+    }).finally(() => {
+      busy = false;
+      if (queuedReturn !== undefined) {
+        const code = queuedReturn;
+        queuedReturn = undefined;
+        completeRedirect(code);
+      }
+    });
   }
 
   function onSubmit(id, callback) {
@@ -222,23 +244,67 @@
   }
   displaySession();
 
-  onSubmit('social-login', async values => {
-    await request('/auth/v1/otp', {email: values.email, create_user: true});
-    email = values.email;
-    displaySession();
-    return 'Письмо отправлено. Введи код или вставь ссылку из письма';
-  });
-  onSubmit('social-verify', async values => {
-    const result = await request('/auth/v1/verify', verification(values.credential));
-    if (!result?.access_token || result.user?.email?.toLowerCase() !== email.trim().toLowerCase()) {
-      throw Error('Вставь письмо для адреса, который указал в игре');
+  async function completeLogin(result) {
+    if (!result?.access_token || result.user?.email?.toLowerCase() !== email?.trim().toLowerCase()) {
+      throw Error('Запроси новое письмо для адреса, который указал в игре');
     }
     store(result);
     get('social-verify').reset();
-    email = null;
+    saveLogin(null);
     displaySession();
     await refresh();
     return 'Вход выполнен';
+  }
+
+  function completeRedirect(code) {
+    if (session) return;
+    document.querySelector('[data-go="team"]').click();
+    get('social').scrollIntoView({block: 'nearest'});
+    if (busy) {
+      queuedReturn = code;
+      return;
+    }
+
+    run(async () => {
+      if (!code || !waitingLogin?.verifier) {
+        throw Error('Запроси новое письмо и открой его на этом устройстве');
+      }
+      const result = await request('/auth/v1/token?grant_type=pkce', {
+        auth_code: code,
+        code_verifier: waitingLogin.verifier
+      });
+      return completeLogin(result);
+    });
+  }
+
+  window.addEventListener('city-auth-return', event => completeRedirect(event.detail));
+  onSubmit('social-login', async values => {
+    const address = values.email.trim();
+    const data = {email: address, create_user: true};
+    const login = {email: address};
+    let path = '/auth/v1/otp';
+    if (nativeLogin) {
+      const [verifier, challenge] = window.CityAuth.createChallenge().split('.');
+      login.verifier = verifier;
+      data.code_challenge = challenge;
+      data.code_challenge_method = 's256';
+      path += '?redirect_to=' + encodeURIComponent(redirect);
+    }
+    try {
+      saveLogin(login);
+      await request(path, data);
+    } catch (error) {
+      saveLogin(null);
+      displaySession();
+      throw error;
+    }
+    displaySession();
+    return nativeLogin ? 'Письмо отправлено. Нажми кнопку в письме на этом устройстве'
+      : 'Письмо отправлено. Введи код или вставь ссылку из письма';
+  });
+  onSubmit('social-verify', async values => {
+    const result = await request('/auth/v1/verify', verification(values.credential));
+    return completeLogin(result);
   });
   get('social-logout').onclick = () => run(async () => {
     try { await request('/auth/v1/logout?scope=local', {}, session?.access_token); }
