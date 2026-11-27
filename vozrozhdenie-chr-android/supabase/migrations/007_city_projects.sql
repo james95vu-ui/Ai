@@ -26,8 +26,7 @@ create index if not exists city_project_contributions_player_idx on public.city_
 insert into public.city_projects(city_id,slot,title,required_points)
 select c.id,n,
  (array['Жилой дом','Школа','Больница','Парк','Спортивный комплекс',
- 'Библиотека','Мост','Культурный центр','Мастерская','Научный центр'])
- [((n-1)%10)+1]||' №'||n,
+ 'Библиотека','Мост','Культурный центр','Мастерская','Научный центр'])[((n-1)%10)+1]||' №'||n,
  (1000::bigint + ((n-1)/10)*2000::bigint)
 from public.cities c cross join generate_series(1,100) as n
 on conflict(city_id,slot) do nothing;
