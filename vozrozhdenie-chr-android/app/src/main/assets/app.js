@@ -43,7 +43,7 @@ function showTycoon() {
   $('energy-bar').max = Tycoon.energyCap(tycoon);
   $('energy-bar').value = tycoon.energy;
   $('tap').disabled = !s.city || tycoon.energy < 1;
-  $('upgrade').disabled = !s.city || s.coins < cost() || tycoon.energy < 0;
+  $('upgrade').disabled = !s.city || s.coins < cost();
   for (const [key,label,base] of tapExtras) {
     const level=tycoon[key]||0, price=Math.ceil(base*1.65**level), button=$(key);
     button.textContent=label+' · '+level+'/10'+(level<10?' · '+fmt(price)+' ◉':'');
@@ -245,7 +245,7 @@ function stats() {
   $('power').textContent = '+' + fmt(tapReward()) + ' монет';
   $('combo').textContent = combo >= 10 ? 'Комбо ×'+comboMultiplier().toLocaleString('ru-RU')+'!' : 'Комбо ' + combo + ' / 10';
   $('bar').value = combo;
-  $('upgrade').textContent = 'Улучшить нажатие: ' + fmt(cost()) + ' ◉ · 3 энергии';
+  $('upgrade').textContent = 'Улучшить нажатие: ' + fmt(cost()) + ' ◉';
   showTycoon();
 }
 
