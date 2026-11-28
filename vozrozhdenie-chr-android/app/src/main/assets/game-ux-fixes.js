@@ -9,6 +9,7 @@ if(settings){
 }
 const connect=document.getElementById('connect');if(connect){connect.hidden=true;connect.style.display='none'}
 if(team){const hint=document.createElement('p');hint.textContent='Для входа в сообщество открой «Настройки» → «Профиль игрока». Рейтинг можно просматривать здесь.';team.insertBefore(hint,team.firstElementChild?.nextSibling||null)}
+if(sessionStorage.getItem('chr_reset_notice')==='1'){sessionStorage.removeItem('chr_reset_notice');const n=document.getElementById('notice');if(n)n.textContent='Локальный прогресс сброшен. Начни новую игру.';}
 const reset=document.querySelector('#settings .chr-reset');
 if(reset){
  reset.onclick=()=>{
@@ -18,7 +19,8 @@ if(reset){
   document.body.append(overlay);
   overlay.querySelector('.reset-cancel').onclick=()=>overlay.remove();
   overlay.querySelector('.reset-accept').onclick=()=>{
-   ['vozrozhdenie_demo_v1','chr_player_name_v1','chr_new_era_settings_v1'].forEach(k=>localStorage.removeItem(k));
+   ['vozrozhdenie_demo_v1','chr_player_name_v1','chr_player_email_v1','chr_guest_started_v1','chr_guest_city_v1','chr_new_era_settings_v1'].forEach(k=>localStorage.removeItem(k));
+   sessionStorage.setItem('chr_reset_notice','1');
    location.reload();
   };
  }
