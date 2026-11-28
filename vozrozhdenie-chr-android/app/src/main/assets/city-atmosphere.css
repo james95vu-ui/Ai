@@ -1,0 +1,13 @@
+/* Atmospheric details are independent of gameplay hit areas. */
+#town #map .city-scenery{overflow:hidden}
+#town #map .city-scenery::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse at 75% 16%,#fff0bd70 0%,#ffe8ae16 23%,transparent 46%),linear-gradient(180deg,#173b5830 0%,transparent 35%,#123b2b18 70%,#071f1980 100%);mix-blend-mode:screen}
+#town #map .city-scenery::after{z-index:2;content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 28%,#061d264d 100%),linear-gradient(180deg,transparent 58%,#0b29205c 100%)}
+#town #map{isolation:isolate}
+#town #map .city-building{touch-action:manipulation;transition:transform .18s ease,filter .18s ease}
+#town #map .city-building:active{transform:translateY(2px) scale(.96)}
+#town #map .city-building.selected{z-index:8}
+#town #map .city-building:not(.selected){z-index:4}
+#town #details:not([hidden]){animation:cityDetailsRise .22s cubic-bezier(.2,.8,.2,1) both}
+@keyframes cityDetailsRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#town #details:not([hidden]){animation:none}#town #map .city-building{transition:none}}
+@media(max-width:370px){body.game-shell:has(#town:not([hidden])) #town #map .city-building{width:28%;min-height:65px}#town #map .city-building-art{width:52px;height:47px}#town #map .city-building-label{font-size:9px}}
