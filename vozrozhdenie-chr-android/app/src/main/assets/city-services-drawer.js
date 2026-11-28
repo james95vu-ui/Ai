@@ -9,7 +9,7 @@ if(picker){
  const title=document.createElement('h2');title.className='city-services-city-title';title.textContent='Выбор города';
  drawer.append(title,picker);
 }
-town.append(toggle,drawer);
+document.body.append(toggle,drawer);
 if(hero)hero.hidden=true;
 function closeDrawer(){drawer.hidden=true;toggle.setAttribute('aria-expanded','false')}
 function openDrawer(){drawer.hidden=false;toggle.setAttribute('aria-expanded','true')}
@@ -20,7 +20,7 @@ let pending=false;
 function organize(){
  pending=false;
  for(const child of Array.from(town.children)){
-  if(child===toggle||child===drawer||child.id==='details'||child.classList.contains('city-hero')||child.classList.contains('development')||child.classList.contains('landscape'))continue;
+  if(child.id==='details'||child.classList.contains('city-hero')||child.classList.contains('development')||child.classList.contains('landscape'))continue;
   if(child.nodeType===1)drawer.append(child);
  }
  // City selector is always available, even when online-only panels are absent.
