@@ -1,12 +1,12 @@
 (()=>{'use strict';const $=id=>document.getElementById(id),KEY='vozrozhdenie_demo_v1',fmt=n=>Math.floor(n).toLocaleString('ru-RU');
 const balanceFormat = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const cities = ['Урус-Мартан', 'Гудермес', 'Шали', 'Аргун', 'Ойсхара', 'Ачхой-Мартан', 'Курчалой', 'Серноводское', 'Шатой', 'Грозный'];
-const thresholds = [0, 5, 12, 22, 35, 52, 74, 102, 137, 180];
+const thresholds = [0, 5, 12, 22, 35, 52, 74, 102, 137, 180, 230, 288, 354, 428, 510, 600, 700, 812, 936, 1072];
 const buildings=[['Городской парк','🌳',500,20,1],['Новая школа','🏫',900,35,1],['Мастерская','🏭',1400,50,1],['Жилой дом','🏠',1800,75,2],['Больница','🏥',2500,110,3],['Мечеть','🕌',3000,130,3],['Рынок','🏪',3800,180,4],['Стадион','🏟️',5000,240,5],['Библиотека','📚',6500,320,6]];const fresh=()=>({city:null,coins:1250,income:60,level:1,contribution:120,built:[],tapLevel:0,lastCollectedAt:Date.now(),daily:{}});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){s=fresh()}if(!Array.isArray(s.built))s.built=[];for(const k of ['coins','income','level','contribution','tapLevel','lastCollectedAt'])if(!Number.isFinite(s[k]))s[k]=fresh()[k];let combo=0,lastTap=0,selected=0,timer;let authoritativeOnlineCity=null;const save=()=>localStorage.setItem(KEY,JSON.stringify(s));const day=()=>new Date().toISOString().slice(0,10);function daily(){if(s.daily?.date!==day())s.daily={date:day(),taps:0,builds:0,claimed:[]};return s.daily}let lastActiveTick=performance.now();function collect(){const tick=performance.now(),elapsed=Math.max(0,Math.min(tick-lastActiveTick,60000));lastActiveTick=tick;const gain=s.city?elapsed*hourlyIncome()/3600000:0;s.coins+=gain;if(Math.abs(s.coins-Math.round(s.coins))<1e-8)s.coins=Math.round(s.coins);s.lastCollectedAt=Date.now();save();return gain}function notice(t){$('notice').textContent=t;clearTimeout(timer);timer=setTimeout(()=>$('notice').textContent='',2500)}function power(){return 10+5*s.tapLevel}function cost(){return Math.floor(200*1.7**s.tapLevel)}// Keep the existing active-city fields for saved games and achievement readers.
 if (!s.campaign || typeof s.campaign !== 'object' || Array.isArray(s.campaign)) {
   s.campaign = {};
   if (s.city) {
-    const restoredLevel = Math.max(1, Math.min(10, Math.trunc(s.level)));
+    const restoredLevel = Math.max(1, Math.min(20, Math.trunc(s.level)));
     s.campaign[s.city] = { taps: thresholds[restoredLevel - 1], built: s.built };
     s.level = restoredLevel;
   }
@@ -26,7 +26,7 @@ function useEnergy(amount) {
 }
 
 function prestigeReward() {
-  return cities.filter(city => cityLevel(s.campaign[city]?.taps || 0) === 10).length;
+  return cities.filter(city => cityLevel(s.campaign[city]?.taps || 0) === 20).length;
 }
 
 function showTycoon() {
@@ -111,7 +111,7 @@ function cityLevel(taps) {
 function isUnlocked(city) {
   const index = cities.indexOf(city);
   return index === 0 || !!s.campaign[city] ||
-    (index > 0 && cityLevel(s.campaign[cities[index - 1]]?.taps || 0) === 10);
+    (index > 0 && cityLevel(s.campaign[cities[index - 1]]?.taps || 0) === 20);
 }
 
 function buildProject(building) {
@@ -129,8 +129,8 @@ function developCity() {
   if (level === s.level) return false;
   s.level = level;
   const project = buildings[level - 2];
-  buildProject(project);
-  notice('Уровень ' + level + ' · ' + project[0] + (level === 10 ? ' · Город завершён' : ''));
+  if(project)buildProject(project);
+  notice('Уровень ' + level + (project ? ' · ' + project[0] : ' · новый этап восстановления') + (level === 20 ? ' · Город завершён' : ''));
   return true;
 }
 
@@ -142,19 +142,18 @@ function showCampaign() {
   const next = thresholds[s.level];
   $('city-development').value = next ? ((progress?.taps || 0) - previous) / (next - previous) : 1;
   $('development-text').textContent = !progress ? 'Начни с Урус-Мартана' : next
-    ? 'Уровень ' + s.level + ' из 10 · до улучшения ' + (next - progress.taps) + ' нажатий'
-    : 'Уровень 10 из 10 · город завершён';
+    ? 'Уровень ' + s.level + ' из 20 · до улучшения ' + (next - progress.taps) + ' нажатий'
+    : 'Уровень 20 из 20 · город завершён';
   const nextCity = cities[index + 1];
-  if (index === cities.length - 1 && s.level === 10) {
+  if (index === cities.length - 1 && s.level === 20) {
     const completed = cities.every(city => cityLevel(s.campaign[city]?.taps || 0) === 10);
     if (completed) $('development-text').textContent = 'Все 10 городов завершены';
   }
-  $('next-city').hidden = !!authoritativeOnlineCity || !nextCity || !s.city || (index >= 0 && s.level < 10);
+  $('next-city').hidden = !!authoritativeOnlineCity || !nextCity || !s.city || (index >= 0 && s.level < 20);
   $('next-city').textContent = nextCity ? 'Перейти: ' + nextCity : '';
   $('walk').disabled = !s.city;
   $('town').dataset.level = s.level;
-  $('development-stage').textContent = s.level >= 9 ? 'Новый город'
-    : s.level >= 6 ? 'Рост' : s.level >= 3 ? 'Обновление' : 'Восстановление';
+  $('development-stage').textContent = s.level === 20 ? 'Город будущего' : s.level >= 16 ? 'Современный город' : s.level >= 11 ? 'Развитие' : s.level >= 6 ? 'Строительство' : 'Восстановление';
 }
 
 function renderCityOptions() {
