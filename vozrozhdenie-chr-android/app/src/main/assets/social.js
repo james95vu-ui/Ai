@@ -30,6 +30,7 @@
     session = value;
     if (value) localStorage.setItem(key, JSON.stringify(value));
     else localStorage.removeItem(key);
+    window.dispatchEvent(new Event('game:auth-changed'));
   }
 
   function requestId() {
