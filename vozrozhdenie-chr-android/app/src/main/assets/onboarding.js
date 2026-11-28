@@ -15,7 +15,7 @@ const cities=[['grozny','Грозный'],['urus_martan','Урус-Мартан'
 for(const [id,title] of cities){const option=document.createElement('option');option.value=id;option.textContent=title;citySelect.append(option)}
 let cityBusy=false;
 function credentials(){let session;try{session=JSON.parse(localStorage.getItem(sessionKey)||'null')}catch(_){}const cfg=window.GAME_CONFIG||{};return session?.access_token&&cfg.url&&cfg.key?{session,cfg}:null}
-async function rpc(method,payload={}){const a=credentials();if(!a)throw Error('Сначала подтверди email');const response=await fetch(a.cfg.url.replace(/\\/$/,'')+'/rest/v1/rpc/'+method,{method:'POST',headers:{apikey:a.cfg.key,Authorization:'Bearer '+a.session.access_token,'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!response.ok){let msg='Ошибка '+response.status;try{const body=await response.json();msg=body.message||msg}catch(_){}throw Error(msg)}return response.json()}
+async function rpc(method,payload={}){const a=credentials();if(!a)throw Error('Сначала подтверди email');const response=await fetch(a.cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/'+method,{method:'POST',headers:{apikey:a.cfg.key,Authorization:'Bearer '+a.session.access_token,'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!response.ok){let msg='Ошибка '+response.status;try{const body=await response.json();msg=body.message||msg}catch(_){}throw Error(msg)}return response.json()}
 async function checkCity(){
  if(cityBusy)return;
  const a=credentials();if(!a){cityStep.hidden=true;return}
