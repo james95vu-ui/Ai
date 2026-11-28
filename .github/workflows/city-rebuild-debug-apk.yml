@@ -45,15 +45,13 @@ jobs:
         with:
           gradle-version: '8.7'
       - name: Restore persistent debug signing key
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: vozrozhdenie-chr-android/app/stable-debug.jks
           key: vozrozhdenie-stable-debug-signing-v1
-      - name: Generate debug signing key only on first build
+      - name: Require existing signing key to prevent incompatible updates
         run: |
-          if [ ! -f app/stable-debug.jks ]; then
-            keytool -genkeypair -keystore app/stable-debug.jks -storetype JKS -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Vozrozhdenie,C=EE"
-          fi
+          test -s app/stable-debug.jks || { echo 'Existing signing key unavailable; refusing to generate an incompatible APK'; exit 1; }
       - name: Validate game JavaScript syntax
         run: |
           node - <<'NODE'
