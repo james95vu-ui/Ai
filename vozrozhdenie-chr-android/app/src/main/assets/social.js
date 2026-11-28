@@ -43,7 +43,7 @@
 
   function verification(credential) {
     const input = credential.trim();
-    if (/^[0-9]{6,10}$/.test(input)) return {email, token: input, type: 'email'};
+    if (/^[0-9]{6}$/.test(input)) {if(!email)throw Error('Сначала введи email и запроси код');return {email:email.trim().toLowerCase(),token:input,type:'email'};}
 
     let link;
     try { link = new URL(input); }
@@ -246,7 +246,7 @@
   displaySession();
 
   async function completeLogin(result) {
-    if (!result?.access_token || result.user?.email?.toLowerCase() !== email?.trim().toLowerCase()) {
+    if (!result?.access_token || !result.user?.email || (email && result.user.email.toLowerCase() !== email.trim().toLowerCase())) {
       throw Error('Запроси новое письмо для адреса, который указал в игре');
     }
     store(result);
@@ -259,8 +259,8 @@
 
   function completeRedirect(code) {
     if (session) return;
-    document.querySelector('[data-go="team"]').click();
-    get('social').scrollIntoView({block: 'nearest'});
+    document.querySelector('[data-go="settings"]')?.click();
+    get('social')?.scrollIntoView({block: 'nearest'});
     if (busy) {
       queuedReturn = code;
       return;
@@ -280,7 +280,8 @@
 
   window.addEventListener('city-auth-return', event => completeRedirect(event.detail));
   onSubmit('social-login', async values => {
-    const address = values.email.trim();
+    const address = values.email.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address))throw Error('Введи корректный адрес электронной почты');
     const data = {email: address, create_user: true};
     const login = {email: address};
     let path = '/auth/v1/otp';
@@ -300,11 +301,13 @@
       throw error;
     }
     displaySession();
-    return nativeLogin ? 'Письмо отправлено. Нажми кнопку в письме на этом устройстве'
-      : 'Письмо отправлено. Введи код или вставь ссылку из письма';
+    return 'Письмо отправлено. Введи шестизначный код из письма. Если пришла ссылка, её также можно вставить сюда.';
   });
   onSubmit('social-verify', async values => {
-    const result = await request('/auth/v1/verify', verification(values.credential));
+    const credential=verification(values.credential);
+    let result;
+    try{result=await request('/auth/v1/verify',credential)}
+    catch(e){if(credential.token&&/invalid|expired|token|otp/i.test(e.message)){result=await request('/auth/v1/verify',{...credential,type:'signup'});}else throw e;}
     return completeLogin(result);
   });
   get('social-logout').onclick = () => run(async () => {
