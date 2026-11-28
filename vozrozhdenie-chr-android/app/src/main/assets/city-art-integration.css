@@ -14,3 +14,8 @@ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building
 body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="6"]{left:5%;top:65%}
 body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="7"]{left:38%;top:65%}
 body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="8"]{right:5%;top:67%}
+
+/* The first city stage must look abandoned, not already restored. */
+body.game-shell #town[data-level="1"] #map .city-scenery{background-image:url('city-level-1.svg')!important;filter:saturate(.67) contrast(1.09)!important}
+body.game-shell #town[data-level="1"] #map .city-scenery:after{background:linear-gradient(180deg,#373b3a66,transparent 35%,#342e2580)!important}
+body.game-shell:has(#town[hidden])>.city-services-toggle,body.game-shell:has(#town[hidden])>.city-services-drawer{display:none!important}
