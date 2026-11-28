@@ -30,8 +30,8 @@
 #intro{position:fixed;inset:0;z-index:9999;overflow-y:auto;background:linear-gradient(180deg,#102d27,#071b18);color:#fff4df;display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box}
 #intro[hidden]{display:none!important}
 .intro-card{width:min(100%,460px);border:1px solid #c8a86980;border-radius:26px;overflow:hidden;background:#163b32;box-shadow:0 20px 70px #0008}
-.intro-art{height:240px;background:#183d38 url('intro-city.jpg') center/cover no-repeat;overflow:hidden}
-.intro-art svg{display:none}
+.intro-art{height:240px;background:linear-gradient(180deg,rgba(8,29,30,.05),rgba(8,29,30,.4)),linear-gradient(135deg,#295a52,#173b39);overflow:hidden}
+.intro-art svg{display:block;width:100%;height:100%}
 .intro-content{padding:24px 24px 28px;text-align:center}
 .intro-content h1{font-family:Georgia,serif;font-size:clamp(29px,7vw,40px);letter-spacing:2px;margin:0;color:#fff8e9}
 .intro-subtitle{font-family:Georgia,serif;color:#e9c77d;font-size:clamp(15px,4vw,20px);letter-spacing:1px;margin:6px 0 12px}
@@ -67,8 +67,8 @@
       <input id="intro-name" maxlength="30" autocomplete="nickname" placeholder="Введи имя игрока">
       <label for="intro-email">Электронная почта</label>
       <input id="intro-email" type="email" autocomplete="email" inputmode="email" required placeholder="example@mail.com">
-      <p class="intro-description">Выбери свой город после входа. На почту придёт письмо с подтверждением.</p>
-      <button id="intro-start" type="button">ПОЛУЧИТЬ КОД ВХОДА</button><div id="intro-verification" hidden><label for="intro-code">Код или ссылка из письма</label><input id="intro-code" autocomplete="one-time-code" placeholder="Код из письма"><button id="intro-confirm" type="button">ПОДТВЕРДИТЬ EMAIL</button><button id="intro-resend" type="button">Отправить повторно</button></div>
+      <p class="intro-description">Можно начать без подтверждения почты. Прогресс хранится на этом устройстве; онлайн-функции потребуют входа.</p>
+      <button id="intro-start" type="button">НАЧАТЬ ИГРУ</button><div id="intro-verification" hidden style="display:none"><label for="intro-code">Код или ссылка из письма</label><input id="intro-code" autocomplete="one-time-code" placeholder="Код из письма"><button id="intro-confirm" type="button">ПОДТВЕРДИТЬ EMAIL</button><button id="intro-resend" type="button">Отправить повторно</button></div>
       <div id="intro-city-step" hidden><label for="intro-city-select">Выбери свой город</label><select id="intro-city-select" required></select><p class="intro-description">Город закрепляется за аккаунтом. Сменить его свободно нельзя.</p><button id="intro-city-join" type="button">ЗАКРЕПИТЬ ГОРОД</button></div><p id="intro-error" role="status"></p>
     </div>
   </div>
