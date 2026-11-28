@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="city-theme.css">
 <link rel="stylesheet" href="game-screens.css">
 <link rel="stylesheet" href="visual-refresh.css">
-<link rel="stylesheet" href="city-league.css">
+<link rel="stylesheet" href="city-league.css"><link rel="stylesheet" href="regional-map.css">
 <link rel="stylesheet" href="city-progress.css">
 <link rel="stylesheet" href="community-build.css">
 <link rel="stylesheet" href="completed-buildings.css">
@@ -95,7 +95,7 @@
 <header class="game-header"><div><small>ВОЗРОЖДЕНИЕ</small><h1 id="city">Твой город</h1></div></header>
 <section class="stats"><div class="balance">Баланс<strong id="coins"></strong></div><div>Доход / час<strong id="income"></strong></div><div>Уровень<strong id="level"></strong></div><div>Вклад<strong id="contribution"></strong></div></section>
 <div class="game-screens">
-<section id="town" data-screen><div class="city-hero">
+<section id="regional-map" data-screen hidden><h2>Карта региона</h2><p class="regional-map-intro">Нажми на город, чтобы посмотреть его развитие.</p><div id="regional-map-board"><img src="chechnya-city-map.webp" alt="Игровая карта Чеченской Республики"><div id="regional-map-pins"></div></div><div id="regional-map-detail" aria-live="polite">Загрузка городов…</div></section><section id="town" data-screen><div class="city-hero">
   <div class="city-picker"><select id="cities" aria-label="Город"></select><button id="join" type="button">Перейти</button></div>
 </div><div class="development">
   <div class="development-heading"><p id="development-text"></p><span id="development-stage"></span></div>
@@ -192,7 +192,7 @@
 </dialog>
 </main>
 <nav class="game-nav" aria-label="Разделы игры">
-  <button type="button" data-go="town" aria-controls="town" aria-current="page"><span aria-hidden="true">⌂</span>Город</button>
+  <button type="button" data-go="regional-map" aria-controls="regional-map"><span aria-hidden="true">🗺️</span>Карта</button><button type="button" data-go="town" aria-controls="town" aria-current="page"><span aria-hidden="true">⌂</span>Город</button>
   <button type="button" data-go="earn" aria-controls="earn"><span aria-hidden="true">◉</span>Монеты</button>
   <button type="button" data-go="quests" aria-controls="quests"><span aria-hidden="true">✓</span>Задания</button>
   <button type="button" data-go="team" aria-controls="team"><span aria-hidden="true">▥</span>Рейтинг</button>
