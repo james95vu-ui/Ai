@@ -11,8 +11,24 @@ const drawings=[
 '<rect x="12" y="30" width="72" height="48" fill="#d7bd93"/><path d="m7 30 41-21 41 21" fill="#9a7154"/><rect x="19" y="42" width="14" height="19" fill="#9cc5c3"/><rect x="42" y="42" width="14" height="19" fill="#9cc5c3"/><rect x="65" y="42" width="12" height="19" fill="#9cc5c3"/><path d="M40 78V64h17v14" fill="#6b5843"/>'
 ];
 const svg=markup=>'<svg class="city-building-art" viewBox="0 0 96 84" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse cx="48" cy="78" rx="43" ry="5" fill="#0b1c17" opacity=".55"/>'+markup+'</svg>';
-function decorate(){document.querySelectorAll('#map .city-building').forEach(button=>{const index=Number(button.dataset.building);if(!Number.isInteger(index)||!drawings[index])return;const old=button.querySelector('.city-building-art');if(old)old.remove();const icon=button.querySelector('span:first-child');if(icon)icon.hidden=true;button.insertAdjacentHTML('afterbegin',svg(drawings[index]));});}
+function decorate(){
+ document.querySelectorAll('#map .city-building').forEach(button=>{
+  const index=Number(button.dataset.building);
+  if(!Number.isInteger(index)||!drawings[index])return;
+  // map() recreates each button; decorate it once, without mutating unrelated nodes.
+  if(button.dataset.artReady==='1')return;
+  button.dataset.artReady='1';
+  const originalIcon=Array.from(button.children).find(el=>el.tagName==='SPAN'&&!el.classList.contains('city-building-label'));
+  if(originalIcon)originalIcon.hidden=true;
+  button.insertAdjacentHTML('afterbegin',svg(drawings[index]));
+  const illustration=button.querySelector('.city-building-art');
+  if(illustration)illustration.style.opacity=button.classList.contains('built')?'1':'.72';
+ });
+}
 const map=document.getElementById('map');if(!map)return;
-const observer=new MutationObserver(decorate);observer.observe(map,{childList:true});
+const observer=new MutationObserver(records=>{
+ if(records.some(record=>Array.from(record.addedNodes).some(node=>node.nodeType===1&&node.classList?.contains('city-building'))))decorate();
+});
+observer.observe(map,{childList:true});
 decorate();
 })();
