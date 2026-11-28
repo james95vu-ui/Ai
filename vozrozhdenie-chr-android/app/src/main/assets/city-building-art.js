@@ -22,7 +22,18 @@ function decorate(){
   if(originalIcon)originalIcon.hidden=true;
   button.insertAdjacentHTML('afterbegin',svg(drawings[index]));
   const illustration=button.querySelector('.city-building-art');
-  if(illustration)illustration.style.opacity=button.classList.contains('built')?'1':'.72';
+  if(illustration){
+   const built=button.classList.contains('built');
+   const level=Math.max(0,Number(button.dataset.upgradeLevel)||0);
+   illustration.style.opacity=built?'1':'.48';
+   illustration.style.filter=built?'saturate('+Math.min(1.7,1.05+level*.13)+') brightness('+Math.min(1.35,1+level*.055)+')':'grayscale(.85) brightness(.75)';
+   if(built&&level>0){
+    const glow=document.createElement('span');
+    glow.className='city-upgrade-glow';
+    glow.setAttribute('aria-hidden','true');
+    button.append(glow);
+   }
+  }
  });
 }
 const map=document.getElementById('map');if(!map)return;
