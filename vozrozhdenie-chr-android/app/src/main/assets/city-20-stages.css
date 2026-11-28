@@ -1,0 +1,27 @@
+/* Twenty visually distinct reconstruction milestones, bound to actual campaign level. */
+#town #map .city-scenery{transition:filter .8s ease,opacity .8s ease!important}
+#town #map .city-scenery::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:url('city-level-1.svg') center/cover no-repeat;opacity:var(--ruin-opacity,0);transition:opacity 1s ease}
+#town #map .city-scenery::after{z-index:2!important}
+#town[data-level="1"] #map .city-scenery{background-image:url('city-level-1.svg')!important}
+#town[data-level="1"] #map .city-scenery{--ruin-opacity:0;filter:saturate(0.620) brightness(0.830)!important}
+#town[data-level="1"] #map .city-scenery{filter:saturate(.67) contrast(1.09)!important}
+#town[data-level="2"] #map .city-scenery{--ruin-opacity:0.857;filter:saturate(0.652) brightness(0.846)!important}
+#town[data-level="3"] #map .city-scenery{--ruin-opacity:0.786;filter:saturate(0.684) brightness(0.862)!important}
+#town[data-level="4"] #map .city-scenery{--ruin-opacity:0.714;filter:saturate(0.716) brightness(0.878)!important}
+#town[data-level="5"] #map .city-scenery{--ruin-opacity:0.643;filter:saturate(0.748) brightness(0.894)!important}
+#town[data-level="6"] #map .city-scenery{--ruin-opacity:0.571;filter:saturate(0.780) brightness(0.910)!important}
+#town[data-level="7"] #map .city-scenery{--ruin-opacity:0.500;filter:saturate(0.812) brightness(0.926)!important}
+#town[data-level="8"] #map .city-scenery{--ruin-opacity:0.429;filter:saturate(0.844) brightness(0.942)!important}
+#town[data-level="9"] #map .city-scenery{--ruin-opacity:0.357;filter:saturate(0.876) brightness(0.958)!important}
+#town[data-level="10"] #map .city-scenery{--ruin-opacity:0.286;filter:saturate(0.908) brightness(0.974)!important}
+#town[data-level="11"] #map .city-scenery{--ruin-opacity:0.214;filter:saturate(0.940) brightness(0.990)!important}
+#town[data-level="12"] #map .city-scenery{--ruin-opacity:0.143;filter:saturate(0.972) brightness(1.006)!important}
+#town[data-level="13"] #map .city-scenery{--ruin-opacity:0.071;filter:saturate(1.004) brightness(1.022)!important}
+#town[data-level="14"] #map .city-scenery{--ruin-opacity:0.000;filter:saturate(1.036) brightness(1.038)!important}
+#town[data-level="15"] #map .city-scenery{--ruin-opacity:0.000;filter:saturate(1.068) brightness(1.054)!important}
+#town[data-level="16"] #map .city-scenery{--ruin-opacity:0.000;filter:saturate(1.100) brightness(1.070)!important}
+#town[data-level="17"] #map .city-scenery{--ruin-opacity:0.000;filter:saturate(1.132) brightness(1.086)!important}
+#town[data-level="18"] #map .city-scenery{--ruin-opacity:0.000;filter:saturate(1.164) brightness(1.102)!important}
+#town[data-level="19"] #map .city-scenery{--ruin-opacity:0.000;filter:saturate(1.196) brightness(1.118)!important}
+#town[data-level="20"] #map .city-scenery{--ruin-opacity:0.000;filter:saturate(1.228) brightness(1.134)!important}
+#town .development-heading #development-stage{white-space:normal!important;text-align:right!important}
