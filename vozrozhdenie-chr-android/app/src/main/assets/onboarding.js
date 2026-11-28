@@ -17,24 +17,30 @@ let cityBusy=false;
 function credentials(){let session;try{session=JSON.parse(localStorage.getItem(sessionKey)||'null')}catch(_){}const cfg=window.GAME_CONFIG||{};return session?.access_token&&cfg.url&&cfg.key?{session,cfg}:null}
 async function rpc(method,payload={}){const a=credentials();if(!a)throw Error('Сначала подтверди email');if(a.session.expires_at&&a.session.expires_at<Date.now()/1000+60&&a.session.refresh_token){const refreshed=await fetch(a.cfg.url.replace(/\/$/,'')+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:a.cfg.key,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:a.session.refresh_token})});if(!refreshed.ok)throw Error('Сессия истекла. Войди снова по почте');const fresh=await refreshed.json();localStorage.setItem(sessionKey,JSON.stringify(fresh));a.session=fresh}const response=await fetch(a.cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/'+method,{method:'POST',headers:{apikey:a.cfg.key,Authorization:'Bearer '+a.session.access_token,'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!response.ok){let msg='Ошибка '+response.status;try{const body=await response.json();msg=body.message||msg}catch(_){}throw Error(msg)}return response.json()}
 async function syncNickname(){
- const a=credentials(),nickname=(localStorage.getItem('chr_player_name_v1')||'').trim();
- if(!a||nickname.length<2||nickname.length>30)return;
- const userId=a.session.user?.id;
- if(!userId)return;
- const key='chr_nickname_registered_'+userId;
- if(localStorage.getItem(key)==='1')return;
- try{await rpc('game_set_nickname',{p_nickname:nickname});localStorage.setItem(key,'1')}
- catch(e){error.textContent='Город сохранён, но имя пока не синхронизировано: '+e.message}
+ const a=credentials(),proposed=(localStorage.getItem('chr_player_name_v1')||'').trim();
+ if(!a)return;
+ try{
+  const profile=await rpc('game_my_nickname');
+  if(profile?.[0]?.nickname){
+   localStorage.setItem('chr_player_name_v1',profile[0].nickname);
+   name.value=profile[0].nickname;
+   return;
+  }
+  if(proposed.length>=2&&proposed.length<=30){
+   const saved=await rpc('game_set_nickname',{p_nickname:proposed});
+   localStorage.setItem('chr_player_name_v1',saved);
+  }
+ }catch(e){error.textContent='Не удалось синхронизировать имя: '+e.message}
 }
 async function checkCity(){
  if(cityBusy)return;
  const a=credentials();if(!a){cityStep.hidden=true;return}
- cityBusy=true;intro.hidden=false;step.hidden=true;start.hidden=true;name.disabled=true;email.disabled=true;cityStep.hidden=true;error.textContent='Проверяем закреплённый город…';
+ cityBusy=true;cityJoin.disabled=false;intro.hidden=false;step.hidden=true;start.hidden=true;name.disabled=true;email.disabled=true;cityStep.hidden=true;error.textContent='Проверяем закреплённый город…';
  try{
   const rows=await rpc('city_my_progress');
   if(rows?.length){await syncNickname();intro.hidden=true;window.dispatchEvent(new Event('online'));return}
   cityStep.hidden=false;error.textContent='Выбери город. После подтверждения изменить его можно только по правилам игры.';
- }catch(e){cityStep.hidden=false;cityJoin.disabled=true;error.textContent='Не удалось проверить город: '+e.message}
+ }catch(e){cityStep.hidden=false;cityJoin.disabled=true;error.textContent='Не удалось проверить город: '+e.message+'. Повтори проверку после восстановления соединения.'}
  finally{cityBusy=false}
 }
 cityJoin.onclick=async()=>{
@@ -46,7 +52,7 @@ cityJoin.onclick=async()=>{
  finally{cityBusy=false;cityJoin.disabled=false}
 };
 window.addEventListener('game:auth-changed',()=>{if(credentials())checkCity();else{intro.hidden=false;cityStep.hidden=true;start.hidden=false;name.disabled=false;email.disabled=false;sync()}});
-window.addEventListener('pageshow',()=>{if(credentials())checkCity();else sync()});
+window.addEventListener('online',()=>{if(credentials())checkCity()});\nwindow.addEventListener('pageshow',()=>{if(credentials())checkCity();else sync()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(credentials())checkCity();else sync()}});
 if(credentials())checkCity();else sync();
 })();
