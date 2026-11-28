@@ -1,7 +1,7 @@
 
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-const key='chr_new_era_settings_v1',defaults={sound:true,music:false,volume:60,vibration:true};
+const key='chr_new_era_settings_v1',defaults={sound:true,music:true,volume:60,vibration:true};
 let settings;try{settings={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(e){settings={...defaults}}
 const persist=()=>localStorage.setItem(key,JSON.stringify(settings));
 const screens = document.querySelector('.game-screens');
@@ -36,7 +36,8 @@ const melody=[392,440,493.88,587.33,493.88,440,392,329.63,349.23,392,440,523.25,
 function playTone(a,freq,start,duration,volume,type='sine'){try{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.00001,start);g.gain.linearRampToValueAtTime(volume,start+.07);g.gain.exponentialRampToValueAtTime(.00001,start+duration);o.connect(g).connect(a.destination);o.start(start);o.stop(start+duration+.02)}catch(e){}}
 function musicNote(){if(!settings.music||!settings.volume||document.hidden)return;const a=ctx();if(!a||a.state!=='running')return;const t=a.currentTime,step=musicStep++,scale=settings.volume/100;const chord=chords[Math.floor(step/4)%chords.length];if(step%4===0){chord.forEach((f,i)=>playTone(a,f,t,3.8,scale*.0035,'sine'));playTone(a,chord[0]/2,t,2.4,scale*.009,'triangle')}if(step%2===0)playTone(a,melody[step%melody.length],t,.85,scale*.014,'sine');else if(step%4===3)playTone(a,melody[(step+2)%melody.length]/2,t,1.1,scale*.006,'triangle')}
 function updateMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}if(!settings.music||!settings.volume||document.hidden)return;const a=ctx();if(!a)return;a.resume?.().catch(()=>{});musicNote();musicTimer=setInterval(musicNote,720)}
-document.addEventListener('pointerdown',()=>{if(settings.music&&audioCtx?.state==='suspended')audioCtx.resume?.().then(updateMusic).catch(()=>{})},{passive:true});
+document.addEventListener('pointerdown',()=>{if(settings.music){const a=ctx();if(a&&a.state!=='running')a.resume().then(updateMusic).catch(()=>{});else if(!musicTimer)updateMusic()}},{passive:true});
+updateMusic();
 document.addEventListener('visibilitychange',updateMusic);
 $('tap').addEventListener('click', () => {
   sound();
