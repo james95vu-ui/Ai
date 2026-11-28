@@ -9,7 +9,7 @@ if(settings){
 }
 const connect=document.getElementById('connect');if(connect){connect.hidden=true;connect.style.display='none'}
 if(team){const hint=document.createElement('p');hint.textContent='Для входа в сообщество открой «Настройки» → «Профиль игрока». Рейтинг можно просматривать здесь.';team.insertBefore(hint,team.firstElementChild?.nextSibling||null)}
-if(sessionStorage.getItem('chr_reset_notice')==='1'){sessionStorage.removeItem('chr_reset_notice');const n=document.getElementById('notice');if(n)n.textContent='Локальный прогресс сброшен. Начни новую игру.';}
+if(sessionStorage.getItem('chr_reset_notice')==='1'){sessionStorage.removeItem('chr_reset_notice');const n=document.getElementById('notice');if(n){const message='Локальный прогресс сброшен.';n.textContent=message;setTimeout(()=>{if(n.textContent===message)n.textContent=''},1400)}}
 const reset=document.querySelector('#settings .chr-reset');
 if(reset){
  reset.onclick=()=>{

@@ -7,3 +7,5 @@
 .city-league-heading span,.city-league-score{font-size:12px;opacity:.82}
 .city-league-score{margin-top:5px}
 .city-league-refresh{min-height:44px;padding:10px 14px;border:1px solid #d5b879;border-radius:12px;background:#d5b879;color:#16372e;font-weight:700}
+
+.city-league h3{padding:38px 14px 12px;border-radius:12px;background:linear-gradient(0deg,#102c29ee,transparent),url(city-reconstruction-realistic.jpg) center 40%/cover;color:white}.city-league-item:first-child{border-color:#cbac68;background:linear-gradient(110deg,#7a633344,#102d29)}

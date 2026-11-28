@@ -1,7 +1,7 @@
 'use strict';
 
 const Tycoon = (() => {
-  const energyTick = 3000;
+  const baseEnergyTick = 1100;
   const chestCooldown = 4 * 60 * 60 * 1000;
   const maxUpgrade = 30;
   const tech = [
@@ -28,12 +28,13 @@ const Tycoon = (() => {
   }
 
   function energyCap(t) {
-    return (t.technologies.includes('power') ? 80 : 60) + 10 * (t.energyUpgrades || 0);
+    return (t.technologies.includes('power') ? 200 : 180) + 10 * (t.energyUpgrades || 0);
   }
 
   function recharge(t, now) {
     const cap = energyCap(t);
     if (now < t.energyAt) return;
+    const energyTick = Math.max(500,baseEnergyTick-60*(t.regenLevel||0));
     const ticks = Math.floor((now - t.energyAt) / energyTick);
     t.energy = Math.min(cap, t.energy + ticks);
     t.energyAt = t.energy === cap ? now : t.energyAt + ticks * energyTick;

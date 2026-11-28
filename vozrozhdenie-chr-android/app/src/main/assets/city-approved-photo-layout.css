@@ -16,3 +16,5 @@
 #town #map .city-building:not(.selected):not(:focus-visible){outline:0!important}
 #town #map .city-building:not(.selected) .city-building-label{opacity:.83!important}
 #town #map .city-building:focus-visible{outline:2px solid #ffe4a3!important}
+
+body.game-shell #town #map .city-scenery > .city-photo,body.game-shell #town #map .city-photo img {display:block!important;width:100%;height:100%;object-fit:cover;object-position:center}

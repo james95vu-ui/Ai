@@ -1,7 +1,7 @@
 
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-const key='chr_new_era_settings_v1',defaults={sound:true,music:false,volume:60,vibration:true};
+const key='chr_new_era_settings_v1',defaults={sound:true,music:true,volume:60,vibration:true};
 let settings;try{settings={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(e){settings={...defaults}}
 const persist=()=>localStorage.setItem(key,JSON.stringify(settings));
 const screens = document.querySelector('.game-screens');
@@ -55,6 +55,15 @@ $('tap').addEventListener('click', () => {
 $('join').addEventListener('click',sound);$('upgrade').addEventListener('click',sound);
 const oldKey='vozrozhdenie_demo_v1';
 const awards=[['Первый шаг','Выбери город',s=>!!s.city],['Строитель','Построй первое здание',s=>(s.built||[]).length>=1],['Архитектор','Построй 5 зданий',s=>(s.built||[]).length>=5],['Мастер дохода','Достигни 500 монет в час',s=>s.income>=500],['Герой города','Достигни 5 уровня',s=>s.level>=5],['Тысяча вкладов','Набери 1000 очков вклада',s=>s.contribution>=1000]];
+awards.push(
+ ['Городской инженер','Улучши силу нажатия 12 раз',s=>s.tapLevel>=12],
+ ['Энергетик','Расширь запас энергии 15 раз',s=>s.tycoon?.energyUpgrades>=15],
+ ['Без передышки','Доведи восстановление энергии до 10 уровня',s=>s.tycoon?.regenLevel>=10],
+ ['Мастер серии','Доведи доход за серию до 10 уровня',s=>s.tycoon?.comboLevel>=10],
+ ['Большая стройка','Накопи 250 000 очков вклада',s=>s.contribution>=250000],
+ ['Миллион для города','Накопи миллион очков вклада',s=>s.contribution>=1000000],
+ ['Город будущего','Достигни 20 уровня города',s=>s.level>=20]
+);
 function renderAwards(){let s={};try{s=JSON.parse(localStorage.getItem(oldKey)||'{}')}catch(e){}achievements.querySelectorAll('.achievement').forEach(e=>e.remove());for(const [name,desc,check] of awards){const ok=check(s),r=document.createElement('div');r.className='achievement'+(ok?'':' locked');const t=document.createElement('div');t.textContent=(ok?'🏆 ':'🔒 ')+name;const small=document.createElement('small');small.textContent=desc;t.append(document.createElement('br'),small);const status=document.createElement('strong');status.textContent=ok?'✓':'—';r.append(t,status);achievements.append(r)}}
 renderAwards();document.addEventListener('click',()=>setTimeout(renderAwards,30));setInterval(renderAwards,15000);
 })();

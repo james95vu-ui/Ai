@@ -92,7 +92,7 @@
   </div>
 </div>
 <main>
-<header class="game-header"><div><small>ВОЗРОЖДЕНИЕ</small><h1 id="city">Твой город</h1></div><p id="route"></p></header>
+<header class="game-header"><div><small>ВОЗРОЖДЕНИЕ</small><h1 id="city">Твой город</h1></div></header>
 <section class="stats"><div class="balance">Баланс<strong id="coins"></strong></div><div>Доход / час<strong id="income"></strong></div><div>Уровень<strong id="level"></strong></div><div>Вклад<strong id="contribution"></strong></div></section>
 <div class="game-screens">
 <section id="town" data-screen><div class="city-hero">
@@ -103,7 +103,7 @@
   <button id="walk" type="button" hidden disabled aria-hidden="true">Прогулка 3D</button>
   <button id="next-city" type="button" hidden></button>
 </div><div class="landscape"><div id="map"></div></div><div id="details"></div></section>
-<section id="earn" data-screen hidden><h2>Заработок</h2><div class="energy-status">Энергия <strong id="energy"></strong></div><progress id="energy-bar" aria-label="Энергия" value="0"></progress><div class="tapwrap"><button id="tap"><span class="tap-emblem" aria-hidden="true"></span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><button id="energy-upgrade" type="button">⚡ Улучшить запас энергии</button><div class="passive-income">
+<section id="earn" data-screen hidden><h2>Заработок</h2><div class="energy-status">Энергия <strong id="energy"></strong></div><progress id="energy-bar" aria-label="Энергия" value="0"></progress><div class="tapwrap"><button id="tap"><span class="tap-emblem" aria-hidden="true"></span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><button id="energy-upgrade" type="button">⚡ Улучшить запас энергии</button><button id="regenLevel" type="button"></button><button id="comboLevel" type="button"></button><div class="passive-income">
   <div><strong>Пассивный доход</strong><span id="income-next"></span></div>
   <progress id="income-progress" aria-label="Прогресс до следующей монеты" max="1" value="0"></progress>
   <p id="offline"></p>
@@ -112,7 +112,7 @@
   <h3>Сундук</h3><p>250 монет (65%) · 400 и 12 энергии (25%) · 800 и 25 энергии (10%). Бесплатно раз в 4 часа.</p>
   <button id="chest" type="button"></button>
 </div></section>
-<section id="team" data-screen hidden><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><button id="refresh">Обновить рейтинг</button><div id="ranking"></div><div class="tycoon-card"><h3>🏆 Лучшие игроки</h3><p id="player-ranking-status">Для рейтинга игроков требуется подтверждённый онлайн-вход.</p><button id="player-ranking-refresh" type="button">Обновить игроков</button><div id="player-ranking" aria-live="polite"></div><h3>👆 Рейтинг тапалки</h3><p>Учитываются только нажатия, подтверждённые сервером.</p><div id="tap-ranking" aria-live="polite"></div></div>
+<section id="team" data-screen hidden><h2>Команда и рейтинг</h2><p id="network">Локальная игра. Онлайн-сервис не подключён.</p><button id="connect">Подключить онлайн</button><div class="tycoon-card"><h3>🏆 Лучшие игроки</h3><p id="player-ranking-status">Для рейтинга игроков требуется подтверждённый онлайн-вход.</p><button id="player-ranking-refresh" type="button">Обновить игроков</button><div id="player-ranking" aria-live="polite"></div><h3>👆 Рейтинг тапалки</h3><p>Учитываются только нажатия, подтверждённые сервером.</p><div id="tap-ranking" aria-live="polite"></div></div>
 <div class="tycoon-card" id="social">
   <h3>Сообщество</h3>
   <p id="social-status" role="status"></p>
