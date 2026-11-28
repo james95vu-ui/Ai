@@ -262,13 +262,18 @@ function updateBuildButton() {
 function map() {
   const el = $('map');
   el.replaceChildren();
+  const scenery=document.createElement('div');scenery.className='city-scenery';scenery.setAttribute('aria-hidden','true');scenery.innerHTML='<div class="city-sky"></div><div class="city-mountains city-mountains-back"></div><div class="city-mountains city-mountains-front"></div><div class="city-forest"></div><div class="city-river"></div><div class="city-path"></div><div class="city-trees"></div>';
+  el.append(scenery);
   buildings.forEach((project, i) => {
     const button = document.createElement('button');
     const built = s.built.includes(project[0]);
-    button.className = 'plot' + (built ? ' built' : '') + (selected === i ? ' selected' : '');
+    button.className = 'plot city-building' + (built ? ' built' : '') + (selected === i ? ' selected' : '');
+    button.dataset.building=String(i);
+    button.setAttribute('aria-label',project[0]+(built?' — построено':' — доступно для строительства'));
     const icon = document.createElement('span');
     icon.textContent = built ? project[1] : '＋';
-    button.append(icon, document.createTextNode(project[0]));
+    const label=document.createElement('span');label.className='city-building-label';label.textContent=project[0];
+    button.append(icon,label);
     button.onclick = () => { selected = i; map(); };
     el.append(button);
   });
