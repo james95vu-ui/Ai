@@ -22,6 +22,6 @@ try{const result=await rpc(name);lastActionMessage=name==='game_claim_manager_in
 catch(e){lastActionMessage='Ошибка: '+e.message;status.textContent=lastActionMessage}
 finally{busy=false;refresh.disabled=false;await load()}}
 hire.addEventListener('click',()=>act('game_hire_manager'));claim.addEventListener('click',()=>act('game_claim_manager_income'));refresh.addEventListener('click',load);
-document.querySelector('[data-go="earn"]')?.addEventListener('click',()=>setTimeout(load,0));window.addEventListener('online',load);let tapCount=0;window.addEventListener('game:online-tap',()=>{if(++tapCount%10===0&&!screen.hidden)load()});
+document.querySelector('[data-go="earn"]')?.addEventListener('click',()=>setTimeout(load,0));window.addEventListener('online',load);window.addEventListener('game:server-wallet-updated',load);let tapCount=0;window.addEventListener('game:online-tap',()=>{if(++tapCount%10===0&&!screen.hidden)load()});
 if(!screen.hidden)load();
 })();
