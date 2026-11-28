@@ -11,8 +11,8 @@ android {
         applicationId 'com.vozrozhdenie.chr'
         minSdk 23
         targetSdk 35
-        versionCode (project.findProperty('ciVersionCode') ?: '1').toInteger()
-        versionName '0.1.' + (project.findProperty('ciVersionCode') ?: '0')
+        versionCode = Integer.parseInt((project.findProperty('ciVersionCode') ?: '1').toString())
+        versionName = '0.1.' + (project.findProperty('ciVersionCode') ?: '0').toString()
     }
 
     signingConfigs {
