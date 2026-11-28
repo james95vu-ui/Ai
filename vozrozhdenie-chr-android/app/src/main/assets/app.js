@@ -269,11 +269,21 @@ function map() {
     const built = s.built.includes(project[0]);
     button.className = 'plot city-building' + (built ? ' built' : '') + (selected === i ? ' selected' : '');
     button.dataset.building=String(i);
+    const upgradeLevel=s.campaign[s.city]?.upgrades?.[project[0]]||0;
+    button.dataset.upgradeLevel=String(upgradeLevel);
+    button.dataset.construction=built?'complete':'planned';
     button.setAttribute('aria-label',project[0]+(built?' — построено':' — доступно для строительства'));
     const icon = document.createElement('span');
     icon.textContent = built ? project[1] : '＋';
     const label=document.createElement('span');label.className='city-building-label';label.textContent=project[0];
     button.append(icon,label);
+    if(built){
+      const levelBadge=document.createElement('span');
+      levelBadge.className='city-upgrade-badge';
+      levelBadge.textContent='★ '+(upgradeLevel+1);
+      levelBadge.setAttribute('aria-label','Уровень здания '+(upgradeLevel+1));
+      button.append(levelBadge);
+    }
     button.onclick = () => { selected = i; window.cityDetailsOpen=true; map(); };
     el.append(button);
   });
