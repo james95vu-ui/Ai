@@ -43,7 +43,7 @@ function showTycoon() {
   $('energy-bar').max = Tycoon.energyCap(tycoon);
   $('energy-bar').value = tycoon.energy;
   $('tap').disabled = !s.city || tycoon.energy < 1;
-  $('upgrade').disabled = !s.city || s.coins < cost() || tycoon.energy < 3;
+  $('upgrade').disabled = !s.city || s.coins < cost();
   for (const [key,label,base] of tapExtras) {
     const level=tycoon[key]||0, price=Math.ceil(base*1.65**level), button=$(key);
     button.textContent=label+' · '+level+'/10'+(level<10?' · '+fmt(price)+' ◉':'');
@@ -245,7 +245,7 @@ function stats() {
   $('power').textContent = '+' + fmt(tapReward()) + ' монет';
   $('combo').textContent = combo >= 10 ? 'Комбо ×'+comboMultiplier().toLocaleString('ru-RU')+'!' : 'Комбо ' + combo + ' / 10';
   $('bar').value = combo;
-  $('upgrade').textContent = 'Улучшить нажатие: ' + fmt(cost()) + ' ◉ · 3 энергии';
+  $('upgrade').textContent = 'Улучшить нажатие: ' + fmt(cost()) + ' ◉';
   showTycoon();
 }
 
@@ -297,7 +297,7 @@ function map() {
       levelBadge.setAttribute('aria-label','Уровень здания '+(upgradeLevel+1));
       button.append(levelBadge);
     }
-    button.onclick = () => { selected = i; window.cityDetailsOpen=true; map(); };
+    button.onclick = () => { selected = i; window.cityDetailsOpen=true; map(); $('details').scrollIntoView({block:'nearest'}); };
     el.append(button);
   });
 
@@ -342,7 +342,7 @@ $('next-city').onclick = () => visitCity(cities[cities.indexOf(s.city) + 1]);
 $('walk').onclick = () => $('walk-view').dispatchEvent(new CustomEvent('walkstart', {
   detail: { city: s.city, level: s.level, built: buildings.map(building => s.built.includes(building[0])) }
 }));
-$('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=tapReward();s.coins+=n;s.contribution+=n;daily().taps++;daily().earned=(daily().earned||0)+n;if(combo===10)daily().series=(daily().series||0)+1;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('energy-upgrade').onclick=()=>{const level=tycoon.energyUpgrades||0,price=Math.floor(350*Math.pow(1.65,level));if(!s.city||level>=30||s.coins<price)return;collect();s.coins-=price;tycoon.energyUpgrades=level+1;tycoon.energy=Math.min(Tycoon.energyCap(tycoon),tycoon.energy+10);save();render();notice('Максимальная энергия увеличена на 10')};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost()||!useEnergy(3))return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Локальный доход за закрытую игру не начисляется. Онлайн-менеджеры копят до 24 часов по времени сервера.';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
+$('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=tapReward();s.coins+=n;s.contribution+=n;daily().taps++;daily().earned=(daily().earned||0)+n;if(combo===10)daily().series=(daily().series||0)+1;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('energy-upgrade').onclick=()=>{const level=tycoon.energyUpgrades||0,price=Math.floor(350*Math.pow(1.65,level));if(!s.city||level>=30||s.coins<price)return;collect();s.coins-=price;tycoon.energyUpgrades=level+1;tycoon.energy=Math.min(Tycoon.energyCap(tycoon),tycoon.energy+10);save();render();notice('Максимальная энергия увеличена на 10')};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost() )return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Локальный доход за закрытую игру не начисляется. Онлайн-менеджеры копят до 24 часов по времени сервера.';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
   if (document.hidden || !s.city) return;
   const wholeCoins = Math.floor(s.coins);
   const questDay = s.daily?.date;

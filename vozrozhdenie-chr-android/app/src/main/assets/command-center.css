@@ -1,0 +1,119 @@
+/* Command center: immersive strategy HUD for the existing Android WebView game. */
+:root{
+  color-scheme:dark;
+  --cc-bg:#081613;--cc-panel:rgba(10,27,24,.86);--cc-panel-2:rgba(19,42,35,.94);
+  --cc-line:rgba(239,208,143,.28);--cc-gold:#f0cb7e;--cc-mint:#b9e7bc;--cc-cream:#fff4dc;
+  --cc-safe-top:env(safe-area-inset-top,0px);--cc-safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body.game-shell{width:100%;height:100%;min-height:100%;overflow:hidden}
+body.game-shell{background:var(--cc-bg);color:var(--cc-cream);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none;touch-action:pan-x pan-y}
+.game-shell main{position:relative;width:100%;max-width:none;height:100svh;min-height:100svh;margin:0;padding:0;overflow:hidden;isolation:isolate}
+.game-shell .game-header{position:absolute;z-index:40;left:14px;right:14px;top:calc(7px + var(--cc-safe-top));height:48px;padding:5px 12px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--cc-line);border-radius:17px;background:linear-gradient(135deg,rgba(7,25,22,.92),rgba(27,57,44,.77));box-shadow:0 7px 22px #0007,inset 0 1px #ffffff20;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.game-shell .game-header:before,.game-shell .game-header:after{display:none}
+.game-shell .game-header small{display:block;margin:0;color:#e9c779;font-size:9px;line-height:1;letter-spacing:.2em}
+.game-shell .game-header h1{margin:4px 0 0;font:700 17px/1.1 Georgia,serif;letter-spacing:.02em;color:#fff5dd}
+.game-shell .stats{position:absolute;z-index:40;top:calc(62px + var(--cc-safe-top));left:14px;right:14px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:0;border:0;background:none}
+.game-shell .stats>div{min-width:0;min-height:46px;padding:6px 7px 5px;border:1px solid rgba(235,209,157,.2);border-radius:12px;background:linear-gradient(145deg,rgba(7,24,22,.88),rgba(18,45,36,.82));box-shadow:0 5px 14px #0005;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:9px;line-height:1.1;color:#d2d9c7;overflow:hidden}
+.game-shell .stats>div:after{display:none}
+.game-shell .stats strong{display:block;margin-top:4px;color:#f2d38e;font-size:clamp(12px,3.3vw,16px);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-shell .game-screens{position:absolute;inset:calc(115px + var(--cc-safe-top)) 0 calc(67px + var(--cc-safe-bottom));min-height:0;overflow:hidden}
+.game-shell .game-screens>section{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:15px 14px 22px;border:0;border-radius:0;background:transparent;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;animation:cc-screen-in .22s ease-out both}
+.game-shell .game-screens>section::-webkit-scrollbar{display:none}
+.game-shell .game-screens>section[hidden]{display:none!important}
+.game-shell .game-screens h2{font:700 21px/1.15 Georgia,serif;color:#fff2d3;margin:2px 0 12px}
+.game-shell .game-screens h3{font-size:15px;color:#f1d18a}
+.game-shell .game-screens p{color:#d0ddcf}
+.game-shell button,.game-shell select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.game-shell .game-nav{position:fixed;z-index:80;left:10px;right:10px;bottom:calc(7px + var(--cc-safe-bottom));width:auto;transform:none;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;padding:5px;border:1px solid rgba(239,212,160,.22);border-radius:20px;background:linear-gradient(165deg,rgba(23,44,37,.97),rgba(6,19,18,.97));box-shadow:0 10px 35px #0009,inset 0 1px #ffffff18;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.game-shell .game-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;min-height:49px;padding:5px 2px;border-radius:14px;background:transparent;color:#b9c8b8;font:600 9px/1.05 system-ui,sans-serif;white-space:nowrap}
+.game-shell .game-nav button span{font-size:19px;line-height:1;text-shadow:none}
+.game-shell .game-nav button[aria-current="page"]{background:linear-gradient(160deg,rgba(220,184,103,.24),rgba(183,141,60,.09));color:#ffe6a8;box-shadow:inset 0 0 0 1px rgba(237,198,114,.25)}
+.game-shell .game-nav button[aria-current="page"]:after{content:"";position:absolute;top:3px;left:34%;right:34%;height:2px;border-radius:2px;background:#f5d38d;box-shadow:0 0 8px #f5d38d}
+.game-shell .game-nav button:active{transform:scale(.94)}
+.game-shell #notice{z-index:120;bottom:calc(70px + var(--cc-safe-bottom));left:50%;width:max-content;max-width:calc(100% - 28px);padding:11px 15px;border:1px solid #eacb84;border-radius:14px;background:rgba(13,36,30,.96);color:#fff0ce;box-shadow:0 8px 28px #0009;text-align:center;font-size:12px}
+.game-shell #notice:empty{display:none}
+.game-shell .city-hero{position:absolute;z-index:4;left:12px;right:12px;top:8px;padding:0}
+.game-shell .city-picker{display:flex;width:max-content;max-width:100%;margin:auto;padding:5px;border:1px solid var(--cc-line);border-radius:15px;background:var(--cc-panel);box-shadow:0 6px 18px #0007;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.game-shell .city-picker select{max-width:210px;min-width:0;margin:0;padding:9px 28px 9px 10px;border-radius:10px;background:#163b32;color:#fff1d3;font-size:12px}
+.game-shell .city-picker button{padding:9px 12px;border-radius:10px;background:linear-gradient(#f0d99f,#bd9957);color:#243b2e;font-size:11px}
+.game-shell #town{padding:0;overflow:hidden;background:#10291e}
+.game-shell #town .development{position:absolute;z-index:5;top:54px;left:12px;right:12px;margin:0;padding:9px 11px;border:1px solid rgba(245,217,157,.26);border-radius:14px;background:rgba(8,28,24,.75);box-shadow:0 7px 18px #0006;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.game-shell .development-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.game-shell #development-text{margin:0;color:#e2e3c9;font-size:10px;line-height:1.2}
+.game-shell #development-stage{flex:none;font-size:11px}
+.game-shell .development progress{height:7px;margin:6px 0 0}
+.game-shell #town .landscape{position:absolute;z-index:0;inset:0;border-radius:0;overflow:hidden;background:#344b39}
+.game-shell #map{position:absolute;inset:0;display:block;overflow:hidden;padding:0;background:#3f6345}
+.game-shell #map:after{content:"";position:absolute;z-index:1;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(3,17,14,.15) 0%,transparent 26%,rgba(5,18,14,.06) 63%,rgba(4,19,16,.5) 100%);box-shadow:inset 0 0 80px rgba(4,15,13,.38)}
+.game-shell #map .city-scenery{position:absolute;inset:0;overflow:hidden}
+.game-shell #map .city-photo,.game-shell #map .city-photo img{display:block;width:100%;height:100%}
+.game-shell #map .city-photo img{object-fit:cover;object-position:center 54%;filter:saturate(.88) brightness(.73) contrast(1.05)}
+.game-shell #map .city-building{position:absolute;z-index:2;width:clamp(62px,19vw,82px);min-height:58px;max-height:68px;padding:5px 3px;border:1px solid rgba(255,234,190,.73);border-radius:14px;background:linear-gradient(150deg,rgba(25,53,42,.93),rgba(7,26,23,.88));color:#fff1ce;box-shadow:0 7px 18px #0008,inset 0 1px #ffffff42;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:9px;line-height:1.05}
+.game-shell #map .city-building>span:first-child{font-size:22px;line-height:1}
+.game-shell #map .city-building-label{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff5de;font-weight:700}
+.game-shell #map .city-building.built{border-color:#f5d489;background:linear-gradient(155deg,rgba(108,83,42,.93),rgba(16,42,32,.94));box-shadow:0 0 0 2px rgba(242,205,126,.22),0 8px 22px #000a,inset 0 1px #fff6c5}
+.game-shell #map .city-building.selected{outline:2px solid #fff0bb;outline-offset:2px;transform:translateY(-2px)}
+.game-shell #map .city-upgrade-badge{position:absolute;top:-7px;right:-6px;padding:3px 5px;border-radius:9px;background:#f1cf80;color:#3e321c;font-size:8px;font-weight:900}
+.game-shell #map .city-building:nth-child(2){left:5%;top:37%}
+.game-shell #map .city-building:nth-child(3){left:40%;top:43%}
+.game-shell #map .city-building:nth-child(4){right:5%;top:36%}
+.game-shell #map .city-building:nth-child(5){left:5%;top:55%}
+.game-shell #map .city-building:nth-child(6){left:40%;top:58%}
+.game-shell #map .city-building:nth-child(7){right:5%;top:55%}
+.game-shell #map .city-building:nth-child(8){left:5%;top:73%}
+.game-shell #map .city-building:nth-child(9){left:40%;top:75%}
+.game-shell #map .city-building:nth-child(10){right:5%;top:72%}
+.game-shell #details{position:absolute;z-index:8;left:12px;right:12px;bottom:11px;margin:0;padding:12px;border:1px solid #e8c57b75;border-radius:17px;background:linear-gradient(150deg,rgba(11,34,28,.97),rgba(23,48,38,.96));box-shadow:0 10px 32px #000a}
+.game-shell #details[hidden]{display:none!important}
+.game-shell #details p{margin:3px 0 10px;color:#f1e4c4;font-size:12px;line-height:1.35}
+.game-shell #details button{margin:4px 5px 0 0;padding:9px 11px;border:1px solid #e9cb8b55;border-radius:11px;background:#e3c279;color:#233629;font-size:10px}
+.game-shell #details .city-details-close{float:right;background:#223e34;color:#f0dfb9}
+.game-shell #town:not(:has(#details:not([hidden]))) .development{top:56px}
+.game-shell #regional-map{padding:13px}
+.game-shell #regional-map h2,.game-shell #regional-map .regional-map-intro{position:relative;z-index:2}
+.game-shell #regional-map-board{position:absolute;inset:0;border:0;border-radius:0;background:#173a34}
+.game-shell #regional-map-board>img{width:100%;height:100%;object-fit:cover;object-position:center;filter:saturate(.84) brightness(.76)}
+.game-shell #regional-map-board:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(7,25,22,.75),transparent 29%,rgba(4,20,18,.18))}
+.game-shell #regional-map-pins{position:absolute;inset:0;z-index:2}
+.game-shell #regional-map-detail{position:absolute;z-index:5;left:12px;right:12px;bottom:12px;padding:12px;border:1px solid var(--cc-line);border-radius:15px;background:var(--cc-panel);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.game-shell .game-screens #earn>h2,.game-shell .game-screens #quests>h2,.game-shell .game-screens #team>h2{padding:8px 3px 0}
+.game-shell .energy-status,.game-shell .passive-income,.game-shell .tycoon-card{margin:10px 0;padding:13px;border:1px solid var(--cc-line);border-radius:17px;background:linear-gradient(150deg,rgba(27,56,46,.94),rgba(11,31,28,.96));box-shadow:0 8px 25px #0004,inset 0 1px #fff1}
+.game-shell .tapwrap{padding:clamp(10px,4vh,26px) 15px 8px}
+.game-shell #tap{width:clamp(154px,48vw,196px);height:clamp(154px,48vw,196px);border:7px solid #f5dc99;background:radial-gradient(circle at 34% 25%,#fff7ce,#f2cc76 42%,#bd8537 100%);box-shadow:0 12px 0 #78572d,0 18px 35px #0008,inset 0 3px 9px #fff9;color:#49351d}
+.game-shell #tap:active{transform:translateY(7px) scale(.98);box-shadow:0 5px 0 #78572d,0 12px 25px #0008}
+.game-shell #tap strong{font-size:12px;letter-spacing:.1em}
+.game-shell #tap small{font-size:10px}
+.game-shell #upgrade,.game-shell #energy-upgrade,.game-shell #regenLevel,.game-shell #comboLevel,.game-shell #chest,.game-shell #connect{margin:5px 0;padding:12px 14px;border:1px solid #e6c77d7a;border-radius:13px;background:linear-gradient(160deg,#efcf87,#ba9252);color:#25382d;font-weight:800}
+.game-shell #upgrade,.game-shell #energy-upgrade{width:100%}
+.game-shell #chest,.game-shell #connect{width:100%}
+.game-shell .task{padding:12px 2px;border-color:#ffffff20;color:#fff0d0}
+.game-shell .task button{border:1px solid #e8cb8a66;border-radius:11px;background:#dabb76;color:#28392c}
+.game-shell .rank{color:#fff0d0}
+.game-shell #player-ranking-refresh{background:#dabb76;color:#24372c}
+.game-shell #social{padding-bottom:18px}
+.game-shell input,.game-shell select{border:1px solid var(--cc-line);border-radius:11px}
+.game-shell .command-drawer{position:fixed;z-index:110;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:10px 10px calc(75px + var(--cc-safe-bottom));background:rgba(1,9,8,.58);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:cc-fade-in .16s ease-out}
+.game-shell .command-drawer[hidden]{display:none}
+.game-shell .command-sheet{width:min(100%,560px);max-height:min(77svh,670px);overflow:auto;padding:17px;border:1px solid #e8c97f66;border-radius:24px;background:linear-gradient(155deg,#244a3c,#102b27 68%);box-shadow:0 20px 60px #000b}
+.game-shell .command-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.game-shell .command-sheet h2{margin:0;color:#fff1d1;font:700 21px Georgia,serif}
+.game-shell .command-close{width:38px;height:38px;border:1px solid #ffffff28;border-radius:50%;background:#ffffff12;color:#fff4db}
+.game-shell .command-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.game-shell .command-shortcuts button{min-height:63px;display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #e7ca8b3d;border-radius:15px;background:linear-gradient(140deg,#ffffff14,#00000012);color:#fff1d1;text-align:left;font-size:12px}
+.game-shell .command-shortcuts button span{font-size:23px}
+.game-shell .command-shortcuts .command-primary{background:linear-gradient(145deg,#f0d795,#b78f4d);color:#27382c;font-weight:800}
+.game-shell .command-status{margin:13px 2px 0;padding-top:10px;border-top:1px solid #ffffff20;color:#bacabd;font-size:11px}
+.game-shell .game-nav [data-command-open]{border-left:1px solid #ffffff18;color:#e8cf97}
+@keyframes cc-screen-in{from{opacity:.65;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes cc-fade-in{from{opacity:0}to{opacity:1}}
+@media(min-width:700px){
+ .game-shell .game-header,.game-shell .stats{left:max(14px,calc((100vw - 620px)/2));right:max(14px,calc((100vw - 620px)/2))}
+ .game-shell .game-screens{left:max(0px,calc((100vw - 680px)/2));right:max(0px,calc((100vw - 680px)/2))}
+ .game-shell .game-nav{left:50%;right:auto;width:min(620px,calc(100% - 20px));transform:translateX(-50%)}
+}
+@media(max-height:700px){
+ .game-shell .game-screens{inset:calc(106px + var(--cc-safe-top)) 0 calc(62px + var(--cc-safe-bottom))}
+ .game-shell #town .development{top:50px;padding:7px 10px}
+ .game-shell #map .city-building{min-height:49px;max-height:57px}
+}
+@media(prefers-reduced-motion:reduce){.game-shell *, .game-shell *:before,.game-shell *:after{animation-duration:.01ms!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}

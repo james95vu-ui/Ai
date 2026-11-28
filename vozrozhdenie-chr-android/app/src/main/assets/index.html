@@ -60,6 +60,7 @@
 #intro-start{width:100%;margin-top:22px;border:0;border-radius:13px;background:#dfbe77;color:#17342c;padding:16px;font-size:17px;font-weight:800}
 #intro-city-join{width:100%;margin-top:12px;padding:15px;border:0;border-radius:12px;background:#dfbe77;color:#17342c;font-weight:800}#intro-confirm{width:100%;margin-top:12px;padding:14px;border:0;border-radius:12px;background:#dfbe77;color:#17342c;font-weight:800}#intro-resend{margin-top:8px;background:transparent;border:0;color:#e9c77d;text-decoration:underline}#intro-error{color:#ffb8ac;min-height:1.3em;margin:9px 0 0}
 </style>
+<link rel="stylesheet" href="command-center.css"><link rel="stylesheet" href="play-experience.css">
 </head>
 <body class="game-shell">
 <div id="intro" hidden>
@@ -83,11 +84,10 @@
       <p class="intro-description">Твоя история начинается здесь</p>
       <label for="intro-name">Твоё имя</label>
       <input id="intro-name" maxlength="30" autocomplete="nickname" placeholder="Введи имя игрока">
-      <label for="intro-email">Электронная почта</label>
-      <input id="intro-email" type="email" autocomplete="email" inputmode="email" required placeholder="example@mail.com">
-      <p class="intro-description">Можно начать без подтверждения почты. Прогресс хранится на этом устройстве; онлайн-функции потребуют входа.</p>
+      <input id="intro-email" type="hidden">
+      <p class="intro-description">Игра автоматически подключается к серверу. Электронная почта не требуется.</p>
       <button id="intro-start" type="button">НАЧАТЬ ИГРУ</button><div id="intro-verification" hidden style="display:none"><label for="intro-code">Код или ссылка из письма</label><input id="intro-code" autocomplete="one-time-code" placeholder="Код из письма"><button id="intro-confirm" type="button">ПОДТВЕРДИТЬ EMAIL</button><button id="intro-resend" type="button">Отправить повторно</button></div>
-      <div id="intro-city-step" hidden><label for="intro-city-select">Выбери свой город</label><select id="intro-city-select" required></select><p class="intro-description">Выбери город, в котором начнёшь играть. Без подтверждения почты выбор сохраняется на этом устройстве.</p><button id="intro-city-join" type="button">ВЫБРАТЬ ГОРОД И ИГРАТЬ</button></div><p id="intro-error" role="status"></p>
+      <div id="intro-city-step" hidden><label for="intro-city-select">Выбери свой город</label><select id="intro-city-select" required></select><p class="intro-description">Выбери город, в котором начнёшь играть. Выбор закрепляется на сервере.</p><button id="intro-city-join" type="button">ВЫБРАТЬ ГОРОД И ИГРАТЬ</button></div><p id="intro-error" role="status"></p>
     </div>
   </div>
 </div>
@@ -103,7 +103,7 @@
   <button id="walk" type="button" hidden disabled aria-hidden="true">Прогулка 3D</button>
   <button id="next-city" type="button" hidden></button>
 </div><div class="landscape"><div id="map"></div></div><div id="details"></div></section>
-<section id="earn" data-screen hidden><h2>Заработок</h2><div class="energy-status">Энергия <strong id="energy"></strong></div><progress id="energy-bar" aria-label="Энергия" value="0"></progress><div class="tapwrap"><button id="tap"><span class="tap-emblem" aria-hidden="true"></span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><button id="upgrade"></button><button id="energy-upgrade" type="button">⚡ Улучшить запас энергии</button><button id="regenLevel" type="button"></button><button id="comboLevel" type="button"></button><div class="passive-income">
+<section id="earn" data-screen hidden><h2>Заработок</h2><div class="energy-status">Энергия <strong id="energy"></strong></div><progress id="energy-bar" aria-label="Энергия" value="0"></progress><div class="tapwrap"><button id="tap"><span class="tap-emblem" aria-hidden="true"></span><strong>ЗАРАБОТАТЬ</strong><small id="power"></small></button><div id="pop" aria-hidden="true"></div></div><div id="combo"></div><progress id="bar" aria-label="Прогресс комбо" max="10" value="0"></progress><div class="earn-upgrades"><button id="upgrade"></button><button id="energy-upgrade" type="button">⚡ Улучшить запас энергии</button><button id="regenLevel" type="button"></button><button id="comboLevel" type="button"></button></div><div class="passive-income">
   <div><strong>Пассивный доход</strong><span id="income-next"></span></div>
   <progress id="income-progress" aria-label="Прогресс до следующей монеты" max="1" value="0"></progress>
   <p id="offline"></p>
@@ -192,12 +192,11 @@
 </dialog>
 </main>
 <nav class="game-nav" aria-label="Разделы игры">
-  <button type="button" data-go="regional-map" aria-controls="regional-map"><span aria-hidden="true">🗺️</span>Карта</button><button type="button" data-go="town" aria-controls="town" aria-current="page"><span aria-hidden="true">⌂</span>Город</button>
-  <button type="button" data-go="earn" aria-controls="earn"><span aria-hidden="true">◉</span>Монеты</button>
+  <button type="button" data-go="regional-map" aria-controls="regional-map"><span aria-hidden="true">🗺️</span>Карта</button>
+  <button type="button" data-go="town" aria-controls="town" aria-current="page"><span aria-hidden="true">⌂</span>Город</button>
+  <button type="button" data-go="earn" aria-controls="earn"><span aria-hidden="true">◉</span>Развитие</button>
   <button type="button" data-go="quests" aria-controls="quests"><span aria-hidden="true">✓</span>Задания</button>
-  <button type="button" data-go="team" aria-controls="team"><span aria-hidden="true">▥</span>Рейтинг</button>
-  <button type="button" data-go="achievements" aria-controls="achievements"><span aria-hidden="true">★</span>Награды</button>
-  <button type="button" data-go="settings" aria-controls="settings"><span aria-hidden="true">⚙</span>Настройки</button>
+  <button type="button" data-go="team" aria-controls="team"><span aria-hidden="true">🏆</span>Рейтинг</button>
 </nav>
 <link rel="stylesheet" href="server-managers.css">
 <script src="config.js"></script>
@@ -227,9 +226,10 @@
 <script src="game-hud-icons.js"></script>
 <script src="city-building-art.js"></script>
 <script src="city-map-interactions.js"></script>
-<script src="city-services-drawer.js"></script>
+
 <script src="update-03.js"></script>
 <script src="game-ux-fixes.js"></script>
 <script src="walk.js"></script>
 <script src="city-viewport-controller.js"></script>
+<script src="command-center.js"></script><script src="play-experience.js"></script>
 </body></html>

@@ -1,7 +1,7 @@
 
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
-const key='chr_new_era_settings_v1',defaults={sound:true,music:true,volume:60,vibration:true};
+const key='chr_new_era_settings_v1',defaults={sound:true,music:true,volume:60,vibration:true,track:'original'};
 let settings;try{settings={...defaults,...JSON.parse(localStorage.getItem(key)||'{}')}}catch(e){settings={...defaults}}
 const persist=()=>localStorage.setItem(key,JSON.stringify(settings));
 const screens = document.querySelector('.game-screens');
@@ -29,13 +29,14 @@ const l=document.createElement('label');l.textContent='Громкость';const
 const hint=document.createElement('p');hint.textContent='Настройки сохраняются на этом устройстве.';settingsPanel.append(hint);
 let audioCtx;
 function ctx(){try{return audioCtx||(audioCtx=new(window.AudioContext||window.webkitAudioContext)())}catch(e){return null}}
-function sound(){if(!settings.sound||!settings.volume)return;const a=ctx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type='sine';o.frequency.setValueAtTime(640,t);o.frequency.exponentialRampToValueAtTime(900,t+.09);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.001,settings.volume/100*.055),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.13)}catch(e){}}
+function sound(tap=false){if(!settings.sound||!settings.volume)return;const a=ctx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type='sine';o.frequency.setValueAtTime(tap?440:780,t);o.frequency.exponentialRampToValueAtTime(tap?660:540,t+.09);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.001,settings.volume/100*.055),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.13)}catch(e){}}
+const trackLabel=document.createElement('label');trackLabel.textContent='Фоновая музыка ';const track=document.createElement('select');for(const [v,n] of [['original','Утро над городом'],['quiet','Тихий режим']]){const o=document.createElement('option');o.value=v;o.textContent=n;track.append(o)}track.value=settings.track;track.onchange=()=>{settings.track=track.value;persist();updateMusic()};trackLabel.append(track);settingsPanel.append(trackLabel);
 const backgroundMusic = new Audio('utro-nad-gorodom.ogg');
 backgroundMusic.loop = true;
 backgroundMusic.preload = 'none';
 
 function updateMusic() {
-  backgroundMusic.volume = Math.max(0, Math.min(1, Number(settings.volume) / 100 || 0));
+  backgroundMusic.volume = Math.max(0, Math.min(1, Number(settings.volume) / 100 * (settings.track==='quiet'?.25:1) || 0));
   if (!settings.music || !backgroundMusic.volume || document.hidden) {
     backgroundMusic.pause();
     return;
@@ -47,12 +48,12 @@ document.addEventListener('click', updateMusic);
 document.addEventListener('visibilitychange', updateMusic);
 updateMusic();
 $('tap').addEventListener('click', () => {
-  sound();
+  sound(true);
   if (!settings.vibration) return;
   if (window.CityHaptics) window.CityHaptics.tap();
   else navigator.vibrate?.(16);
 });
-$('join').addEventListener('click',sound);$('upgrade').addEventListener('click',sound);
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.disabled&&b.id!=='tap')sound(false)});
 const oldKey='vozrozhdenie_demo_v1';
 const awards=[['Первый шаг','Выбери город',s=>!!s.city],['Строитель','Построй первое здание',s=>(s.built||[]).length>=1],['Архитектор','Построй 5 зданий',s=>(s.built||[]).length>=5],['Мастер дохода','Достигни 500 монет в час',s=>s.income>=500],['Герой города','Достигни 5 уровня',s=>s.level>=5],['Тысяча вкладов','Набери 1000 очков вклада',s=>s.contribution>=1000]];
 awards.push(
