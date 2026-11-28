@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - city-rebuild-phase1-2026
+      - full-game-command-center-2026
     paths:
       - 'vozrozhdenie-chr-android/**'
       - '.github/workflows/city-rebuild-debug-apk.yml'
