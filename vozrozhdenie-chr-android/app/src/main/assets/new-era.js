@@ -27,9 +27,13 @@ const checkbox=(title,field)=>{const l=document.createElement('label');l.textCon
 checkbox('Звуковые эффекты','sound');checkbox('Фоновая музыка','music');checkbox('Вибрация','vibration');
 const l=document.createElement('label');l.textContent='Громкость';const slider=document.createElement('input');slider.type='range';slider.min=0;slider.max=100;slider.value=settings.volume;slider.oninput=()=>{settings.volume=Number(slider.value);persist();updateMusic()};l.append(slider);settingsPanel.append(l);
 const hint=document.createElement('p');hint.textContent='Настройки сохраняются на этом устройстве.';settingsPanel.append(hint);
-let audioCtx,osc,gain;function ctx(){try{return audioCtx||(audioCtx=new(window.AudioContext||window.webkitAudioContext)())}catch(e){return null}}
+let audioCtx,musicTimer=null,musicStep=0;
+function ctx(){try{return audioCtx||(audioCtx=new(window.AudioContext||window.webkitAudioContext)())}catch(e){return null}}
 function sound(){if(!settings.sound||!settings.volume)return;const a=ctx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type='sine';o.frequency.setValueAtTime(640,t);o.frequency.exponentialRampToValueAtTime(900,t+.09);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.001,settings.volume/100*.055),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.13)}catch(e){}}
-function updateMusic(){if(!settings.music||!settings.volume||document.hidden){if(osc){try{osc.stop()}catch(e){}osc.disconnect();osc=null}return}const a=ctx();if(!a||osc)return;try{osc=a.createOscillator();gain=a.createGain();osc.type='sine';osc.frequency.value=174.61;gain.gain.value=settings.volume/100*.008;osc.connect(gain).connect(a.destination);osc.start()}catch(e){osc=null}}
+const melody=[220,261.63,329.63,293.66,261.63,220,196,220,246.94,293.66,329.63,261.63,220,196,174.61,196];
+function musicNote(){if(!settings.music||!settings.volume||document.hidden)return;const a=ctx();if(!a||a.state!=='running')return;try{const t=a.currentTime,frequency=melody[musicStep++%melody.length],o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=frequency;g.gain.setValueAtTime(.00001,t);g.gain.linearRampToValueAtTime(settings.volume/100*.017,t+.15);g.gain.exponentialRampToValueAtTime(.00001,t+1.6);o.connect(g).connect(a.destination);o.start(t);o.stop(t+1.65)}catch(e){}}
+function updateMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}if(!settings.music||!settings.volume||document.hidden)return;const a=ctx();if(!a)return;a.resume?.().catch(()=>{});musicNote();musicTimer=setInterval(musicNote,1100)}
+document.addEventListener('pointerdown',()=>{if(settings.music&&audioCtx?.state==='suspended')audioCtx.resume?.().then(updateMusic).catch(()=>{})},{passive:true});
 document.addEventListener('visibilitychange',updateMusic);
 $('tap').addEventListener('click', () => {
   sound();
