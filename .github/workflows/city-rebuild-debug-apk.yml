@@ -8,6 +8,10 @@ on:
       - 'vozrozhdenie-chr-android/**'
       - '.github/workflows/city-rebuild-debug-apk.yml'
 
+concurrency:
+  group: city-rebuild-apk-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -77,6 +81,13 @@ jobs:
               required.update(p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file())
               html = (root / 'index.html').read_text()
               required.update(re.findall(r'(?:src|href)="([^":#]+\.(?:js|css))"', html))
+              for css in root.rglob('*.css'):
+                  for url in re.findall(r"url\(\s*['\"]?([^)'\"]+)['\"]?\s*\)", css.read_text()):
+                      url = url.strip()
+                      if url.startswith(('data:', 'http:', 'https:', '#', '//')):
+                          continue
+                      target = (css.parent / url.split('?')[0].split('#')[0]).resolve()
+                      required.add(target.relative_to(root.resolve()).as_posix())
               missing = sorted(p for p in required if 'assets/' + p not in names)
               if missing:
                   raise SystemExit('Missing APK assets: ' + ', '.join(missing))
