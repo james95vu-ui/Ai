@@ -16,13 +16,23 @@ for(const [id,title] of cities){const option=document.createElement('option');op
 let cityBusy=false;
 function credentials(){let session;try{session=JSON.parse(localStorage.getItem(sessionKey)||'null')}catch(_){}const cfg=window.GAME_CONFIG||{};return session?.access_token&&cfg.url&&cfg.key?{session,cfg}:null}
 async function rpc(method,payload={}){const a=credentials();if(!a)throw Error('Сначала подтверди email');const response=await fetch(a.cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/'+method,{method:'POST',headers:{apikey:a.cfg.key,Authorization:'Bearer '+a.session.access_token,'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!response.ok){let msg='Ошибка '+response.status;try{const body=await response.json();msg=body.message||msg}catch(_){}throw Error(msg)}return response.json()}
+async function syncNickname(){
+ const a=credentials(),nickname=(localStorage.getItem('chr_player_name_v1')||'').trim();
+ if(!a||nickname.length<2||nickname.length>30)return;
+ const userId=a.session.user?.id;
+ if(!userId)return;
+ const key='chr_nickname_registered_'+userId;
+ if(localStorage.getItem(key)==='1')return;
+ try{await rpc('game_set_nickname',{p_nickname:nickname});localStorage.setItem(key,'1')}
+ catch(e){error.textContent='Город сохранён, но имя пока не синхронизировано: '+e.message}
+}
 async function checkCity(){
  if(cityBusy)return;
  const a=credentials();if(!a){cityStep.hidden=true;return}
  cityBusy=true;intro.hidden=false;step.hidden=true;start.hidden=true;name.disabled=true;email.disabled=true;cityStep.hidden=true;error.textContent='Проверяем закреплённый город…';
  try{
   const rows=await rpc('city_my_progress');
-  if(rows?.length){intro.hidden=true;window.dispatchEvent(new Event('online'));return}
+  if(rows?.length){await syncNickname();intro.hidden=true;window.dispatchEvent(new Event('online'));return}
   cityStep.hidden=false;error.textContent='Выбери город. После подтверждения изменить его можно только по правилам игры.';
  }catch(e){cityStep.hidden=false;cityJoin.disabled=true;error.textContent='Не удалось проверить город: '+e.message}
  finally{cityBusy=false}
@@ -31,7 +41,7 @@ cityJoin.onclick=async()=>{
  if(cityBusy)return;
  if(!window.confirm('Закрепить выбранный город за аккаунтом? Свободная смена города недоступна.'))return;
  cityBusy=true;cityJoin.disabled=true;error.textContent='Закрепляем город на сервере…';
- try{await rpc('city_join',{p_city_id:citySelect.value});intro.hidden=true;window.dispatchEvent(new Event('online'))}
+ try{await rpc('city_join',{p_city_id:citySelect.value});await syncNickname();intro.hidden=true;window.dispatchEvent(new Event('online'))}
  catch(e){error.textContent='Не удалось закрепить город: '+e.message}
  finally{cityBusy=false;cityJoin.disabled=false}
 };
