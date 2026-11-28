@@ -119,12 +119,12 @@
   <p id="social-status" role="status"></p>
   <form id="social-login">
     <label>Электронная почта <input name="email" type="email" autocomplete="email" required></label>
-    <button type="submit">Отправить письмо</button>
+    <button type="submit">Получить код на email</button>
   </form>
   <p id="social-return-hint" hidden>Открой письмо на этом устройстве и нажми кнопку входа. Android предложит открыть игру.</p>
   <form id="social-verify" hidden>
-    <label>Код или ссылка из письма <input name="credential" type="password" autocomplete="one-time-code" maxlength="2048" required></label>
-    <p>Если в письме только кнопка, зажми её, выбери «Копировать ссылку» и вставь сюда.</p>
+    <label>Шестизначный код из письма <input name="credential" type="text" inputmode="numeric" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" maxlength="2048" placeholder="000000" required></label>
+    <p>Введи 6 цифр из письма. Если пришла только кнопка, скопируй ссылку из неё и вставь в это поле.</p>
     <button type="submit">Войти</button>
   </form>
   <div id="social-online" hidden>
