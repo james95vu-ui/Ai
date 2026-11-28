@@ -60,7 +60,7 @@
 #intro-start{width:100%;margin-top:22px;border:0;border-radius:13px;background:#dfbe77;color:#17342c;padding:16px;font-size:17px;font-weight:800}
 #intro-city-join{width:100%;margin-top:12px;padding:15px;border:0;border-radius:12px;background:#dfbe77;color:#17342c;font-weight:800}#intro-confirm{width:100%;margin-top:12px;padding:14px;border:0;border-radius:12px;background:#dfbe77;color:#17342c;font-weight:800}#intro-resend{margin-top:8px;background:transparent;border:0;color:#e9c77d;text-decoration:underline}#intro-error{color:#ffb8ac;min-height:1.3em;margin:9px 0 0}
 </style>
-</head>
+<link rel="stylesheet" href="command-center.css">\n</head>
 <body class="game-shell">
 <div id="intro" hidden>
   <div class="intro-card">
@@ -192,12 +192,11 @@
 </dialog>
 </main>
 <nav class="game-nav" aria-label="Разделы игры">
-  <button type="button" data-go="regional-map" aria-controls="regional-map"><span aria-hidden="true">🗺️</span>Карта</button><button type="button" data-go="town" aria-controls="town" aria-current="page"><span aria-hidden="true">⌂</span>Город</button>
-  <button type="button" data-go="earn" aria-controls="earn"><span aria-hidden="true">◉</span>Монеты</button>
+  <button type="button" data-go="regional-map" aria-controls="regional-map"><span aria-hidden="true">🗺️</span>Карта</button>
+  <button type="button" data-go="town" aria-controls="town" aria-current="page"><span aria-hidden="true">⌂</span>Город</button>
+  <button type="button" data-go="earn" aria-controls="earn"><span aria-hidden="true">◉</span>Развитие</button>
   <button type="button" data-go="quests" aria-controls="quests"><span aria-hidden="true">✓</span>Задания</button>
-  <button type="button" data-go="team" aria-controls="team"><span aria-hidden="true">▥</span>Рейтинг</button>
-  <button type="button" data-go="achievements" aria-controls="achievements"><span aria-hidden="true">★</span>Награды</button>
-  <button type="button" data-go="settings" aria-controls="settings"><span aria-hidden="true">⚙</span>Настройки</button>
+  <button type="button" data-go="team" aria-controls="team"><span aria-hidden="true">🏆</span>Рейтинг</button>
 </nav>
 <link rel="stylesheet" href="server-managers.css">
 <script src="config.js"></script>
@@ -231,5 +230,5 @@
 <script src="update-03.js"></script>
 <script src="game-ux-fixes.js"></script>
 <script src="walk.js"></script>
-<script src="city-viewport-controller.js"></script>
+<script src="city-viewport-controller.js"></script>\n<script src="command-center.js"></script>
 </body></html>
