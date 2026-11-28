@@ -14,7 +14,7 @@
   if(!session?.access_token){status.textContent='Войди в разделе «Сообщество», чтобы увидеть рейтинг игроков';return}
   busy=true;button.disabled=true;
   try{
-   const response=await fetch(cfg.url.replace(/\\/$/,'')+'/rest/v1/rpc/tycoon_player_ranking',{
+   const response=await fetch(cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/tycoon_player_ranking',{
     method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({p_limit:50})
    });
    if(!response.ok)throw Error('HTTP '+response.status);
@@ -34,7 +34,7 @@
   let session;try{session=JSON.parse(localStorage.getItem(key)||'null')}catch(_){session=null}
   if(!session?.access_token||!cfg.url||!cfg.key)return;
   try{
-   const response=await fetch(cfg.url.replace(/\\/$/,'')+'/rest/v1/rpc/tycoon_tap_ranking',{
+   const response=await fetch(cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/tycoon_tap_ranking',{
     method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({p_limit:50})
    });
    if(!response.ok)return;
