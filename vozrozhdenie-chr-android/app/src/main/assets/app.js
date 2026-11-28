@@ -2,7 +2,7 @@
 const balanceFormat = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const cities = ['Урус-Мартан', 'Гудермес', 'Шали', 'Аргун', 'Ойсхара', 'Ачхой-Мартан', 'Курчалой', 'Серноводское', 'Шатой', 'Грозный'];
 const thresholds = [0, 5, 12, 22, 35, 52, 74, 102, 137, 180];
-const buildings=[['Городской парк','🌳',500,20,1],['Новая школа','🏫',900,35,1],['Мастерская','🏭',1400,50,1],['Жилой дом','🏠',1800,75,2],['Больница','🏥',2500,110,3],['Мечеть','🕌',3000,130,3],['Рынок','🏪',3800,180,4],['Стадион','🏟️',5000,240,5],['Библиотека','📚',6500,320,6]];const fresh=()=>({city:null,coins:1250,income:60,level:1,contribution:120,built:[],tapLevel:0,lastCollectedAt:Date.now(),daily:{}});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){s=fresh()}if(!Array.isArray(s.built))s.built=[];for(const k of ['coins','income','level','contribution','tapLevel','lastCollectedAt'])if(!Number.isFinite(s[k]))s[k]=fresh()[k];let combo=0,lastTap=0,selected=0,timer;const save=()=>localStorage.setItem(KEY,JSON.stringify(s));const day=()=>new Date().toISOString().slice(0,10);function daily(){if(s.daily?.date!==day())s.daily={date:day(),taps:0,builds:0,claimed:[]};return s.daily}function collect(){const now=Date.now(),gain=s.city?Math.max(0,Math.min(now-s.lastCollectedAt,86400000))*hourlyIncome()/3600000:0;s.coins+=gain;if(Math.abs(s.coins-Math.round(s.coins))<1e-8)s.coins=Math.round(s.coins);s.lastCollectedAt=Math.max(now,s.lastCollectedAt);save();return gain}function notice(t){$('notice').textContent=t;clearTimeout(timer);timer=setTimeout(()=>$('notice').textContent='',2500)}function power(){return 10+5*s.tapLevel}function cost(){return Math.floor(200*1.7**s.tapLevel)}// Keep the existing active-city fields for saved games and achievement readers.
+const buildings=[['Городской парк','🌳',500,20,1],['Новая школа','🏫',900,35,1],['Мастерская','🏭',1400,50,1],['Жилой дом','🏠',1800,75,2],['Больница','🏥',2500,110,3],['Мечеть','🕌',3000,130,3],['Рынок','🏪',3800,180,4],['Стадион','🏟️',5000,240,5],['Библиотека','📚',6500,320,6]];const fresh=()=>({city:null,coins:1250,income:60,level:1,contribution:120,built:[],tapLevel:0,lastCollectedAt:Date.now(),daily:{}});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){s=fresh()}if(!Array.isArray(s.built))s.built=[];for(const k of ['coins','income','level','contribution','tapLevel','lastCollectedAt'])if(!Number.isFinite(s[k]))s[k]=fresh()[k];let combo=0,lastTap=0,selected=0,timer;let authoritativeOnlineCity=null;const save=()=>localStorage.setItem(KEY,JSON.stringify(s));const day=()=>new Date().toISOString().slice(0,10);function daily(){if(s.daily?.date!==day())s.daily={date:day(),taps:0,builds:0,claimed:[]};return s.daily}function collect(){const now=Date.now(),gain=s.city?Math.max(0,Math.min(now-s.lastCollectedAt,86400000))*hourlyIncome()/3600000:0;s.coins+=gain;if(Math.abs(s.coins-Math.round(s.coins))<1e-8)s.coins=Math.round(s.coins);s.lastCollectedAt=Math.max(now,s.lastCollectedAt);save();return gain}function notice(t){$('notice').textContent=t;clearTimeout(timer);timer=setTimeout(()=>$('notice').textContent='',2500)}function power(){return 10+5*s.tapLevel}function cost(){return Math.floor(200*1.7**s.tapLevel)}// Keep the existing active-city fields for saved games and achievement readers.
 if (!s.campaign || typeof s.campaign !== 'object' || Array.isArray(s.campaign)) {
   s.campaign = {};
   if (s.city) {
@@ -149,7 +149,7 @@ function showCampaign() {
     const completed = cities.every(city => cityLevel(s.campaign[city]?.taps || 0) === 10);
     if (completed) $('development-text').textContent = 'Все 10 городов завершены';
   }
-  $('next-city').hidden = !nextCity || !s.city || (index >= 0 && s.level < 10);
+  $('next-city').hidden = !!authoritativeOnlineCity || !nextCity || !s.city || (index >= 0 && s.level < 10);
   $('next-city').textContent = nextCity ? 'Перейти: ' + nextCity : '';
   $('walk').disabled = !s.city;
   $('town').dataset.level = s.level;
@@ -160,12 +160,12 @@ function showCampaign() {
 function renderCityOptions() {
   const select = $('cities');
   select.replaceChildren();
-  const legacyCities = Object.keys(s.campaign).filter(city => !cities.includes(city));
+  const legacyCities = Object.keys(s.campaign).filter(city => !cities.includes(city) && !authoritativeOnlineCity);
   const options = [...cities, ...legacyCities];
   for (const city of options) {
     const option = document.createElement('option');
     option.value = city;
-    option.disabled = city !== s.city && !isUnlocked(city);
+    option.disabled = authoritativeOnlineCity ? city !== authoritativeOnlineCity : city !== s.city && !isUnlocked(city);
     option.textContent = option.disabled ? city + ' · закрыт' : city;
     select.append(option);
   }
@@ -173,7 +173,8 @@ function renderCityOptions() {
 }
 
 function visitCity(city) {
-  if (!isUnlocked(city) || s.city === city) return;
+  if (authoritativeOnlineCity && city !== authoritativeOnlineCity) { notice('Онлайн-город закреплён за аккаунтом: ' + authoritativeOnlineCity); return; }
+  if ((!authoritativeOnlineCity && !isUnlocked(city)) || s.city === city) return;
   collect();
   const progress = s.campaign[city] ||= { taps: 0, built: [] };
   s.city = city;
@@ -320,8 +321,7 @@ async function autoOnline(){
     if(renewed?.access_token){
      session=renewed;
      localStorage.setItem('vozrozhdenie_online_session',JSON.stringify(session));
-     await api('/rest/v1/rpc/join_city','POST',{p_city:s.city});
-     $('network').textContent='Онлайн: '+s.city+' · рейтинг обновлён';
+     $('network').textContent='Онлайн-сессия обновлена · рейтинг доступен';
     }
    }catch(e){$('network').textContent='Рейтинг доступен · для команды потребуется вход';}
   }
@@ -330,4 +330,32 @@ async function autoOnline(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoOnline()});
 window.addEventListener('online',autoOnline);
 setInterval(()=>{if(!document.hidden)autoOnline()},60000);
-render();autoOnline();})();
+// The authenticated server membership is authoritative; legacy local campaigns remain offline-only.
+let syncCityBusy=false;
+async function syncAuthoritativeCity(){
+ if(syncCityBusy||document.hidden||!cfg.url||!cfg.key)return;
+ let social;try{social=JSON.parse(localStorage.getItem('vozrozhdenie_social_session_v1')||'null')}catch(_){}
+ if(!social?.access_token){authoritativeOnlineCity=null;return;}
+ syncCityBusy=true;
+ try{
+  const response=await fetch(cfg.url.replace(/\\/$/,'')+'/rest/v1/rpc/city_my_progress',{
+   method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+social.access_token,'Content-Type':'application/json'},body:'{}'
+  });
+  if(!response.ok)return;
+  const rows=await response.json();
+  if(!Array.isArray(rows)||!rows.length){authoritativeOnlineCity=null;return;}
+  const serverCity=rows[0].city_name;
+  if(!cities.includes(serverCity))return;
+  authoritativeOnlineCity=serverCity;
+  if(s.city!==serverCity){
+   collect();const progress=s.campaign[serverCity] ||= {taps:0,built:[]};
+   s.city=serverCity;s.level=cityLevel(progress.taps);s.built=progress.built;selected=0;
+   save();render();notice('Город синхронизирован: '+serverCity);
+  }else{renderCityOptions();showCampaign()}
+ }catch(_){/* Keep last confirmed server city if temporarily offline. */}
+ finally{syncCityBusy=false}
+}
+window.addEventListener('online',syncAuthoritativeCity);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncAuthoritativeCity()});
+setInterval(syncAuthoritativeCity,60000);
+render();autoOnline();syncAuthoritativeCity();})();
