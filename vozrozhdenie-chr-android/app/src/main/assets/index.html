@@ -39,7 +39,7 @@
 .intro-content input,.intro-content select{box-sizing:border-box;width:100%;padding:14px 12px;border:1px solid #bca26d;border-radius:12px;background:#0c2923;color:white;font-size:16px;min-height:48px}
 .intro-content select option{color:#102d27;background:white}
 #intro-start{width:100%;margin-top:22px;border:0;border-radius:13px;background:#dfbe77;color:#17342c;padding:16px;font-size:17px;font-weight:800}
-#intro-error{color:#ffb8ac;min-height:1.3em;margin:9px 0 0}
+#intro-confirm{width:100%;margin-top:12px;padding:14px;border:0;border-radius:12px;background:#dfbe77;color:#17342c;font-weight:800}#intro-resend{margin-top:8px;background:transparent;border:0;color:#e9c77d;text-decoration:underline}#intro-error{color:#ffb8ac;min-height:1.3em;margin:9px 0 0}
 </style>
 </head>
 <body class="game-shell">
@@ -65,7 +65,7 @@
       <label for="intro-name">Твоё имя</label>
       <input id="intro-name" maxlength="30" autocomplete="nickname" placeholder="Введи имя игрока">
       <label for="intro-email">Электронная почта</label>\n      <input id="intro-email" type="email" autocomplete="email" inputmode="email" required placeholder="example@mail.com">\n      <p class="intro-description">Выбери свой город после входа. На почту придёт письмо с подтверждением.</p>
-      <button id="intro-start" type="button">НАЧАТЬ ИГРУ</button>
+      <button id="intro-start" type="button">ПОЛУЧИТЬ КОД ВХОДА</button><div id="intro-verification" hidden><label for="intro-code">Код или ссылка из письма</label><input id="intro-code" autocomplete="one-time-code" placeholder="Код из письма"><button id="intro-confirm" type="button">ПОДТВЕРДИТЬ EMAIL</button><button id="intro-resend" type="button">Отправить повторно</button></div>
       <p id="intro-error" role="status"></p>
     </div>
   </div>
@@ -202,28 +202,7 @@
 <script src="tap-online.js"></script>
 <script src="server-managers.js"></script>
 <script src="server-chests.js"></script>
-<script>
-(function(){
-'use strict';
-var nameKey='chr_player_name_v1',intro=document.getElementById('intro'),name=document.getElementById('intro-name'),email=document.getElementById('intro-email'),error=document.getElementById('intro-error');
-var session=null;try{session=JSON.parse(localStorage.getItem('vozrozhdenie_social_session_v1')||'null')}catch(_){}
-if(session?.access_token){intro.hidden=true;return}
-name.value=localStorage.getItem(nameKey)||'';
-email.value=localStorage.getItem('chr_player_email_v1')||'';
-intro.hidden=false;
-document.getElementById('intro-start').addEventListener('click',function(){
- var player=name.value.trim(),address=email.value.trim().toLowerCase();
- if(player.length<2){error.textContent='Введи имя не короче двух символов';return}
- if(!email.checkValidity()||!address){error.textContent='Введи действительный адрес электронной почты';return}
- localStorage.setItem(nameKey,player);localStorage.setItem('chr_player_email_v1',address);
- var socialEmail=document.querySelector('#social-login input[name="email"]');
- if(socialEmail)socialEmail.value=address;
- intro.hidden=true;
- document.querySelector('[data-go="team"]')?.click();
- document.getElementById('social-login')?.requestSubmit();
-});
-})();
-</script>
+<script src="onboarding.js"></script>
 <script src="update-03.js"></script>
 <script src="walk.js"></script>
 </body></html>
