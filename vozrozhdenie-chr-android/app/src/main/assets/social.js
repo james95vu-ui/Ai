@@ -70,7 +70,7 @@
   }
 
   async function rpc(name, data = {}) {
-    if (!session) throw Error('Войди по электронной почте');
+    await window.gameEnsureSession();
     if (session.expires_at && session.expires_at < Date.now() / 1000 + 45) {
       store(await request('/auth/v1/token?grant_type=refresh_token', {refresh_token: session.refresh_token}));
     }
@@ -104,10 +104,10 @@
   }
 
   function displaySession() {
-    get('social-login').hidden = !!session;
-    get('social-verify').hidden = !!session || !email;
+    get('social-login').hidden = true;
+    get('social-verify').hidden = true;
     get('social-online').hidden = !session;
-    get('social-return-hint').hidden = !!session || !waitingLogin?.verifier;
+    get('social-return-hint').hidden = true;
   }
 
   function run(operation) {
@@ -244,6 +244,26 @@
     return;
   }
   displaySession();
+  let connecting;
+  window.gameEnsureSession = async () => {
+    if (connecting) return connecting;
+    connecting = (async () => {
+      if (session?.access_token) {
+        if (session.expires_at && session.expires_at < Date.now()/1000 + 60) {
+          store(await request('/auth/v1/token?grant_type=refresh_token', {refresh_token:session.refresh_token}));
+        }
+        return session;
+      }
+      const result = await request('/auth/v1/signup', {data:{}});
+      if (!result?.access_token || !result.user?.id) throw Error('Сервер не выдал онлайн-сессию');
+      store(result);
+      displaySession();
+      return session;
+    })();
+    try { return await connecting; } finally { connecting = null; }
+  };
+  get('social-logout').hidden = true;
+  window.addEventListener('online', () => {if(localStorage.getItem('chr_player_name_v1')) window.gameEnsureSession().then(()=>run(refresh)).catch(e=>{status.textContent=e.message;});});
 
   async function completeLogin(result) {
     if (!result?.access_token || !result.user?.email || (email && result.user.email.toLowerCase() !== email.trim().toLowerCase())) {
@@ -350,5 +370,5 @@
     await chat(values.message);
     get('chat-form').reset();
   });
-  if (session) run(refresh);
+  if (session || localStorage.getItem('chr_player_name_v1')) run(async()=>{await window.gameEnsureSession();await refresh();});
 })();
