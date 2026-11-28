@@ -1,0 +1,14 @@
+/* Map readability and meaningful construction states. */
+#town #map .city-building[data-construction="locked"] .city-building-label{background:#101d1cbd!important;color:#c6c6bf!important;border-color:#747d71!important;opacity:.65!important}
+#town #map .city-building[data-construction="available"] .city-building-label{background:#173d35e8!important;color:#fff0bc!important;border-color:#e4c47d!important;box-shadow:0 2px 9px #0007!important}
+#town #map .city-building[data-construction="complete"] .city-building-label{background:#123c2ee6!important;color:#d9ffdb!important;border-color:#77b68e!important}
+#town #map .city-building[data-construction="locked"]{filter:grayscale(.45)!important}
+#town #map .city-building[data-construction="available"]{cursor:pointer!important}
+#town #map .city-building .city-building-label{transition:background .3s ease,box-shadow .3s ease,opacity .3s ease!important;white-space:normal!important;text-align:center!important}
+#town #map .city-building:active .city-building-label{transform:scale(.97)}
+#town .development-heading{display:flex!important;justify-content:space-between!important;gap:8px!important;align-items:center!important}
+#town #development-stage{display:inline-block!important;max-width:48%!important;font-size:clamp(10px,2.4vw,13px)!important;line-height:1.2!important}
+#town #development-text{font-size:clamp(10px,2.3vw,13px)!important}
+#town #map .city-scenery{background-repeat:no-repeat!important}
+#town #map .city-scenery:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#071d2147 0%,transparent 16%,transparent 77%,#071e1b5c 100%)!important}
+@media (prefers-reduced-motion:reduce){#town #map .city-building .city-building-label,#town #map .city-scenery{transition:none!important}}
