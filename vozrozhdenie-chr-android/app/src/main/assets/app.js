@@ -36,6 +36,7 @@ function showTycoon() {
   $('energy-bar').value = tycoon.energy;
   $('tap').disabled = !s.city || tycoon.energy < 1;
   $('upgrade').disabled = !s.city || s.coins < cost() || tycoon.energy < 3;
+  const energyButton=$('energy-upgrade');if(energyButton){const level=tycoon.energyUpgrades||0,price=Math.floor(350*Math.pow(1.65,level));energyButton.textContent=level>=30?'⚡ Запас энергии улучшен до максимума':'⚡ Улучшить запас энергии +10 · '+fmt(price)+' ◉';energyButton.disabled=!s.city||level>=30||s.coins<price;}
   const minutes = Math.ceil(Math.max(0, tycoon.nextChest - Date.now()) / 60000);
   $('chest').disabled = !s.city || minutes > 0;
   $('chest').textContent = minutes ? 'Следующий сундук через ' + minutes + ' мин' : 'Открыть сундук';
@@ -327,7 +328,7 @@ $('next-city').onclick = () => visitCity(cities[cities.indexOf(s.city) + 1]);
 $('walk').onclick = () => $('walk-view').dispatchEvent(new CustomEvent('walkstart', {
   detail: { city: s.city, level: s.level, built: buildings.map(building => s.built.includes(building[0])) }
 }));
-$('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=power()*(combo>=10?2:1);s.coins+=n;s.contribution+=n;daily().taps++;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost()||!useEnergy(3))return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Локальный доход за закрытую игру не начисляется. Онлайн-менеджеры копят до 24 часов по времени сервера.';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
+$('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=power()*(combo>=10?2:1);s.coins+=n;s.contribution+=n;daily().taps++;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('energy-upgrade').onclick=()=>{const level=tycoon.energyUpgrades||0,price=Math.floor(350*Math.pow(1.65,level));if(!s.city||level>=30||s.coins<price)return;collect();s.coins-=price;tycoon.energyUpgrades=level+1;tycoon.energy=Math.min(Tycoon.energyCap(tycoon),tycoon.energy+10);save();render();notice('Максимальная энергия увеличена на 10')};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost()||!useEnergy(3))return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Локальный доход за закрытую игру не начисляется. Онлайн-менеджеры копят до 24 часов по времени сервера.';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
   if (document.hidden || !s.city) return;
   const wholeCoins = Math.floor(s.coins);
   const questDay = s.daily?.date;
