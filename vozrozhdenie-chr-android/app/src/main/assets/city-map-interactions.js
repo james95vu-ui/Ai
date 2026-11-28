@@ -2,6 +2,7 @@
 const map=document.getElementById('map'),details=document.getElementById('details');
 if(!map||!details)return;
 let lastSelected=null;
+let selectedIndex=null;
 function refresh(){
  const buttons=Array.from(map.querySelectorAll('.city-building'));
  for(const button of buttons){
@@ -11,6 +12,7 @@ function refresh(){
   button.setAttribute('aria-description',built?'Здание построено. Нажмите для улучшения.':'Нажмите, чтобы открыть строительство.');
   if(selected&&button!==lastSelected){
    lastSelected=button;
+   selectedIndex=button.dataset.building;
    button.classList.remove('city-building-spotlight');
    void button.offsetWidth;
    button.classList.add('city-building-spotlight');
@@ -26,7 +28,7 @@ observer.observe(details,{childList:true,attributes:true,attributeFilter:['hidde
 document.addEventListener('keydown',event=>{
  if(event.key!=='Escape'||details.hidden)return;
  const close=details.querySelector('.city-details-close');
- if(close){close.click();lastSelected?.focus({preventScroll:true});}
+ if(close){close.click();const target=map.querySelector('.city-building[data-building="'+selectedIndex+'"]');target?.focus({preventScroll:true});}
 });
 refresh();
 })();
