@@ -1,35 +1,18 @@
 (()=>{'use strict';
-const nav=document.querySelector('.game-nav');
-if(!nav||document.querySelector('.command-drawer'))return;
-const drawer=document.createElement('div');
-drawer.className='command-drawer';
-drawer.hidden=true;
-drawer.setAttribute('aria-hidden','true');
-drawer.innerHTML='<section class="command-sheet" role="dialog" aria-modal="true" aria-labelledby="command-title"><div class="command-sheet-head"><h2 id="command-title">Управление городом</h2><button class="command-close" type="button" aria-label="Закрыть">✕</button></div><div class="command-shortcuts"><button type="button" data-screen="regional-map"><span>🗺️</span>Карта республики</button><button type="button" data-screen="town"><span>🏙️</span>Мой город</button><button type="button" class="command-primary" data-screen="earn"><span>⚡</span>Заработок и улучшения</button><button type="button" data-screen="quests"><span>📜</span>Ежедневные задания</button><button type="button" data-screen="team"><span>🏆</span>Команда и рейтинг</button><button type="button" data-action="chest"><span>🎁</span>Открыть сундук</button><button type="button" data-action="energy"><span>🔋</span>Улучшить запас энергии</button><button type="button" data-action="tap-upgrade"><span>👆</span>Усилить тапалку</button></div><p class="command-status">Все ресурсы и улучшения привязаны к текущему игровому сохранению.</p></section>';
-nav.insertAdjacentElement('afterend',drawer);
-const openButton=document.createElement('button');
-openButton.type='button';openButton.dataset.commandOpen='';openButton.setAttribute('aria-haspopup','dialog');openButton.setAttribute('aria-expanded','false');
-openButton.innerHTML='<span aria-hidden="true">⋯</span>Ещё';
-nav.append(openButton);
-const sheet=drawer.querySelector('.command-sheet');
-const closeButton=drawer.querySelector('.command-close');
-function open(){drawer.hidden=false;drawer.setAttribute('aria-hidden','false');openButton.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';closeButton.focus()}
-function close(){drawer.hidden=true;drawer.setAttribute('aria-hidden','true');openButton.setAttribute('aria-expanded','false');document.body.style.overflow='';openButton.focus()}
-openButton.addEventListener('click',open);
-closeButton.addEventListener('click',close);
-drawer.addEventListener('click',e=>{if(e.target===drawer)close()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden)close()});
-sheet.addEventListener('click',e=>{
- const screen=e.target.closest('[data-screen]');
- if(screen){const tab=nav.querySelector('[data-go="'+screen.dataset.screen+'"]');if(tab)tab.click();close();return}
- const action=e.target.closest('[data-action]')?.dataset.action;
- if(!action)return;
- const targetId=action==='chest'?'quests':'earn';
- const tab=nav.querySelector('[data-go="'+targetId+'"]');
- const control=document.getElementById(action==='chest'?'chest':action==='energy'?'energy-upgrade':'upgrade');
- close();
- if(tab)tab.click();
- requestAnimationFrame(()=>{if(control&&!control.disabled)control.click()});
-});
-nav.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(!b)return;openButton.removeAttribute('aria-current');});
+const nav=document.querySelector('.game-nav'),screens=document.querySelector('.game-screens'),town=document.getElementById('town');
+if(!nav||!screens||!town)return;
+const make=(id,title)=>{const s=document.createElement('section');s.id=id;s.dataset.screen='';s.hidden=true;const h=document.createElement('h2');h.textContent=title;s.append(h);screens.append(s);return s};
+const more=make('more','Ещё'),city=make('city-services','Управление городом');
+const picker=town.querySelector('.city-picker');if(picker){picker.hidden=true;town.querySelector('.city-hero').hidden=true;}
+function move(){for(const el of [...town.children]){if(el.id==='details'||el.matches('.city-hero,.development,.landscape'))continue;city.append(el)}}
+move();new MutationObserver(move).observe(town,{childList:true});
+const paths={more:'<circle cx="6" cy="16" r="2"/><circle cx="16" cy="16" r="2"/><circle cx="26" cy="16" r="2"/>',settings:'<circle cx="16" cy="16" r="6"/><path d="M16 2v5m0 18v5M2 16h5m18 0h5M6 6l4 4m12 12 4 4M6 26l4-4M22 10l4-4"/>',achievements:'<path d="M9 4h14v10a7 7 0 0 1-14 0zM9 7H3v4a6 6 0 0 0 6 6m14-10h6v4a6 6 0 0 1-6 6M16 21v7m-7 0h14"/>',city:'<path d="M3 28h26M6 28V12l10-8 10 8v16M12 28V18h8v10"/>',profile:'<circle cx="16" cy="10" r="6"/><path d="M4 29v-3a12 12 0 0 1 24 0v3"/>',map:'<path d="m3 7 9-4 8 4 9-4v22l-9 4-8-4-9 4zM12 3v22M20 7v22"/>'};
+const icon=k=>'<svg viewBox="0 0 32 32" width="27" height="27" fill="none" stroke="#e9c779" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+paths[k]+'</svg>';
+const map=nav.querySelector('[data-go="regional-map"] span');if(map)map.innerHTML=icon('map');
+const tab=document.createElement('button');tab.type='button';tab.dataset.go='more';tab.setAttribute('aria-controls','more');tab.innerHTML='<span>'+icon('more')+'</span>Ещё';nav.append(tab);
+function go(id){for(const s of document.querySelectorAll('section[data-screen]'))s.hidden=s.id!==id;for(const b of nav.querySelectorAll('[data-go]'))b.removeAttribute('aria-current');tab.setAttribute('aria-current','page');const s=document.getElementById(id);if(s)s.scrollTop=0;}
+function entry(label,k,id,anchor){const b=document.createElement('button');b.type='button';b.className='more-entry';b.innerHTML=icon(k)+'<span></span><i aria-hidden="true">›</i>';b.querySelector('span').textContent=label;b.onclick=()=>{go(id);if(anchor)document.getElementById(anchor)?.scrollIntoView({block:'start'})};more.append(b)}
+entry('Профиль','profile','settings','game-profile');entry('Настройки','settings','settings');entry('Достижения','achievements','achievements');entry('Управление городом и чат','city','city-services');
+for(const id of ['settings','achievements','city-services']){const s=document.getElementById(id);if(!s)continue;const b=document.createElement('button');b.type='button';b.className='more-back';b.textContent='‹ Все разделы';b.onclick=()=>go('more');s.prepend(b)}
+const style=document.createElement('style');style.textContent='.game-shell .game-nav{grid-template-columns:repeat(6,minmax(0,1fr))!important;padding:4px!important}.game-shell .game-nav button{min-height:44px!important;font-size:clamp(9px,2.4vw,12px)!important}.game-shell .game-nav button[hidden]{display:none!important}.game-shell .game-nav:has([data-go="owner-admin"]:not([hidden])){grid-template-columns:repeat(7,minmax(0,1fr))!important}#more .more-entry{display:flex;align-items:center;gap:14px;width:100%;min-height:58px;margin:9px 0;padding:12px 16px;color:#fff4dc;background:linear-gradient(145deg,#24483b,#102c27);border:1px solid #d5b87966;text-align:left;font-size:16px}#more .more-entry i{margin-left:auto;font-style:normal} .more-back{margin-bottom:12px!important}#city-services>section{position:relative!important;inset:auto!important;width:100%!important;max-height:none!important}body.game-shell #town #map .city-building .city-building-label{white-space:normal!important;text-overflow:clip!important;overflow-wrap:anywhere!important}';document.head.append(style);
 })();
