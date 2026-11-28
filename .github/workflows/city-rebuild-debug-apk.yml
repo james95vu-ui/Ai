@@ -3,11 +3,14 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - city-rebuild-phase1-2026
       - full-game-command-center-2026
     paths:
       - 'vozrozhdenie-chr-android/**'
       - '.github/workflows/city-rebuild-debug-apk.yml'
+
+concurrency:
+  group: command-center-apk-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -46,15 +49,12 @@ jobs:
         with:
           gradle-version: '8.7'
       - name: Restore persistent debug signing key
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: vozrozhdenie-chr-android/app/stable-debug.jks
           key: vozrozhdenie-stable-debug-signing-v1
-      - name: Generate debug signing key only on first build
-        run: |
-          if [ ! -f app/stable-debug.jks ]; then
-            keytool -genkeypair -keystore app/stable-debug.jks -storetype JKS -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Vozrozhdenie,C=EE"
-          fi
+      - name: Require existing signing key
+        run: test -s app/stable-debug.jks
       - name: Validate game JavaScript syntax
         run: |
           node - <<'NODE'
@@ -68,6 +68,18 @@ jobs:
           NODE
       - name: Build unsigned-by-owner debug APK
         run: gradle :app:assembleDebug --stacktrace --no-daemon -PciVersionCode=${{ github.run_number }}
+      - name: Verify command center assets
+        run: |
+          python3 - <<'PY'
+          import pathlib, zipfile
+          root = pathlib.Path('app/src/main/assets')
+          apk, = pathlib.Path('app/build/outputs/apk/debug').glob('*.apk')
+          required = {'city-reconstruction-realistic.jpg','city-phone.jpg','chechnya-city-map.webp','utro-nad-gorodom.ogg','command-center.js','command-center.css','index.html'}
+          required.update(p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file())
+          with zipfile.ZipFile(apk) as z:
+              missing = required - {n[7:] for n in z.namelist() if n.startswith('assets/')}
+              if missing: raise SystemExit('Missing assets: ' + ', '.join(sorted(missing)))
+          PY
       - name: Upload installable debug APK
         uses: actions/upload-artifact@v4
         with:
