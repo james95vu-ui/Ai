@@ -1,6 +1,11 @@
 name: City Rebuild Android debug APK
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - city-rebuild-phase1-2026
+    paths:
+      - '.github/apk-build-request.txt'
 
 permissions:
   contents: read
