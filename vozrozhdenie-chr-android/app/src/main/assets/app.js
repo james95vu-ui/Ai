@@ -338,7 +338,7 @@ async function syncAuthoritativeCity(){
  if(!social?.access_token){authoritativeOnlineCity=null;return;}
  syncCityBusy=true;
  try{
-  const response=await fetch(cfg.url.replace(/\\/$/,'')+'/rest/v1/rpc/city_my_progress',{
+  const response=await fetch(cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/city_my_progress',{
    method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+social.access_token,'Content-Type':'application/json'},body:'{}'
   });
   if(!response.ok)return;
