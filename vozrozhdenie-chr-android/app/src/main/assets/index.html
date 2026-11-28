@@ -84,11 +84,10 @@
       <p class="intro-description">Твоя история начинается здесь</p>
       <label for="intro-name">Твоё имя</label>
       <input id="intro-name" maxlength="30" autocomplete="nickname" placeholder="Введи имя игрока">
-      <label for="intro-email">Электронная почта</label>
-      <input id="intro-email" type="email" autocomplete="email" inputmode="email" required placeholder="example@mail.com">
-      <p class="intro-description">Можно начать без подтверждения почты. Прогресс хранится на этом устройстве; онлайн-функции потребуют входа.</p>
+      <input id="intro-email" type="hidden">
+      <p class="intro-description">Игра автоматически подключается к серверу. Электронная почта не требуется.</p>
       <button id="intro-start" type="button">НАЧАТЬ ИГРУ</button><div id="intro-verification" hidden style="display:none"><label for="intro-code">Код или ссылка из письма</label><input id="intro-code" autocomplete="one-time-code" placeholder="Код из письма"><button id="intro-confirm" type="button">ПОДТВЕРДИТЬ EMAIL</button><button id="intro-resend" type="button">Отправить повторно</button></div>
-      <div id="intro-city-step" hidden><label for="intro-city-select">Выбери свой город</label><select id="intro-city-select" required></select><p class="intro-description">Выбери город, в котором начнёшь играть. Без подтверждения почты выбор сохраняется на этом устройстве.</p><button id="intro-city-join" type="button">ВЫБРАТЬ ГОРОД И ИГРАТЬ</button></div><p id="intro-error" role="status"></p>
+      <div id="intro-city-step" hidden><label for="intro-city-select">Выбери свой город</label><select id="intro-city-select" required></select><p class="intro-description">Выбери город, в котором начнёшь играть. Выбор закрепляется на сервере.</p><button id="intro-city-join" type="button">ВЫБРАТЬ ГОРОД И ИГРАТЬ</button></div><p id="intro-error" role="status"></p>
     </div>
   </div>
 </div>
