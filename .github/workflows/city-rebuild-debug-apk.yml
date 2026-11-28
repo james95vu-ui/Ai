@@ -65,6 +65,23 @@ jobs:
           NODE
       - name: Build unsigned-by-owner debug APK
         run: gradle :app:assembleDebug --stacktrace --no-daemon -PciVersionCode=${{ github.run_number }}
+      - name: Verify packaged game assets
+        run: |
+          python3 - <<'PY'
+          import pathlib, zipfile, re
+          root = pathlib.Path('app/src/main/assets')
+          apk, = pathlib.Path('app/build/outputs/apk/debug').glob('*.apk')
+          with zipfile.ZipFile(apk) as z:
+              names = set(z.namelist())
+              required = {'index.html', 'city-panorama.webp', 'city-level-1.svg'}
+              required.update(p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file())
+              html = (root / 'index.html').read_text()
+              required.update(re.findall(r'(?:src|href)="([^":#]+\.(?:js|css))"', html))
+              missing = sorted(p for p in required if 'assets/' + p not in names)
+              if missing:
+                  raise SystemExit('Missing APK assets: ' + ', '.join(missing))
+              print(f'Verified {len(required)} packaged assets; APK size: {apk.stat().st_size} bytes')
+          PY
       - name: Upload installable debug APK
         uses: actions/upload-artifact@v4
         with:
