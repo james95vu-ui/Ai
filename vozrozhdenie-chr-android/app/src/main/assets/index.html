@@ -29,8 +29,8 @@
 #intro{position:fixed;inset:0;z-index:9999;overflow-y:auto;background:linear-gradient(180deg,#102d27,#071b18);color:#fff4df;display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box}
 #intro[hidden]{display:none!important}
 .intro-card{width:min(100%,460px);border:1px solid #c8a86980;border-radius:26px;overflow:hidden;background:#163b32;box-shadow:0 20px 70px #0008}
-.intro-art{height:210px;background:linear-gradient(#183d38,#3f7768);overflow:hidden}
-.intro-art svg{width:100%;height:100%;display:block}
+.intro-art{height:240px;background:#183d38 url('intro-city.jpg') center/cover no-repeat;overflow:hidden}
+.intro-art svg{display:none}
 .intro-content{padding:24px 24px 28px;text-align:center}
 .intro-content h1{font-family:Georgia,serif;font-size:clamp(29px,7vw,40px);letter-spacing:2px;margin:0;color:#fff8e9}
 .intro-subtitle{font-family:Georgia,serif;color:#e9c77d;font-size:clamp(15px,4vw,20px);letter-spacing:1px;margin:6px 0 12px}
@@ -64,7 +64,7 @@
       <p class="intro-description">Твоя история начинается здесь</p>
       <label for="intro-name">Твоё имя</label>
       <input id="intro-name" maxlength="30" autocomplete="nickname" placeholder="Введи имя игрока">
-      <p class="intro-description">Первый город маршрута — Урус-Мартан.</p>
+      <label for="intro-email">Электронная почта</label>\n      <input id="intro-email" type="email" autocomplete="email" inputmode="email" required placeholder="example@mail.com">\n      <p class="intro-description">Выбери свой город после входа. На почту придёт письмо с подтверждением.</p>
       <button id="intro-start" type="button">НАЧАТЬ ИГРУ</button>
       <p id="intro-error" role="status"></p>
     </div>
@@ -200,26 +200,27 @@
 <script src="project-chat.js"></script>
 <script src="game-nickname.js"></script>
 <script src="tap-online.js"></script>
-<script src="server-managers.js"></script>\n<script src="server-chests.js"></script>
+<script src="server-managers.js"></script>
+<script src="server-chests.js"></script>
 <script>
 (function(){
 'use strict';
-var gameKey='vozrozhdenie_demo_v1',nameKey='chr_player_name_v1';
-var intro=document.getElementById('intro'),name=document.getElementById('intro-name');
-var saved={};
-try{saved=JSON.parse(localStorage.getItem(gameKey)||'{}')||{}}catch(e){}
-if(saved.city){intro.hidden=true;return}
-var gameCities=document.getElementById('cities');
+var nameKey='chr_player_name_v1',intro=document.getElementById('intro'),name=document.getElementById('intro-name'),email=document.getElementById('intro-email'),error=document.getElementById('intro-error');
+var session=null;try{session=JSON.parse(localStorage.getItem('vozrozhdenie_social_session_v1')||'null')}catch(_){}
+if(session?.access_token){intro.hidden=true;return}
 name.value=localStorage.getItem(nameKey)||'';
+email.value=localStorage.getItem('chr_player_email_v1')||'';
 intro.hidden=false;
 document.getElementById('intro-start').addEventListener('click',function(){
- var player=name.value.trim();
- if(!player){document.getElementById('intro-error').textContent='Введи своё имя';return}
- localStorage.setItem(nameKey,player);
- var firstCity=gameCities.options[0].value;
- gameCities.value=firstCity;
- document.getElementById('join').click();
- try{var after=JSON.parse(localStorage.getItem(gameKey)||'{}');if(after.city===firstCity){intro.hidden=true}else{document.getElementById('intro-error').textContent='Не удалось выбрать город'}}catch(e){document.getElementById('intro-error').textContent='Не удалось сохранить город'}
+ var player=name.value.trim(),address=email.value.trim().toLowerCase();
+ if(player.length<2){error.textContent='Введи имя не короче двух символов';return}
+ if(!email.checkValidity()||!address){error.textContent='Введи действительный адрес электронной почты';return}
+ localStorage.setItem(nameKey,player);localStorage.setItem('chr_player_email_v1',address);
+ var socialEmail=document.querySelector('#social-login input[name="email"]');
+ if(socialEmail)socialEmail.value=address;
+ intro.hidden=true;
+ document.querySelector('[data-go="team"]')?.click();
+ document.getElementById('social-login')?.requestSubmit();
 });
 })();
 </script>
