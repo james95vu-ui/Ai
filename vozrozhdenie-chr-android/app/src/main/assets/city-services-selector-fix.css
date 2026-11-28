@@ -1,0 +1,11 @@
+/* Main game: no city selector bar; map gets its space back. */
+body.game-shell:has(#town:not([hidden])) #town>.city-hero{display:none!important}
+body.game-shell:has(#town:not([hidden])) #town .landscape{top:calc(env(safe-area-inset-top) + 128px)!important;bottom:calc(env(safe-area-inset-bottom) + 126px)!important}
+body.game-shell:has(#town:not([hidden])) #town>.city-services-toggle{top:calc(env(safe-area-inset-top) + 131px)!important;right:12px!important;z-index:101!important}
+body.game-shell:has(#town:not([hidden])) #town>.city-services-drawer:not([hidden]){position:fixed!important;top:calc(env(safe-area-inset-top) + 185px)!important;bottom:calc(env(safe-area-inset-bottom) + 78px)!important;left:8px!important;right:8px!important;min-height:0!important;height:auto!important;display:block!important;overflow-y:auto!important;z-index:102!important}
+body.game-shell:has(#town:not([hidden])) #town .city-services-drawer .city-picker{position:relative!important;inset:auto!important;display:flex!important;flex-direction:row!important;gap:8px!important;width:100%!important;max-width:100%!important;margin:8px 0 16px!important;padding:8px!important;box-sizing:border-box!important;pointer-events:auto!important}
+body.game-shell:has(#town:not([hidden])) #town .city-services-drawer .city-picker select{flex:1 1 auto!important;min-width:0!important;width:0!important}
+body.game-shell:has(#town:not([hidden])) #town .city-services-drawer .city-picker button{flex:0 0 auto!important;min-height:44px!important}
+body.game-shell:has(#town:not([hidden])) #town .city-services-city-title{margin:8px 0!important;font-size:17px!important;color:#f4d18c!important}
+body.game-shell:has(#town:not([hidden])) #town>.city-services-drawer[hidden]{display:none!important}
+@media(max-height:700px){body.game-shell:has(#town:not([hidden])) #town .landscape{top:calc(env(safe-area-inset-top) + 124px)!important}}
