@@ -186,6 +186,8 @@ function visitCity(city) {
 }
 
 if (s.city && s.campaign[s.city]) s.built = s.campaign[s.city].built;
+window.addEventListener('game:guest-started',()=>{if(!s.city)visitCity(cities[0]);});
+
 
 function showIncome() {
   const wholeCoins = Math.floor(s.coins);
