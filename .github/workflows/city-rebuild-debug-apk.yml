@@ -34,6 +34,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
+      - name: Validate game JavaScript syntax
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const dir = 'app/src/main/assets';
+          const files = fs.readdirSync(dir).filter(name => name.endsWith('.js'));
+          for (const file of files) {
+            new Function(fs.readFileSync(dir + '/' + file, 'utf8'));
+          }
+          console.log('Validated ' + files.length + ' JavaScript files');
+          NODE
       - name: Build unsigned-by-owner debug APK
         run: gradle :app:assembleDebug --stacktrace --no-daemon
       - name: Upload installable debug APK
