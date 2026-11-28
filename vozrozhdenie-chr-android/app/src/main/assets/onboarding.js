@@ -52,7 +52,8 @@ cityJoin.onclick=async()=>{
  finally{cityBusy=false;cityJoin.disabled=false}
 };
 window.addEventListener('game:auth-changed',()=>{if(credentials())checkCity();else{intro.hidden=false;cityStep.hidden=true;start.hidden=false;name.disabled=false;email.disabled=false;sync()}});
-window.addEventListener('online',()=>{if(credentials())checkCity()});\nwindow.addEventListener('pageshow',()=>{if(credentials())checkCity();else sync()});
+window.addEventListener('online',()=>{if(credentials())checkCity()});
+window.addEventListener('pageshow',()=>{if(credentials())checkCity();else sync()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(credentials())checkCity();else sync()}});
 if(credentials())checkCity();else sync();
 })();
