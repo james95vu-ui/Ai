@@ -3,7 +3,11 @@
 const town=document.getElementById('town');if(!town)return;
 const root=document.createElement('section');root.className='game-nickname-card tycoon-card';
 root.innerHTML='<h3>👤 Моё игровое имя</h3><form><input name="nickname" minlength="2" maxlength="30" required placeholder="Имя, видимое в чатах"><button>Сохранить имя</button></form><p role="status" class="nickname-status">Имя отображается в городских чатах и чатах строек.</p>';
-town.append(root);\nconst history=document.createElement('p');history.className='nickname-history';history.setAttribute('aria-live','polite');root.append(history);
+town.append(root);
+const history=document.createElement('p');history.className='nickname-history';history.setAttribute('aria-live','polite');root.append(history);
+window.addEventListener('game:auth-changed',()=>{refreshProfile()});
+window.addEventListener('online',()=>{refreshProfile()});
+document.querySelector('[data-go="town"]')?.addEventListener('click',()=>refreshProfile());
 const form=root.querySelector('form'),status=root.querySelector('.nickname-status'),input=form.elements.namedItem('nickname');
 input.value=localStorage.getItem('chr_player_name_v1')||'';
 async function refreshProfile(){
@@ -11,7 +15,7 @@ async function refreshProfile(){
  const cfg=window.GAME_CONFIG||{};if(!session?.access_token||!cfg.url||!cfg.key)return;
  try{
   const res=await fetch(cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/game_my_nickname',{method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:'{}'});
-  if(!res.ok)return;const data=(await res.json())?.[0];if(!data)return;
+  if(!res.ok)throw Error('Не удалось получить профиль');const data=(await res.json())?.[0];if(!data){history.textContent='Имя ещё не создано';return;}
   input.value=data.nickname;
   const old=data.old_nickname?'Старое имя: '+data.old_nickname+' (до '+new Date(data.old_name_expires_at).toLocaleString('ru-RU')+')':'';
   const next=data.can_change?'Имя можно изменить сейчас.':'Следующая смена имени: '+new Date(data.next_change_at).toLocaleString('ru-RU');
@@ -31,4 +35,5 @@ form.addEventListener('submit',async e=>{
   const saved=await res.json();localStorage.setItem('chr_player_name_v1',saved);status.textContent='Игровое имя сохранено: '+saved;await refreshProfile();
  }catch(error){status.textContent=error.message}finally{button.disabled=false}
 });
+setTimeout(refreshProfile,0);
 })();
