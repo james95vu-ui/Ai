@@ -146,7 +146,7 @@ function showCampaign() {
     : 'Уровень 20 из 20 · город завершён';
   const nextCity = cities[index + 1];
   if (index === cities.length - 1 && s.level === 20) {
-    const completed = cities.every(city => cityLevel(s.campaign[city]?.taps || 0) === 10);
+    const completed = cities.every(city => cityLevel(s.campaign[city]?.taps || 0) === 20);
     if (completed) $('development-text').textContent = 'Все 10 городов завершены';
   }
   $('next-city').hidden = !!authoritativeOnlineCity || !nextCity || !s.city || (index >= 0 && s.level < 20);
