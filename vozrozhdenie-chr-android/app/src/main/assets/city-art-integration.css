@@ -1,0 +1,16 @@
+/* Use the actual packaged city artwork rather than procedural CSS mountains. */
+#town #map .city-scenery{background:#234d4a url('city-landscape.svg') center center / cover no-repeat!important}
+#town #map .city-sky,#town #map .city-mountains,#town #map .city-forest,#town #map .city-river,#town #map .city-path,#town #map .city-trees{display:none!important}
+#town #map .city-scenery:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#061e2b55 0%,transparent 23%,transparent 72%,#061d16aa 100%);pointer-events:none}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building{width:24%;height:auto;min-height:53px;padding:4px 3px;border:1px solid #e8c27d;border-radius:9px;background:linear-gradient(170deg,#1d4239f2,#071d1ff0);box-shadow:0 3px 8px #000b,inset 0 1px #fff3bd45;font-size:clamp(9px,2.4vw,12px);gap:2px}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building>span:first-child{font-size:clamp(17px,5vw,25px)}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building.built{background:linear-gradient(170deg,#385e48ed,#0c302bf5)}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="0"]{left:8%;top:33%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="1"]{left:38%;top:32%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="2"]{right:7%;top:35%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="3"]{left:5%;top:49%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="4"]{left:38%;top:49%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="5"]{right:5%;top:51%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="6"]{left:5%;top:65%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="7"]{left:38%;top:65%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="8"]{right:5%;top:67%}
