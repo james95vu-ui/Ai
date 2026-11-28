@@ -27,17 +27,25 @@ const checkbox=(title,field)=>{const l=document.createElement('label');l.textCon
 checkbox('Звуковые эффекты','sound');checkbox('Фоновая музыка','music');checkbox('Вибрация','vibration');
 const l=document.createElement('label');l.textContent='Громкость';const slider=document.createElement('input');slider.type='range';slider.min=0;slider.max=100;slider.value=settings.volume;slider.oninput=()=>{settings.volume=Number(slider.value);persist();updateMusic()};l.append(slider);settingsPanel.append(l);
 const hint=document.createElement('p');hint.textContent='Настройки сохраняются на этом устройстве.';settingsPanel.append(hint);
-let audioCtx,musicTimer=null,musicStep=0;
+let audioCtx;
 function ctx(){try{return audioCtx||(audioCtx=new(window.AudioContext||window.webkitAudioContext)())}catch(e){return null}}
 function sound(){if(!settings.sound||!settings.volume)return;const a=ctx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type='sine';o.frequency.setValueAtTime(640,t);o.frequency.exponentialRampToValueAtTime(900,t+.09);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.001,settings.volume/100*.055),t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.13)}catch(e){}}
-// Original quiet ambient theme: changing chords, bell melody and a soft bass pulse.
-const chords=[[196,246.94,293.66],[174.61,220,261.63],[164.81,207.65,246.94],[146.83,196,246.94]];
-const melody=[392,440,493.88,587.33,493.88,440,392,329.63,349.23,392,440,523.25,440,392,349.23,293.66];
-function playTone(a,freq,start,duration,volume,type='sine'){try{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.00001,start);g.gain.linearRampToValueAtTime(volume,start+.07);g.gain.exponentialRampToValueAtTime(.00001,start+duration);o.connect(g).connect(a.destination);o.start(start);o.stop(start+duration+.02)}catch(e){}}
-function musicNote(){if(!settings.music||!settings.volume||document.hidden)return;const a=ctx();if(!a||a.state!=='running')return;const t=a.currentTime,step=musicStep++,scale=settings.volume/100;const chord=chords[Math.floor(step/4)%chords.length];if(step%4===0){chord.forEach((f,i)=>playTone(a,f,t,3.8,scale*.0035,'sine'));playTone(a,chord[0]/2,t,2.4,scale*.009,'triangle')}if(step%2===0)playTone(a,melody[step%melody.length],t,.85,scale*.014,'sine');else if(step%4===3)playTone(a,melody[(step+2)%melody.length]/2,t,1.1,scale*.006,'triangle')}
-function updateMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}if(!settings.music||!settings.volume||document.hidden)return;const a=ctx();if(!a)return;a.resume?.().catch(()=>{});musicNote();musicTimer=setInterval(musicNote,720)}
-document.addEventListener('pointerdown',()=>{if(settings.music&&audioCtx?.state==='suspended')audioCtx.resume?.().then(updateMusic).catch(()=>{})},{passive:true});
-document.addEventListener('visibilitychange',updateMusic);
+const backgroundMusic = new Audio('utro-nad-gorodom.ogg');
+backgroundMusic.loop = true;
+backgroundMusic.preload = 'none';
+
+function updateMusic() {
+  backgroundMusic.volume = Math.max(0, Math.min(1, Number(settings.volume) / 100 || 0));
+  if (!settings.music || !backgroundMusic.volume || document.hidden) {
+    backgroundMusic.pause();
+    return;
+  }
+  if (backgroundMusic.paused) backgroundMusic.play().catch(() => {});
+}
+
+document.addEventListener('click', updateMusic);
+document.addEventListener('visibilitychange', updateMusic);
+updateMusic();
 $('tap').addEventListener('click', () => {
   sound();
   if (!settings.vibration) return;
