@@ -8,6 +8,7 @@ const history=document.createElement('p');history.className='nickname-history';h
 window.addEventListener('game:auth-changed',()=>{refreshProfile()});
 window.addEventListener('online',()=>{refreshProfile()});
 document.querySelector('[data-go="town"]')?.addEventListener('click',()=>refreshProfile());
+let expiryTimer=null;
 const form=root.querySelector('form'),status=root.querySelector('.nickname-status'),input=form.elements.namedItem('nickname');
 input.value=localStorage.getItem('chr_player_name_v1')||'';
 async function refreshProfile(){
@@ -20,8 +21,10 @@ async function refreshProfile(){
   const old=data.old_nickname?'Старое имя: '+data.old_nickname+' (до '+new Date(data.old_name_expires_at).toLocaleString('ru-RU')+')':'';
   const next=data.can_change?'Имя можно изменить сейчас.':'Следующая смена имени: '+new Date(data.next_change_at).toLocaleString('ru-RU');
   history.textContent=[old,next].filter(Boolean).join(' · ');
+  if(expiryTimer)clearTimeout(expiryTimer);
+  if(data.old_name_expires_at){const remaining=new Date(data.old_name_expires_at).getTime()-Date.now();if(remaining>0)expiryTimer=setTimeout(refreshProfile,Math.min(remaining+1000,2147483647));}
   form.querySelector('button').disabled=!data.can_change;
- }catch(_){history.textContent='Не удалось проверить историю имени'}
+ }catch(_){history.textContent='Не удалось проверить историю имени';form.querySelector('button').disabled=true}
 }
 form.addEventListener('submit',async e=>{
  e.preventDefault();const name=input.value.trim();if(name.length<2||name.length>30)return;
