@@ -1,7 +1,6 @@
-/* Approved city level-one photographic art: 56328.png, portrait 864x1536.
-   Install as city-reconstruction-realistic.jpg after converting to JPEG. */
-#town #map .city-scenery{background-image:url('city-reconstruction-realistic.jpg'),url('city-landscape.svg')!important;background-position:center center!important;background-size:cover!important}
-#town[data-level="1"] #map .city-scenery{background-image:url('city-reconstruction-realistic.jpg'),url('city-level-1.svg')!important}
+/* Use the packaged panorama until dedicated reconstruction artwork is available. */
+#town #map .city-scenery{background-image:url('city-panorama.webp'),url('city-landscape.svg')!important;background-position:center center!important;background-size:cover!important}
+#town[data-level="1"] #map .city-scenery{background-image:url('city-level-1.svg'),url('city-panorama.webp')!important}
 #town #map .city-building{width:24%!important;height:11%!important;min-height:56px!important;justify-content:flex-end!important;padding:4px!important;box-sizing:border-box!important}
 #town #map .city-building[data-building="0"]{left:5%!important;top:50%!important}
 #town #map .city-building[data-building="1"]{left:37%!important;top:20%!important}
@@ -16,3 +15,9 @@
 #town #map .city-building:not(.selected):not(:focus-visible){outline:0!important}
 #town #map .city-building:not(.selected) .city-building-label{opacity:.83!important}
 #town #map .city-building:focus-visible{outline:2px solid #ffe4a3!important}
+
+/* Restore visible construction progression over the existing panorama. */
+#town #map .city-scenery::before{display:block!important;pointer-events:none;opacity:var(--ruin-opacity,0)}
+#town #map .city-building[data-construction="planned"] .city-building-art{display:block!important;opacity:.42!important}
+#town #map .city-building.built .city-building-art{display:block!important;opacity:1!important}
+#town #map .city-building .city-building-art{width:75%;max-height:70%;pointer-events:none;object-fit:contain}
