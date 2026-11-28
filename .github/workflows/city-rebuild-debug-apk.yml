@@ -44,6 +44,16 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
+      - name: Restore persistent debug signing key
+        uses: actions/cache@v4
+        with:
+          path: vozrozhdenie-chr-android/app/stable-debug.jks
+          key: vozrozhdenie-stable-debug-signing-v1
+      - name: Generate debug signing key only on first build
+        run: |
+          if [ ! -f app/stable-debug.jks ]; then
+            keytool -genkeypair -keystore app/stable-debug.jks -storetype JKS -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Vozrozhdenie,C=EE"
+          fi
       - name: Validate game JavaScript syntax
         run: |
           node - <<'NODE'
@@ -56,7 +66,7 @@ jobs:
           console.log('Validated ' + files.length + ' JavaScript files');
           NODE
       - name: Build unsigned-by-owner debug APK
-        run: gradle :app:assembleDebug --stacktrace --no-daemon
+        run: gradle :app:assembleDebug --stacktrace --no-daemon -PciVersionCode=${{ github.run_number }}
       - name: Upload installable debug APK
         uses: actions/upload-artifact@v4
         with:
