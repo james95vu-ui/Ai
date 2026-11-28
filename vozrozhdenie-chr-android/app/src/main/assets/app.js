@@ -2,6 +2,7 @@
 const balanceFormat = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const cities = ['Урус-Мартан', 'Гудермес', 'Шали', 'Аргун', 'Ойсхара', 'Ачхой-Мартан', 'Курчалой', 'Серноводское', 'Шатой', 'Грозный'];
 const thresholds = [0, 5, 12, 22, 35, 52, 74, 102, 137, 180, 230, 288, 354, 428, 510, 600, 700, 812, 936, 1072];
+const cityStages=["Разрушенный город","Расчистка улиц","Вывоз завалов","Ремонт дорог","Восстановление дворов","Первые стройки","Электроснабжение","Водоснабжение","Новые жилые дома","Восстановление школ","Зелёные кварталы","Медицинская помощь","Городские площади","Торговый район","Общественный транспорт","Современные кварталы","Обновлённый центр","Умная инфраструктура","Инновационный город","Город будущего"];
 const buildings=[['Городской парк','🌳',500,20,1],['Новая школа','🏫',900,35,1],['Мастерская','🏭',1400,50,1],['Жилой дом','🏠',1800,75,2],['Больница','🏥',2500,110,3],['Мечеть','🕌',3000,130,3],['Рынок','🏪',3800,180,4],['Стадион','🏟️',5000,240,5],['Библиотека','📚',6500,320,6]];const fresh=()=>({city:null,coins:1250,income:60,level:1,contribution:120,built:[],tapLevel:0,lastCollectedAt:Date.now(),daily:{}});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){s=fresh()}if(!Array.isArray(s.built))s.built=[];for(const k of ['coins','income','level','contribution','tapLevel','lastCollectedAt'])if(!Number.isFinite(s[k]))s[k]=fresh()[k];let combo=0,lastTap=0,selected=0,timer;let authoritativeOnlineCity=null;const save=()=>localStorage.setItem(KEY,JSON.stringify(s));const day=()=>new Date().toISOString().slice(0,10);function daily(){if(s.daily?.date!==day())s.daily={date:day(),taps:0,builds:0,claimed:[]};return s.daily}let lastActiveTick=performance.now();function collect(){const tick=performance.now(),elapsed=Math.max(0,Math.min(tick-lastActiveTick,60000));lastActiveTick=tick;const gain=s.city?elapsed*hourlyIncome()/3600000:0;s.coins+=gain;if(Math.abs(s.coins-Math.round(s.coins))<1e-8)s.coins=Math.round(s.coins);s.lastCollectedAt=Date.now();save();return gain}function notice(t){$('notice').textContent=t;clearTimeout(timer);timer=setTimeout(()=>$('notice').textContent='',2500)}function power(){return 10+5*s.tapLevel}function cost(){return Math.floor(200*1.7**s.tapLevel)}// Keep the existing active-city fields for saved games and achievement readers.
 if (!s.campaign || typeof s.campaign !== 'object' || Array.isArray(s.campaign)) {
   s.campaign = {};
@@ -154,7 +155,9 @@ function showCampaign() {
   $('next-city').textContent = nextCity ? 'Перейти: ' + nextCity : '';
   $('walk').disabled = !s.city;
   $('town').dataset.level = s.level;
-  $('development-stage').textContent = s.level === 20 ? 'Город будущего' : s.level >= 16 ? 'Современный город' : s.level >= 11 ? 'Развитие' : s.level >= 6 ? 'Строительство' : 'Восстановление';
+  $('development-stage').textContent = cityStages[Math.max(0,Math.min(19,s.level-1))];
+  $('town').style.setProperty('--city-progress', String(Math.max(0,Math.min(1,(progress?.taps||0)/(thresholds.at(-1)||1)))));
+  $('town').dataset.stage=String(s.level);
 }
 
 function renderCityOptions() {
@@ -267,12 +270,13 @@ function map() {
   buildings.forEach((project, i) => {
     const button = document.createElement('button');
     const built = s.built.includes(project[0]);
+    const unlocked = s.level >= project[4];
     button.className = 'plot city-building' + (built ? ' built' : '') + (selected === i ? ' selected' : '');
     button.dataset.building=String(i);
     const upgradeLevel=s.campaign[s.city]?.upgrades?.[project[0]]||0;
     button.dataset.upgradeLevel=String(upgradeLevel);
-    button.dataset.construction=built?'complete':'planned';
-    button.setAttribute('aria-label',project[0]+(built?' — построено':' — доступно для строительства'));
+    button.dataset.construction=built?'complete':unlocked?'available':'locked';
+    button.setAttribute('aria-label',project[0]+(built?' — построено':unlocked?' — доступно для строительства':' — откроется на уровне '+project[4]));
     const icon = document.createElement('span');
     icon.textContent = built ? project[1] : '＋';
     const label=document.createElement('span');label.className='city-building-label';label.textContent=project[0];
