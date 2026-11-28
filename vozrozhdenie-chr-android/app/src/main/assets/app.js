@@ -274,7 +274,7 @@ function map() {
     icon.textContent = built ? project[1] : '＋';
     const label=document.createElement('span');label.className='city-building-label';label.textContent=project[0];
     button.append(icon,label);
-    button.onclick = () => { selected = i; map(); };
+    button.onclick = () => { selected = i; window.cityDetailsOpen=true; map(); };
     el.append(button);
   });
 
@@ -283,6 +283,14 @@ function map() {
   const level = city?.upgrades?.[project[0]] || 0;
   const details = $('details');
   details.replaceChildren();
+  details.hidden=!window.cityDetailsOpen;
+  if(window.cityDetailsOpen){
+    const close=document.createElement('button');
+    close.type='button';close.className='city-details-close';close.textContent='✕ Закрыть';
+    close.setAttribute('aria-label','Закрыть сведения о здании');
+    close.onclick=()=>{window.cityDetailsOpen=false;details.hidden=true};
+    details.append(close);
+  }
   const description = document.createElement('p');
   description.textContent = project[0] + (s.built.includes(project[0])
     ? ' · улучшений: ' + level + ' · базовый доход +' + project[3] + '/час'
