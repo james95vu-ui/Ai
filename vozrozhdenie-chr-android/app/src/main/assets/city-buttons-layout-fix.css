@@ -1,0 +1,69 @@
+/* Screenshot-driven layout repair: keep every building reachable and all controls unobscured. */
+body.game-shell:has(#town:not([hidden])) #town #map.hud-map{
+ height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 74px);
+ min-height:560px;
+ max-height:none;
+ overflow:hidden;
+}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building{
+ box-sizing:border-box;
+ width:clamp(88px,25%,180px);
+ height:clamp(66px,10.5dvh,106px);
+ min-height:0;
+ padding:5px 3px 4px;
+ border-radius:12px;
+ justify-content:center;
+ gap:0;
+ overflow:visible;
+}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building-art{
+ width:clamp(42px,8dvh,72px);
+ height:clamp(39px,7dvh,65px);
+ flex:none;
+}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building-label{
+ font-size:clamp(10px,1.4dvh,13px);
+ line-height:1.15;
+ max-width:100%;
+ padding:2px 3px;
+}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="0"]{left:5%;right:auto;top:31%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="1"]{left:37.5%;right:auto;top:31%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="2"]{left:auto;right:5%;top:31%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="3"]{left:5%;right:auto;top:44%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="4"]{left:37.5%;right:auto;top:44%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="5"]{left:auto;right:5%;top:44%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="6"]{left:5%;right:auto;top:57%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="7"]{left:37.5%;right:auto;top:57%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="8"]{left:auto;right:5%;top:57%}
+body.game-shell:has(#town:not([hidden])) #town .city-hero{
+ top:calc(170px + env(safe-area-inset-top));
+}
+body.game-shell:has(#town:not([hidden])) #town .development{
+ bottom:calc(77px + env(safe-area-inset-bottom));
+ z-index:56;
+}
+body.game-shell:has(#town:not([hidden])) #town #details:not([hidden]){
+ bottom:calc(139px + env(safe-area-inset-bottom));
+ z-index:75;
+ max-height:min(28dvh,240px);
+}
+body.game-shell:has(#town:not([hidden])) #town #details[hidden]{display:none!important}
+body.game-shell:has(#town:not([hidden])) #town #details button{
+ min-height:42px;
+ touch-action:manipulation;
+}
+body.game-shell:has(#town:not([hidden])) #town #map .city-upgrade-badge{top:-8px;right:-5px}
+@media(max-height:760px){
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building{height:clamp(57px,10dvh,76px)}
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building-art{width:43px;height:39px}
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="0"],
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="1"],
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="2"]{top:35%}
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="3"],
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="4"],
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="5"]{top:48%}
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="6"],
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="7"],
+ body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="8"]{top:61%}
+}
