@@ -1,24 +1,30 @@
 (()=>{'use strict';
 const town=document.getElementById('town');if(!town)return;
-const core=new Set(['city-hero','development','landscape']);
+const hero=town.querySelector('.city-hero'),picker=hero?.querySelector('.city-picker');
 const toggle=document.createElement('button');toggle.type='button';toggle.className='city-services-toggle';toggle.textContent='☰ Сервисы';toggle.setAttribute('aria-expanded','false');
-const drawer=document.createElement('aside');drawer.className='city-services-drawer';drawer.hidden=true;drawer.setAttribute('aria-label','Дополнительные городские сервисы');
+const drawer=document.createElement('aside');drawer.className='city-services-drawer';drawer.hidden=true;drawer.setAttribute('aria-label','Городские сервисы');
 const close=document.createElement('button');close.type='button';close.className='city-services-close';close.textContent='✕ Закрыть сервисы';
-drawer.append(close);town.append(toggle,drawer);
+drawer.append(close);
+if(picker){
+ const title=document.createElement('h2');title.className='city-services-city-title';title.textContent='Выбор города';
+ drawer.append(title,picker);
+}
+town.append(toggle,drawer);
+if(hero)hero.hidden=true;
 function closeDrawer(){drawer.hidden=true;toggle.setAttribute('aria-expanded','false')}
-toggle.addEventListener('click',()=>{drawer.hidden=!drawer.hidden;toggle.setAttribute('aria-expanded',String(!drawer.hidden))});
+function openDrawer(){drawer.hidden=false;toggle.setAttribute('aria-expanded','true')}
+toggle.addEventListener('click',()=>drawer.hidden?openDrawer():closeDrawer());
 close.addEventListener('click',closeDrawer);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden)closeDrawer()});
 let pending=false;
 function organize(){
  pending=false;
  for(const child of Array.from(town.children)){
-  if(child===toggle||child===drawer||child.id==='details'||core.has(child.className))continue;
-  // Third-party features can append their panels to town at any time.
+  if(child===toggle||child===drawer||child.id==='details'||child.classList.contains('city-hero')||child.classList.contains('development')||child.classList.contains('landscape'))continue;
   if(child.nodeType===1)drawer.append(child);
  }
- toggle.hidden=drawer.children.length<=1;
- if(toggle.hidden)closeDrawer();
+ // City selector is always available, even when online-only panels are absent.
+ toggle.hidden=false;
 }
 const observer=new MutationObserver(records=>{
  if(records.some(r=>r.target===town&&Array.from(r.addedNodes).some(n=>n.nodeType===1&&n!==toggle&&n!==drawer))){
