@@ -16,7 +16,7 @@ android {
     }
 
     signingConfigs {
-        debug {
+        getByName('debug') {
             storeFile file('stable-debug.jks')
             storePassword 'android'
             keyAlias 'androiddebugkey'
