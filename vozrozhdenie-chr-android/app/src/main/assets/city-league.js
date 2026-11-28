@@ -33,7 +33,7 @@
    const response=await fetch(cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/city_leaderboard',{
     method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+cfg.key,'Content-Type':'application/json'},body:'{}'
    });
-   if(!response.ok)throw Error('HTTP '+response.status);
+   if(!response.ok){const e=await response.json().catch(()=>({}));throw Error(e.message||'HTTP '+response.status);}
    const rows=await response.json();
    if(!Array.isArray(rows))throw Error('Некорректный ответ');
    list.replaceChildren(...rows.map((city,index)=>line(city,index+1)));
@@ -44,7 +44,8 @@
  window.addEventListener('game:refresh-cities',()=>{if(!section.hidden)refresh()});
  document.querySelector('[data-go="team"]')?.addEventListener('click',()=>setTimeout(refresh,0));
  window.addEventListener('online',refresh);
+ window.addEventListener('game:auth-changed',refresh);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!section.hidden)refresh()});
- setInterval(()=>{if(!document.hidden&&!section.hidden)refresh()},30000);
+ setInterval(()=>{if(!document.hidden&&!section.hidden)refresh()},10000);
  if(!section.hidden)refresh();
 })();
