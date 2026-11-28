@@ -1,0 +1,10 @@
+/* Progression is represented directly on the city map. */
+#town #map .city-building{isolation:isolate}
+#town #map .city-building[data-construction="planned"] .city-building-art{opacity:.5;filter:grayscale(.85) brightness(.75)}
+#town #map .city-upgrade-badge{position:absolute;top:-7px;right:-5px;z-index:3;display:flex;align-items:center;justify-content:center;min-width:28px;height:23px;padding:0 6px;border:1px solid #fff0b0;border-radius:20px;background:linear-gradient(135deg,#bd8d35,#704416);color:#fff3ca;font-weight:800;font-size:11px;box-shadow:0 3px 8px #0009}
+#town #map .city-upgrade-glow{position:absolute;left:15%;right:15%;top:6%;height:65%;z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse,#f4c96966,transparent 70%);animation:cityUpgradeShine 3.2s ease-in-out infinite alternate}
+#town #map .city-building[data-construction="planned"]{border-bottom-color:#b0a694!important}
+#town #map .city-building[data-construction="planned"] .city-building-label{color:#d8d1c5}
+#town #map .city-building:focus-visible{outline:3px solid #fff0b0;outline-offset:3px}
+@keyframes cityUpgradeShine{from{opacity:.3;transform:scale(.88)}to{opacity:.85;transform:scale(1.13)}}
+@media(prefers-reduced-motion:reduce){#town #map .city-upgrade-glow{animation:none}}
