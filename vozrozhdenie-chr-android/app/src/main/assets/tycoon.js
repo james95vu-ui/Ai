@@ -23,11 +23,12 @@ const Tycoon = (() => {
     t.energy ??= energyCap(t);
     t.energyAt ??= now;
     t.nextChest ??= 0;
+    t.energyUpgrades = Math.max(0, Math.min(30, Math.trunc(Number(t.energyUpgrades)||0)));
     return t;
   }
 
   function energyCap(t) {
-    return t.technologies.includes('power') ? 80 : 60;
+    return (t.technologies.includes('power') ? 80 : 60) + 10 * (t.energyUpgrades || 0);
   }
 
   function recharge(t, now) {

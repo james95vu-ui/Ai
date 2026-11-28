@@ -1,0 +1,39 @@
+/* Second-pass mobile game polish: tactile controls, compact HUD, responsive cards. */
+:root{--hud-edge:rgba(245,214,153,.28);--hud-glow:rgba(241,195,103,.18)}
+body.game-shell{overscroll-behavior-y:contain}
+.game-shell main{padding-bottom:calc(94px + env(safe-area-inset-bottom))}
+.game-shell .game-header{position:relative;overflow:hidden}
+.game-shell .game-header:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(#fff0b5,#b78739)}
+.game-shell .game-header:after{content:"";position:absolute;right:-20px;top:-50px;width:120px;height:120px;border:1px solid #e8c78324;border-radius:50%;box-shadow:0 0 0 18px #e8c78309,0 0 0 40px #e8c78307;pointer-events:none}
+.game-shell .stats>div{position:relative;overflow:hidden}
+.game-shell .stats>div:after{content:"";position:absolute;left:8px;right:8px;bottom:0;height:2px;background:linear-gradient(90deg,transparent,#e7c37a88,transparent)}
+.game-shell .stats>div strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-shell .game-nav{position:fixed;left:0;right:0;bottom:0;z-index:90;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:stretch}
+.game-shell .game-nav button{width:100%;min-height:56px;position:relative;transition:background .16s ease,color .16s ease,transform .12s ease}
+.game-shell .game-nav button:active{transform:scale(.94)}
+.game-shell .game-nav button[aria-current="page"]:after,.game-shell .game-nav button[aria-selected="true"]:after,.game-shell .game-nav button.active:after{content:"";position:absolute;top:2px;left:22%;right:22%;height:2px;background:#ffe5a0;border-radius:2px;box-shadow:0 0 9px #f4cb76}
+.game-shell .game-nav button span{font-family:system-ui,sans-serif;font-weight:700;font-size:1.45rem;text-shadow:0 2px 6px #0007}
+.game-screens>section{padding:clamp(10px,3vw,17px)}
+.game-screens .tycoon-card,.game-screens #details>div{border:1px solid var(--hud-edge);border-radius:14px;background:linear-gradient(155deg,#34514b,#1a3438);box-shadow:inset 0 1px #ffffff20,0 6px 16px #0003}
+.game-screens button:not(:disabled):active{transform:scale(.98)}
+.game-screens button{transition:transform .12s ease,filter .18s ease,box-shadow .18s ease}
+.game-screens button:disabled{opacity:.55;filter:saturate(.6)}
+.game-screens progress{accent-color:#e9c77f;height:12px;border-radius:99px;overflow:hidden}
+.game-screens progress::-webkit-progress-bar{background:#071d20;border-radius:99px}
+.game-screens progress::-webkit-progress-value{background:linear-gradient(90deg,#c59b4f,#ffe0a0);border-radius:99px;box-shadow:0 0 9px #e9c77f66}
+.game-screens .development{border:1px solid var(--hud-edge);border-radius:13px;padding:12px;background:linear-gradient(150deg,#284841,#142c32);box-shadow:inset 0 1px #ffffff16}
+.game-screens .development-heading{gap:10px}
+.game-screens .development-heading #development-stage{color:#f4d590;font-weight:800;letter-spacing:.03em}
+.game-screens .city-picker{display:flex;align-items:center;gap:8px;padding:8px;border-radius:12px;background:#0d252acb;border:1px solid #e4c78d55;backdrop-filter:blur(8px)}
+.game-screens .city-picker select{flex:1;min-width:0;background:#0c282d;color:#f5e5c4;font-weight:800}
+.game-screens .city-picker button{white-space:nowrap;background:linear-gradient(#e9ce93,#bb9554);color:#142c2b;font-weight:800}
+#intro .intro-art{border-bottom:2px solid #d5b16b;box-shadow:0 4px 20px #0005}
+#intro .intro-art svg{filter:saturate(1.12) contrast(1.07)}
+#intro .intro-card{animation:welcome-rise .35s ease-out both}
+#intro .intro-content label{font-size:.84rem;letter-spacing:.02em}
+#intro #intro-error{color:#f4d99e;line-height:1.45}
+#intro #intro-city-step{padding-top:8px}
+#intro #intro-city-select{font-weight:800;color:#f9e3b2}
+@keyframes welcome-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:370px){.game-shell .game-nav button{font-size:.56rem}.game-shell .game-nav button span{font-size:1.18rem}.game-shell .stats>div{padding:6px 3px}}
+@media(prefers-reduced-motion:reduce){#intro .intro-card{animation:none}}

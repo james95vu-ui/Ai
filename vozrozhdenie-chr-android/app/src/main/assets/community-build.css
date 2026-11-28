@@ -1,0 +1,9 @@
+.community-build{margin:14px 12px;padding:16px;border:1px solid #c9ab7099;border-radius:17px;background:#143a31;color:#f8e9c9}
+.community-build h3{margin:0 0 8px;color:#edce8f}
+.build-status,.build-details{font-size:13px}
+.build-controls{display:grid;gap:12px}
+.build-controls label{display:grid;gap:6px;font-size:13px}
+.build-controls select,.build-controls input{width:100%;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #bca26d;background:#0c2923;color:white;font-size:16px}
+.build-progress progress{width:100%;height:13px;accent-color:#e3c179}
+.build-form{display:grid;gap:8px}
+.build-controls button{min-height:44px;border-radius:10px;border:1px solid #d5b879;background:#d5b879;color:#16372e;font-weight:700}

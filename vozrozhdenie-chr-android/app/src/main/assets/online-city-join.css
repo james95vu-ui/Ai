@@ -1,0 +1,8 @@
+.online-city-join{margin:14px 12px;padding:15px;border:1px solid #c9ab7099;border-radius:17px;background:#153b32;color:#fff0d5}
+.online-city-join h3{margin:0 0 8px;color:#eacb8a}
+.online-city-status{font-size:13px}
+.online-city-form{display:grid;gap:10px;margin:12px 0}
+.online-city-form label{display:grid;gap:6px;font-size:13px}
+.online-city-form select{padding:12px;border:1px solid #c9ab70;border-radius:9px;background:#0b241e;color:white;font-size:16px}
+.online-city-join button{min-height:43px;padding:9px 13px;border:0;border-radius:9px;background:#d5b879;color:#16372e;font-weight:700}
+.online-city-join [hidden]{display:none!important}

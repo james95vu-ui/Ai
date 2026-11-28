@@ -11,11 +11,17 @@ android {
         applicationId 'com.vozrozhdenie.chr'
         minSdk 23
         targetSdk 35
-        versionCode 1
-        versionName '0.1.0'
+        versionCode = Integer.parseInt((project.findProperty('ciVersionCode') ?: '1').toString())
+        versionName = '0.1.' + (project.findProperty('ciVersionCode') ?: '0').toString()
     }
 
     signingConfigs {
+        getByName('debug') {
+            storeFile file('stable-debug.jks')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
         release {
             storeFile file('signing.jks')
             storePassword System.getenv('APK_KEYSTORE_PASSWORD')

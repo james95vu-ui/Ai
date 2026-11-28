@@ -1,0 +1,76 @@
+name: City Rebuild Android debug APK
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - city-rebuild-phase1-2026
+    paths:
+      - 'vozrozhdenie-chr-android/**'
+      - '.github/workflows/city-rebuild-debug-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: vozrozhdenie-chr-android
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android command-line tools
+        run: |
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          mkdir -p "$SDK_ROOT/cmdline-tools"
+          curl --fail --location --retry 3 --output /tmp/android-commandlinetools.zip "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
+          unzip -q /tmp/android-commandlinetools.zip -d /tmp/android-cli
+          mkdir -p "$SDK_ROOT/cmdline-tools/latest"
+          cp -R /tmp/android-cli/cmdline-tools/. "$SDK_ROOT/cmdline-tools/latest/"
+          echo "$SDK_ROOT/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+      - name: Install Android platform 35
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_HOME" "platforms;android-35" "build-tools;35.0.0"
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Restore persistent debug signing key
+        uses: actions/cache@v4
+        with:
+          path: vozrozhdenie-chr-android/app/stable-debug.jks
+          key: vozrozhdenie-stable-debug-signing-v1
+      - name: Generate debug signing key only on first build
+        run: |
+          if [ ! -f app/stable-debug.jks ]; then
+            keytool -genkeypair -keystore app/stable-debug.jks -storetype JKS -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Vozrozhdenie,C=EE"
+          fi
+      - name: Validate game JavaScript syntax
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const dir = 'app/src/main/assets';
+          const files = fs.readdirSync(dir).filter(name => name.endsWith('.js'));
+          for (const file of files) {
+            new Function(fs.readFileSync(dir + '/' + file, 'utf8'));
+          }
+          console.log('Validated ' + files.length + ' JavaScript files');
+          NODE
+      - name: Build unsigned-by-owner debug APK
+        run: gradle :app:assembleDebug --stacktrace --no-daemon -PciVersionCode=${{ github.run_number }}
+      - name: Upload installable debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: vozrozhdenie-chr-city-rebuild-debug-apk
+          path: vozrozhdenie-chr-android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14

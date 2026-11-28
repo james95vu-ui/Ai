@@ -1,0 +1,45 @@
+(()=>{'use strict';
+const drawings=[
+'<path d="M5 54h86v24H5z" fill="#b5a079"/><path d="M8 54V38l13-14 12 14v16m18 0V30l13-15 13 15v24" fill="#4d845e"/><circle cx="21" cy="27" r="18" fill="#679b62"/><circle cx="64" cy="19" r="20" fill="#3c7855"/><path d="M45 79V55" stroke="#ddc59b" stroke-width="8"/>',
+'<rect x="12" y="33" width="72" height="44" rx="3" fill="#d9c29d"/><path d="m6 33 42-22 42 22" fill="#b97e57"/><rect x="43" y="46" width="14" height="31" fill="#4e736d"/><path d="M20 45h13v13H20zm43 0h13v13H63z" fill="#8bbcc2"/><path d="M8 77h80" stroke="#f1d8a5" stroke-width="5"/>',
+'<path d="M6 38 46 15 90 38v40H6z" fill="#b38b64"/><path d="M4 38 46 11 92 38" fill="#665e57"/><rect x="17" y="47" width="18" height="24" fill="#4d6b73"/><rect x="43" y="47" width="18" height="24" fill="#4d6b73"/><rect x="70" y="47" width="12" height="31" fill="#5c3f31"/><path d="M66 21V8h7v17" fill="#d4b28b"/><path d="M68 8q5-7 10 0" stroke="#ddd3bd" stroke-width="3" fill="none"/>',
+'<rect x="10" y="32" width="76" height="46" fill="#e1c4a0"/><path d="m5 34 43-25 43 25" fill="#8e5140"/><rect x="40" y="48" width="18" height="30" fill="#694d37"/><path d="M18 45h14v14H18zm46 0h14v14H64z" fill="#8db5b8"/><path d="M5 78h86" stroke="#c6a575" stroke-width="5"/>',
+'<rect x="9" y="31" width="78" height="47" fill="#e0e0d1"/><path d="M9 31h78v8H9z" fill="#5a8b8b"/><path d="M38 31V18h20v13" fill="#d5d9d3"/><path d="M45 12h6v23m-9-17h12" stroke="#b65c57" stroke-width="5"/><path d="M18 47h13v14H18zm24 0h13v14H42zm24 0h13v14H66z" fill="#81b5bf"/>',
+'<rect x="17" y="40" width="62" height="38" fill="#e6d7b4"/><path d="M10 40h76l-38-16z" fill="#bb9d76"/><ellipse cx="48" cy="30" rx="23" ry="20" fill="#64939a"/><path d="M25 30a23 20 0 0 1 46 0" fill="#9ebfc0"/><path d="M44 11h8V2h-8z" fill="#d7bb78"/><path d="M10 13h8v65h-8zm68 0h8v65h-8z" fill="#e7d8b6"/><path d="m9 13 5-12 5 12m58 0 5-12 5 12" fill="#75a6aa"/><path d="M40 78V55q8-11 16 0v23" fill="#5a6966"/>',
+'<rect x="7" y="36" width="82" height="42" fill="#c6a77a"/><path d="m4 36 44-23 44 23" fill="#8f5446"/><path d="M15 44h16v16H15zm25 0h16v16H40zm25 0h16v16H65z" fill="#f1d8a6"/><path d="M10 62h76" stroke="#846e55" stroke-width="5"/><path d="M43 62v16" stroke="#6b4c37" stroke-width="12"/>',
+'<ellipse cx="48" cy="56" rx="43" ry="24" fill="#d7c6a0"/><ellipse cx="48" cy="56" rx="36" ry="17" fill="#56926b"/><path d="M8 55V35l40-23 40 23v20" fill="none" stroke="#c5b48a" stroke-width="8"/><path d="M24 28v30m48-30v30" stroke="#d2c49c" stroke-width="6"/><path d="M13 57q35-25 70 0" fill="none" stroke="#f6e2b1" stroke-width="4"/>',
+'<rect x="12" y="30" width="72" height="48" fill="#d7bd93"/><path d="m7 30 41-21 41 21" fill="#9a7154"/><rect x="19" y="42" width="14" height="19" fill="#9cc5c3"/><rect x="42" y="42" width="14" height="19" fill="#9cc5c3"/><rect x="65" y="42" width="12" height="19" fill="#9cc5c3"/><path d="M40 78V64h17v14" fill="#6b5843"/>'
+];
+const svg=markup=>'<svg class="city-building-art" viewBox="0 0 96 84" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse cx="48" cy="78" rx="43" ry="5" fill="#0b1c17" opacity=".55"/>'+markup+'</svg>';
+function decorate(){
+ document.querySelectorAll('#map .city-building').forEach(button=>{
+  const index=Number(button.dataset.building);
+  if(!Number.isInteger(index)||!drawings[index])return;
+  // map() recreates each button; decorate it once, without mutating unrelated nodes.
+  if(button.dataset.artReady==='1')return;
+  button.dataset.artReady='1';
+  const originalIcon=Array.from(button.children).find(el=>el.tagName==='SPAN'&&!el.classList.contains('city-building-label'));
+  if(originalIcon)originalIcon.hidden=true;
+  button.insertAdjacentHTML('afterbegin',svg(drawings[index]));
+  const illustration=button.querySelector('.city-building-art');
+  if(illustration){
+   const built=button.classList.contains('built');
+   const level=Math.max(0,Number(button.dataset.upgradeLevel)||0);
+   illustration.style.opacity=built?'1':'.48';
+   illustration.style.filter=built?'saturate('+Math.min(1.7,1.05+level*.13)+') brightness('+Math.min(1.35,1+level*.055)+')':'grayscale(.85) brightness(.75)';
+   if(built&&level>0){
+    const glow=document.createElement('span');
+    glow.className='city-upgrade-glow';
+    glow.setAttribute('aria-hidden','true');
+    button.append(glow);
+   }
+  }
+ });
+}
+const map=document.getElementById('map');if(!map)return;
+const observer=new MutationObserver(records=>{
+ if(records.some(record=>Array.from(record.addedNodes).some(node=>node.nodeType===1&&node.classList?.contains('city-building'))))decorate();
+});
+observer.observe(map,{childList:true});
+decorate();
+})();

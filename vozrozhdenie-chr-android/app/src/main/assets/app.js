@@ -1,12 +1,12 @@
 (()=>{'use strict';const $=id=>document.getElementById(id),KEY='vozrozhdenie_demo_v1',fmt=n=>Math.floor(n).toLocaleString('ru-RU');
 const balanceFormat = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const cities = ['Урус-Мартан', 'Гудермес', 'Шали', 'Аргун', 'Ойсхара', 'Ачхой-Мартан', 'Курчалой', 'Шелковская', 'Наурская', 'Грозный'];
-const thresholds = [0, 5, 12, 22, 35, 52, 74, 102, 137, 180];
-const buildings=[['Городской парк','🌳',500,20,1],['Новая школа','🏫',900,35,1],['Мастерская','🏭',1400,50,1],['Жилой дом','🏠',1800,75,2],['Больница','🏥',2500,110,3],['Мечеть','🕌',3000,130,3],['Рынок','🏪',3800,180,4],['Стадион','🏟️',5000,240,5],['Библиотека','📚',6500,320,6]];const fresh=()=>({city:null,coins:1250,income:60,level:1,contribution:120,built:[],tapLevel:0,lastCollectedAt:Date.now(),daily:{}});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){s=fresh()}if(!Array.isArray(s.built))s.built=[];for(const k of ['coins','income','level','contribution','tapLevel','lastCollectedAt'])if(!Number.isFinite(s[k]))s[k]=fresh()[k];let combo=0,lastTap=0,selected=0,timer;const save=()=>localStorage.setItem(KEY,JSON.stringify(s));const day=()=>new Date().toISOString().slice(0,10);function daily(){if(s.daily?.date!==day())s.daily={date:day(),taps:0,builds:0,claimed:[]};return s.daily}function collect(){const now=Date.now(),gain=s.city?Math.max(0,Math.min(now-s.lastCollectedAt,86400000))*hourlyIncome()/3600000:0;s.coins+=gain;if(Math.abs(s.coins-Math.round(s.coins))<1e-8)s.coins=Math.round(s.coins);s.lastCollectedAt=Math.max(now,s.lastCollectedAt);save();return gain}function notice(t){$('notice').textContent=t;clearTimeout(timer);timer=setTimeout(()=>$('notice').textContent='',2500)}function power(){return 10+5*s.tapLevel}function cost(){return Math.floor(200*1.7**s.tapLevel)}// Keep the existing active-city fields for saved games and achievement readers.
+const cities = ['Урус-Мартан', 'Гудермес', 'Шали', 'Аргун', 'Ойсхара', 'Ачхой-Мартан', 'Курчалой', 'Серноводское', 'Шатой', 'Грозный'];
+const thresholds = [0, 5, 12, 22, 35, 52, 74, 102, 137, 180, 230, 288, 354, 428, 510, 600, 700, 812, 936, 1072];
+const buildings=[['Городской парк','🌳',500,20,1],['Новая школа','🏫',900,35,1],['Мастерская','🏭',1400,50,1],['Жилой дом','🏠',1800,75,2],['Больница','🏥',2500,110,3],['Мечеть','🕌',3000,130,3],['Рынок','🏪',3800,180,4],['Стадион','🏟️',5000,240,5],['Библиотека','📚',6500,320,6]];const fresh=()=>({city:null,coins:1250,income:60,level:1,contribution:120,built:[],tapLevel:0,lastCollectedAt:Date.now(),daily:{}});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){s=fresh()}if(!Array.isArray(s.built))s.built=[];for(const k of ['coins','income','level','contribution','tapLevel','lastCollectedAt'])if(!Number.isFinite(s[k]))s[k]=fresh()[k];let combo=0,lastTap=0,selected=0,timer;let authoritativeOnlineCity=null;const save=()=>localStorage.setItem(KEY,JSON.stringify(s));const day=()=>new Date().toISOString().slice(0,10);function daily(){if(s.daily?.date!==day())s.daily={date:day(),taps:0,builds:0,claimed:[]};return s.daily}let lastActiveTick=performance.now();function collect(){const tick=performance.now(),elapsed=Math.max(0,Math.min(tick-lastActiveTick,60000));lastActiveTick=tick;const gain=s.city?elapsed*hourlyIncome()/3600000:0;s.coins+=gain;if(Math.abs(s.coins-Math.round(s.coins))<1e-8)s.coins=Math.round(s.coins);s.lastCollectedAt=Date.now();save();return gain}function notice(t){$('notice').textContent=t;clearTimeout(timer);timer=setTimeout(()=>$('notice').textContent='',2500)}function power(){return 10+5*s.tapLevel}function cost(){return Math.floor(200*1.7**s.tapLevel)}// Keep the existing active-city fields for saved games and achievement readers.
 if (!s.campaign || typeof s.campaign !== 'object' || Array.isArray(s.campaign)) {
   s.campaign = {};
   if (s.city) {
-    const restoredLevel = Math.max(1, Math.min(10, Math.trunc(s.level)));
+    const restoredLevel = Math.max(1, Math.min(20, Math.trunc(s.level)));
     s.campaign[s.city] = { taps: thresholds[restoredLevel - 1], built: s.built };
     s.level = restoredLevel;
   }
@@ -26,7 +26,7 @@ function useEnergy(amount) {
 }
 
 function prestigeReward() {
-  return cities.filter(city => cityLevel(s.campaign[city]?.taps || 0) === 10).length;
+  return cities.filter(city => cityLevel(s.campaign[city]?.taps || 0) === 20).length;
 }
 
 function showTycoon() {
@@ -36,6 +36,7 @@ function showTycoon() {
   $('energy-bar').value = tycoon.energy;
   $('tap').disabled = !s.city || tycoon.energy < 1;
   $('upgrade').disabled = !s.city || s.coins < cost() || tycoon.energy < 3;
+  const energyButton=$('energy-upgrade');if(energyButton){const level=tycoon.energyUpgrades||0,price=Math.floor(350*Math.pow(1.65,level));energyButton.textContent=level>=30?'⚡ Запас энергии улучшен до максимума':'⚡ Улучшить запас энергии +10 · '+fmt(price)+' ◉';energyButton.disabled=!s.city||level>=30||s.coins<price;}
   const minutes = Math.ceil(Math.max(0, tycoon.nextChest - Date.now()) / 60000);
   $('chest').disabled = !s.city || minutes > 0;
   $('chest').textContent = minutes ? 'Следующий сундук через ' + minutes + ' мин' : 'Открыть сундук';
@@ -111,7 +112,7 @@ function cityLevel(taps) {
 function isUnlocked(city) {
   const index = cities.indexOf(city);
   return index === 0 || !!s.campaign[city] ||
-    (index > 0 && cityLevel(s.campaign[cities[index - 1]]?.taps || 0) === 10);
+    (index > 0 && cityLevel(s.campaign[cities[index - 1]]?.taps || 0) === 20);
 }
 
 function buildProject(building) {
@@ -129,8 +130,8 @@ function developCity() {
   if (level === s.level) return false;
   s.level = level;
   const project = buildings[level - 2];
-  buildProject(project);
-  notice('Уровень ' + level + ' · ' + project[0] + (level === 10 ? ' · Город завершён' : ''));
+  if(project)buildProject(project);
+  notice('Уровень ' + level + (project ? ' · ' + project[0] : ' · новый этап восстановления') + (level === 20 ? ' · Город завершён' : ''));
   return true;
 }
 
@@ -142,30 +143,29 @@ function showCampaign() {
   const next = thresholds[s.level];
   $('city-development').value = next ? ((progress?.taps || 0) - previous) / (next - previous) : 1;
   $('development-text').textContent = !progress ? 'Начни с Урус-Мартана' : next
-    ? 'Уровень ' + s.level + ' из 10 · до улучшения ' + (next - progress.taps) + ' нажатий'
-    : 'Уровень 10 из 10 · город завершён';
+    ? 'Уровень ' + s.level + ' из 20 · до улучшения ' + (next - progress.taps) + ' нажатий'
+    : 'Уровень 20 из 20 · город завершён';
   const nextCity = cities[index + 1];
-  if (index === cities.length - 1 && s.level === 10) {
-    const completed = cities.every(city => cityLevel(s.campaign[city]?.taps || 0) === 10);
+  if (index === cities.length - 1 && s.level === 20) {
+    const completed = cities.every(city => cityLevel(s.campaign[city]?.taps || 0) === 20);
     if (completed) $('development-text').textContent = 'Все 10 городов завершены';
   }
-  $('next-city').hidden = !nextCity || !s.city || (index >= 0 && s.level < 10);
+  $('next-city').hidden = !!authoritativeOnlineCity || !nextCity || !s.city || (index >= 0 && s.level < 20);
   $('next-city').textContent = nextCity ? 'Перейти: ' + nextCity : '';
   $('walk').disabled = !s.city;
   $('town').dataset.level = s.level;
-  $('development-stage').textContent = s.level >= 9 ? 'Новый город'
-    : s.level >= 6 ? 'Рост' : s.level >= 3 ? 'Обновление' : 'Восстановление';
+  $('development-stage').textContent = s.level === 20 ? 'Город будущего' : s.level >= 16 ? 'Современный город' : s.level >= 11 ? 'Развитие' : s.level >= 6 ? 'Строительство' : 'Восстановление';
 }
 
 function renderCityOptions() {
   const select = $('cities');
   select.replaceChildren();
-  const legacyCities = Object.keys(s.campaign).filter(city => !cities.includes(city));
+  const legacyCities = Object.keys(s.campaign).filter(city => !cities.includes(city) && !authoritativeOnlineCity);
   const options = [...cities, ...legacyCities];
   for (const city of options) {
     const option = document.createElement('option');
     option.value = city;
-    option.disabled = city !== s.city && !isUnlocked(city);
+    option.disabled = authoritativeOnlineCity ? city !== authoritativeOnlineCity : city !== s.city && !isUnlocked(city);
     option.textContent = option.disabled ? city + ' · закрыт' : city;
     select.append(option);
   }
@@ -173,7 +173,8 @@ function renderCityOptions() {
 }
 
 function visitCity(city) {
-  if (!isUnlocked(city) || s.city === city) return;
+  if (authoritativeOnlineCity && city !== authoritativeOnlineCity) { notice('Онлайн-город закреплён за аккаунтом: ' + authoritativeOnlineCity); return; }
+  if ((!authoritativeOnlineCity && !isUnlocked(city)) || s.city === city) return;
   collect();
   const progress = s.campaign[city] ||= { taps: 0, built: [] };
   s.city = city;
@@ -185,6 +186,19 @@ function visitCity(city) {
 }
 
 if (s.city && s.campaign[s.city]) s.built = s.campaign[s.city].built;
+const guestCityNames={'grozny':'Грозный','urus_martan':'Урус-Мартан','argun':'Аргун','gudermes':'Гудермес','shali':'Шали','kurchaloy':'Курчалой','achkhoy_martan':'Ачхой-Мартан','oyskhara':'Ойсхара','sernovodskoye':'Серноводское','shatoy':'Шатой'};
+window.addEventListener('game:guest-started',event=>{
+ const city=guestCityNames[event.detail?.cityId];
+ if(!city||authoritativeOnlineCity)return;
+ collect();
+ const progress=s.campaign[city] ||= {taps:0,built:[]};
+ s.city=city;
+ s.level=cityLevel(progress.taps);
+ s.built=progress.built;
+ selected=0;
+ save();
+ render();
+});
 
 function showIncome() {
   const wholeCoins = Math.floor(s.coins);
@@ -248,14 +262,29 @@ function updateBuildButton() {
 function map() {
   const el = $('map');
   el.replaceChildren();
+  const scenery=document.createElement('div');scenery.className='city-scenery';scenery.setAttribute('aria-hidden','true');scenery.innerHTML='<div class="city-sky"></div><div class="city-mountains city-mountains-back"></div><div class="city-mountains city-mountains-front"></div><div class="city-forest"></div><div class="city-river"></div><div class="city-path"></div><div class="city-trees"></div>';
+  el.append(scenery);
   buildings.forEach((project, i) => {
     const button = document.createElement('button');
     const built = s.built.includes(project[0]);
-    button.className = 'plot' + (built ? ' built' : '') + (selected === i ? ' selected' : '');
+    button.className = 'plot city-building' + (built ? ' built' : '') + (selected === i ? ' selected' : '');
+    button.dataset.building=String(i);
+    const upgradeLevel=s.campaign[s.city]?.upgrades?.[project[0]]||0;
+    button.dataset.upgradeLevel=String(upgradeLevel);
+    button.dataset.construction=built?'complete':'planned';
+    button.setAttribute('aria-label',project[0]+(built?' — построено':' — доступно для строительства'));
     const icon = document.createElement('span');
     icon.textContent = built ? project[1] : '＋';
-    button.append(icon, document.createTextNode(project[0]));
-    button.onclick = () => { selected = i; map(); };
+    const label=document.createElement('span');label.className='city-building-label';label.textContent=project[0];
+    button.append(icon,label);
+    if(built){
+      const levelBadge=document.createElement('span');
+      levelBadge.className='city-upgrade-badge';
+      levelBadge.textContent='★ '+(upgradeLevel+1);
+      levelBadge.setAttribute('aria-label','Уровень здания '+(upgradeLevel+1));
+      button.append(levelBadge);
+    }
+    button.onclick = () => { selected = i; window.cityDetailsOpen=true; map(); };
     el.append(button);
   });
 
@@ -264,6 +293,14 @@ function map() {
   const level = city?.upgrades?.[project[0]] || 0;
   const details = $('details');
   details.replaceChildren();
+  details.hidden=!window.cityDetailsOpen;
+  if(window.cityDetailsOpen){
+    const close=document.createElement('button');
+    close.type='button';close.className='city-details-close';close.textContent='✕ Закрыть';
+    close.setAttribute('aria-label','Закрыть сведения о здании');
+    close.onclick=()=>{window.cityDetailsOpen=false;details.hidden=true};
+    details.append(close);
+  }
   const description = document.createElement('p');
   description.textContent = project[0] + (s.built.includes(project[0])
     ? ' · улучшений: ' + level + ' · базовый доход +' + project[3] + '/час'
@@ -291,7 +328,7 @@ $('next-city').onclick = () => visitCity(cities[cities.indexOf(s.city) + 1]);
 $('walk').onclick = () => $('walk-view').dispatchEvent(new CustomEvent('walkstart', {
   detail: { city: s.city, level: s.level, built: buildings.map(building => s.built.includes(building[0])) }
 }));
-$('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=power()*(combo>=10?2:1);s.coins+=n;s.contribution+=n;daily().taps++;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost()||!useEnergy(3))return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Офлайн-доход: +'+fmt(gained)+' монет (до 24 часов)';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
+$('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();combo=now-lastTap<1800?Math.min(10,combo+1):1;lastTap=now;const n=power()*(combo>=10?2:1);s.coins+=n;s.contribution+=n;daily().taps++;const leveled=developCity();save();if(leveled)render();else{stats();updateBuildButton();tasks()}showTapGain(n)};$('energy-upgrade').onclick=()=>{const level=tycoon.energyUpgrades||0,price=Math.floor(350*Math.pow(1.65,level));if(!s.city||level>=30||s.coins<price)return;collect();s.coins-=price;tycoon.energyUpgrades=level+1;tycoon.energy=Math.min(Tycoon.energyCap(tycoon),tycoon.energy+10);save();render();notice('Максимальная энергия увеличена на 10')};$('upgrade').onclick=()=>{if(!s.city||s.coins<cost()||!useEnergy(3))return;s.coins-=cost();s.tapLevel++;save();render()};const gained=collect();$('offline').textContent='Локальный доход за закрытую игру не начисляется. Онлайн-менеджеры копят до 24 часов по времени сервера.';setInterval(()=>{if(combo&&Date.now()-lastTap>=1800){combo=0;stats()}},250);setInterval(() => {
   if (document.hidden || !s.city) return;
   const wholeCoins = Math.floor(s.coins);
   const questDay = s.daily?.date;
@@ -305,6 +342,56 @@ $('tap').onclick=()=>{if(!s.city||!useEnergy(1))return;const now=Date.now();comb
     showTycoon();
     updateBuildButton();
   }
-}, 1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){const n=collect();$('offline').textContent='Начислено: +'+fmt(n)+' монет';render()}});
+}, 1000);document.addEventListener('visibilitychange',()=>{if(document.hidden){collect();lastActiveTick=performance.now()}else{lastActiveTick=performance.now();$('offline').textContent='Локальный таймер восстановлен. Пассивный онлайн-доход рассчитывает сервер.';render()}});
 // Online leaderboard uses server-recorded community contributions, not editable local balances.
-const cfg=window.GAME_CONFIG||{};let session=null;try{session=JSON.parse(localStorage.getItem("vozrozhdenie_online_session")||"null")}catch(e){}async function api(path,method='GET',body){const r=await fetch(cfg.url.replace(/\/$/,'')+path,{method,headers:{apikey:cfg.key,Authorization:'Bearer '+(session?.access_token||cfg.key),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}async function ranking(){if(!cfg.url||!cfg.key){notice('Сначала настрой Supabase');return}try{const rows=await api('/rest/v1/rpc/city_ranking','POST',{});$('ranking').replaceChildren();rows.forEach((r,i)=>{const div=document.createElement('div');div.className='rank';div.textContent=(i+1)+'. '+r.city+' · '+r.members+' игроков';$('ranking').append(div)});$('network').textContent='Онлайн-рейтинг подключён';}catch(e){notice('Не удалось загрузить рейтинг: '+e.message)}}$('refresh').onclick=ranking;$('connect').onclick=async()=>{if(!cfg.url||!cfg.key){notice('Нужно настроить config.js');return}if(!s.city){notice('Сначала выбери город');return}try{if(session?.refresh_token){try{session=await api('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:session.refresh_token})}catch(e){session=null}}if(!session){session=await api('/auth/v1/signup','POST',{})}localStorage.setItem('vozrozhdenie_online_session',JSON.stringify(session));await api('/rest/v1/rpc/join_city','POST',{p_city:s.city});$('network').textContent='Ты в онлайн-команде '+s.city;await ranking()}catch(e){notice('Ошибка подключения: '+e.message)}};render();})();
+const cfg=window.GAME_CONFIG||{};let session=null;try{session=JSON.parse(localStorage.getItem("vozrozhdenie_online_session")||"null")}catch(e){}async function api(path,method='GET',body){const r=await fetch(cfg.url.replace(/\/$/,'')+path,{method,headers:{apikey:cfg.key,Authorization:'Bearer '+(session?.access_token||cfg.key),'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}async function ranking(){if(!cfg.url||!cfg.key){notice('Сначала настрой Supabase');return}try{const rows=await api('/rest/v1/rpc/city_ranking','POST',{});$('ranking').replaceChildren();rows.forEach((r,i)=>{const div=document.createElement('div');div.className='rank';div.textContent=(i+1)+'. '+r.city+' · '+r.members+' игроков';$('ranking').append(div)});$('network').textContent='Онлайн-рейтинг подключён';}catch(e){notice('Не удалось загрузить рейтинг: '+e.message)}}$('refresh').onclick=ranking;$('connect').onclick=async()=>{if(!cfg.url||!cfg.key){notice('Нужно настроить config.js');return}if(!s.city){notice('Сначала выбери город');return}try{if(session?.refresh_token){try{session=await api('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:session.refresh_token})}catch(e){session=null}}if(!session){session=await api('/auth/v1/signup','POST',{})}localStorage.setItem('vozrozhdenie_online_session',JSON.stringify(session));await api('/rest/v1/rpc/join_city','POST',{p_city:s.city});$('network').textContent='Ты в онлайн-команде '+s.city;await ranking()}catch(e){notice('Ошибка подключения: '+e.message)}};
+let onlineBusy=false;
+async function autoOnline(){
+ if(onlineBusy||document.hidden||!cfg.url||!cfg.key)return;
+ onlineBusy=true;
+ try{
+  await ranking();
+  if(session?.refresh_token&&s.city){
+   try{
+    const renewed=await api('/auth/v1/token?grant_type=refresh_token','POST',{refresh_token:session.refresh_token});
+    if(renewed?.access_token){
+     session=renewed;
+     localStorage.setItem('vozrozhdenie_online_session',JSON.stringify(session));
+     $('network').textContent='Онлайн-сессия обновлена · рейтинг доступен';
+    }
+   }catch(e){$('network').textContent='Рейтинг доступен · для команды потребуется вход';}
+  }
+ }finally{onlineBusy=false}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoOnline()});
+window.addEventListener('online',autoOnline);
+setInterval(()=>{if(!document.hidden)autoOnline()},60000);
+// The authenticated server membership is authoritative; legacy local campaigns remain offline-only.
+let syncCityBusy=false;
+async function syncAuthoritativeCity(){
+ if(syncCityBusy||document.hidden||!cfg.url||!cfg.key)return;
+ let social;try{social=JSON.parse(localStorage.getItem('vozrozhdenie_social_session_v1')||'null')}catch(_){}
+ if(!social?.access_token){authoritativeOnlineCity=null;return;}
+ syncCityBusy=true;
+ try{
+  const response=await fetch(cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/city_my_progress',{
+   method:'POST',headers:{apikey:cfg.key,Authorization:'Bearer '+social.access_token,'Content-Type':'application/json'},body:'{}'
+  });
+  if(!response.ok)return;
+  const rows=await response.json();
+  if(!Array.isArray(rows)||!rows.length){authoritativeOnlineCity=null;return;}
+  const serverCity=rows[0].city_name;
+  if(!cities.includes(serverCity))return;
+  authoritativeOnlineCity=serverCity;
+  if(s.city!==serverCity){
+   collect();const progress=s.campaign[serverCity] ||= {taps:0,built:[]};
+   s.city=serverCity;s.level=cityLevel(progress.taps);s.built=progress.built;selected=0;
+   save();render();notice('Город синхронизирован: '+serverCity);
+  }else{renderCityOptions();showCampaign()}
+ }catch(_){/* Keep last confirmed server city if temporarily offline. */}
+ finally{syncCityBusy=false}
+}
+window.addEventListener('online',syncAuthoritativeCity);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncAuthoritativeCity()});
+setInterval(syncAuthoritativeCity,60000);
+render();autoOnline();syncAuthoritativeCity();})();

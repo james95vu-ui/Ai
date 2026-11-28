@@ -1,0 +1,9 @@
+/* Building art is drawn from bundled SVG paths, not emoji fonts. */
+#town #map .city-building-art{display:block;width:clamp(50px,14vw,82px);height:clamp(48px,12vw,70px);overflow:visible;filter:drop-shadow(0 5px 3px #0009);transition:transform .24s ease,filter .24s ease}
+#town #map .city-building.built .city-building-art{filter:drop-shadow(0 5px 4px #000a) saturate(1.16)}
+#town #map .city-building.selected .city-building-art{transform:translateY(-5px) scale(1.09);filter:drop-shadow(0 7px 5px #000b) drop-shadow(0 0 5px #ffe0a2)}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building{background:linear-gradient(180deg,#0e2b2908 0%,#071d1fa6 68%,#071d1fe9 100%);border:0;border-bottom:2px solid #cfae71;box-shadow:none;backdrop-filter:none;padding:0 2px 3px;min-height:75px}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building.built{background:linear-gradient(180deg,transparent 0%,#0b3327b5 70%,#0c3329e8 100%)}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building.selected{border-bottom-color:#fff1b7;box-shadow:0 5px 18px #f4ce7999}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building-label{font-size:clamp(9px,2.4vw,12px);padding:3px 4px;background:#0d2923a8;border-radius:4px;color:#ffe9b8}
+@media(prefers-reduced-motion:no-preference){#town #map .city-building.built .city-building-art{animation:buildingIdle 4.5s ease-in-out infinite alternate}@keyframes buildingIdle{from{transform:translateY(0)}to{transform:translateY(-2px)}}}

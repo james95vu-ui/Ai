@@ -1,0 +1,33 @@
+/* Interactive illustrated city viewport, designed for portrait Android screens. */
+#town .landscape{overflow:hidden;border:2px solid #c6a463;border-radius:20px;box-shadow:0 12px 30px #0007,0 0 0 3px #18352c}
+#town #map.hud-map{position:relative;display:block;min-height:clamp(470px,115vw,690px);width:100%;padding:0;overflow:hidden;isolation:isolate;background:#356a61;box-shadow:inset 0 0 30px #0006}
+#town #map .city-scenery{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;background:linear-gradient(180deg,#7aa4b6 0%,#d9b78e 28%,#527b67 29%,#2d6c51 58%,#1b4e40 100%)}
+.city-sky{position:absolute;inset:0 0 55%;background:radial-gradient(circle at 75% 19%,#fff5ce 0 3%,#f8cb8c 4%,transparent 23%),linear-gradient(180deg,#537e9d,#edc29b);animation:cityLight 12s ease-in-out infinite alternate}
+.city-mountains{position:absolute;left:-5%;width:110%;height:38%;top:14%;clip-path:polygon(0 90%,8% 52%,14% 73%,27% 12%,37% 70%,51% 0,66% 72%,79% 20%,91% 65%,100% 30%,100% 100%,0 100%)}
+.city-mountains-back{background:linear-gradient(160deg,#e4ddd0 0 12%,#7d9a98 13%,#456b6e 85%);filter:drop-shadow(0 5px 8px #183b3a)}
+.city-mountains-front{top:25%;height:26%;opacity:.94;transform:scaleX(-1);background:linear-gradient(150deg,#d9d4c3 0 9%,#4d7468 10%,#284f48 80%)}
+.city-forest{position:absolute;inset:44% 0 0;background:radial-gradient(ellipse at 18% 22%,#9fb875 0 3%,transparent 4%),radial-gradient(ellipse at 80% 34%,#b4a75d 0 4%,transparent 5%),repeating-linear-gradient(105deg,transparent 0 19px,#183e2b55 21px 29px,transparent 31px 48px),linear-gradient(170deg,#65884d,#295c3d 58%,#143f37)}
+.city-river{position:absolute;bottom:-18%;left:29%;width:44%;height:80%;transform:rotate(22deg);border-radius:48%;background:repeating-linear-gradient(165deg,#9fdfd7 0 2px,#488d92 4px 11px,#286f7e 13px 22px);box-shadow:0 0 0 7px #b6ae80,0 0 0 15px #385d3d;opacity:.85;animation:riverShimmer 8s linear infinite}
+.city-path{position:absolute;inset:52% -20% -10%;transform:rotate(-25deg);background:linear-gradient(90deg,transparent 43%,#c9b994 44% 49%,#756f55 50%,#c9b994 51% 56%,transparent 57%);opacity:.85}
+.city-trees{position:absolute;inset:48% 0 0;background:radial-gradient(ellipse at 8% 12%,#d7a3a0 0 5%,transparent 5.5%),radial-gradient(ellipse at 90% 22%,#e0a2b3 0 6%,transparent 6.5%),radial-gradient(ellipse at 13% 70%,#1e6541 0 8%,transparent 8.5%),radial-gradient(ellipse at 86% 77%,#1c593b 0 9%,transparent 9.5%);filter:drop-shadow(0 5px 3px #102e2455)}
+#town #map .city-building{position:absolute;z-index:2;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;width:28%;height:18%;min-height:78px;margin:0;padding:5px;border:2px solid #c6a66c;border-radius:14px;background:linear-gradient(145deg,#2c4d42ed,#0d2928ef);box-shadow:inset 0 1px #fff5b34a,0 7px 12px #081e1bc0;color:#fff4db;font-weight:800;font-size:clamp(10px,2.7vw,13px);line-height:1.15;text-align:center;white-space:normal;backdrop-filter:blur(4px)}
+#town #map .city-building>span:first-child{font-size:clamp(28px,8vw,48px);line-height:1.1;filter:drop-shadow(0 4px 4px #0007)}
+#town #map .city-building-label{display:block;max-width:100%;overflow-wrap:anywhere;text-shadow:0 1px 3px #000}
+#town #map .city-building.built{border-color:#f5d485;background:linear-gradient(150deg,#476447ef,#193c35ee)}
+#town #map .city-building:not(.built)>span:first-child{color:#ffe09a;text-shadow:0 0 12px #f7ce77}
+#town #map .city-building.selected{z-index:5;box-shadow:0 0 0 3px #ffe4a0,0 0 24px #f5c86caa,0 9px 16px #0009}
+#town #map .city-building[data-building="0"]{left:5%;top:38%}
+#town #map .city-building[data-building="1"]{left:36%;top:33%}
+#town #map .city-building[data-building="2"]{right:4%;top:40%}
+#town #map .city-building[data-building="3"]{left:3%;top:58%}
+#town #map .city-building[data-building="4"]{left:36%;top:56%}
+#town #map .city-building[data-building="5"]{right:4%;top:62%}
+#town #map .city-building[data-building="6"]{left:4%;top:79%}
+#town #map .city-building[data-building="7"]{left:36%;top:78%}
+#town #map .city-building[data-building="8"]{right:4%;top:81%}
+#town #details{border:1px solid #d5b87966;border-radius:16px;background:linear-gradient(145deg,#294b41,#0d292a);padding:13px;margin-top:12px;box-shadow:0 8px 20px #0005}
+#town #details p{color:#f5e1b5;font-weight:700}
+@keyframes riverShimmer{from{background-position:0 0}to{background-position:0 130px}}
+@keyframes cityLight{from{filter:brightness(.93)}to{filter:brightness(1.13)}}
+@media(min-width:650px){#town #map.hud-map{min-height:620px}#town #map .city-building{width:24%;height:18%}}
+@media(prefers-reduced-motion:reduce){.city-river,.city-sky{animation:none}}

@@ -1,0 +1,3 @@
+Explicit user-requested APK build for city-rebuild-phase1-2026 at commit bc333130d1730e7c45b69af903f1625115d52744.
+
+User requested APK build after button layout fix commit 6242f9f34df4f2daea55328894c20e0cb4bb23de.
