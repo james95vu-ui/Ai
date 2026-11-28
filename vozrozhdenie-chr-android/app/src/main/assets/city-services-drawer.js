@@ -12,9 +12,12 @@ if(picker){
 document.body.append(toggle,drawer);
 if(hero)hero.hidden=true;
 function closeDrawer(){drawer.hidden=true;toggle.setAttribute('aria-expanded','false')}
-function openDrawer(){drawer.hidden=false;toggle.setAttribute('aria-expanded','true')}
+function openDrawer(){if(town.hidden)return;drawer.hidden=false;toggle.setAttribute('aria-expanded','true')}
 toggle.addEventListener('click',()=>drawer.hidden?openDrawer():closeDrawer());
 close.addEventListener('click',closeDrawer);
+const screenObserver=new MutationObserver(()=>{if(town.hidden)closeDrawer();toggle.hidden=town.hidden});
+screenObserver.observe(town,{attributes:true,attributeFilter:['hidden']});
+document.querySelectorAll('.game-nav button,.game-nav a').forEach(button=>button.addEventListener('click',closeDrawer));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden)closeDrawer()});
 let pending=false;
 function organize(){
@@ -24,7 +27,7 @@ function organize(){
   if(child.nodeType===1)drawer.append(child);
  }
  // City selector is always available, even when online-only panels are absent.
- toggle.hidden=false;
+ toggle.hidden=town.hidden;
 }
 const observer=new MutationObserver(records=>{
  if(records.some(r=>r.target===town&&Array.from(r.addedNodes).some(n=>n.nodeType===1&&n!==toggle&&n!==drawer))){
