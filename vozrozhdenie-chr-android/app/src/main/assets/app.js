@@ -186,8 +186,19 @@ function visitCity(city) {
 }
 
 if (s.city && s.campaign[s.city]) s.built = s.campaign[s.city].built;
-window.addEventListener('game:guest-started',event=>{const ids={'grozny':'Грозный','urus_martan':'Урус-Мартан','argun':'Аргун','gudermes':'Гудермес','shali':'Шали','kurchaloy':'Курчалой','achkhoy_martan':'Ачхой-Мартан','oyskhara':'Ойсхара','sernovodskoye':'Серноводское','shatoy':'Шатой'};const selected=ids[event.detail?.cityId]||'Грозный';if(authoritativeOnlineCity)return;collect();const progress=s.campaign[selected]||={taps:0,built:[]};s.city=selected;s.level=cityLevel(progress.taps);s.built=progress.built;selected=0;save();render();});
-
+const guestCityNames={'grozny':'Грозный','urus_martan':'Урус-Мартан','argun':'Аргун','gudermes':'Гудермес','shali':'Шали','kurchaloy':'Курчалой','achkhoy_martan':'Ачхой-Мартан','oyskhara':'Ойсхара','sernovodskoye':'Серноводское','shatoy':'Шатой'};
+window.addEventListener('game:guest-started',event=>{
+ const city=guestCityNames[event.detail?.cityId];
+ if(!city||authoritativeOnlineCity)return;
+ collect();
+ const progress=s.campaign[city] ||= {taps:0,built:[]};
+ s.city=city;
+ s.level=cityLevel(progress.taps);
+ s.built=progress.built;
+ selected=0;
+ save();
+ render();
+});
 
 function showIncome() {
   const wholeCoins = Math.floor(s.coins);
