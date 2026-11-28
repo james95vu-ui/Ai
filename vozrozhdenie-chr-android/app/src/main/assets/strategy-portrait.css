@@ -1,0 +1,35 @@
+/* Portrait strategy screen — map is the world, controls float above it. */
+body.game-shell:has(#town:not([hidden])){background:#10282b}
+body.game-shell:has(#town:not([hidden])) main{padding:0 0 calc(74px + env(safe-area-inset-bottom));gap:0;max-width:none}
+body.game-shell:has(#town:not([hidden])) main>.game-header{position:fixed;z-index:60;top:env(safe-area-inset-top);left:10px;right:10px;margin:0;padding:7px 12px;border-radius:13px;background:linear-gradient(90deg,#112a2bed,#1a3e3ad9);box-shadow:0 3px 15px #0008}
+body.game-shell:has(#town:not([hidden])) .game-header h1{font-size:clamp(17px,4.4vw,25px)}
+body.game-shell:has(#town:not([hidden])) .game-header small{font-size:9px}
+body.game-shell:has(#town:not([hidden])) .game-header #route{font-size:10px}
+body.game-shell:has(#town:not([hidden])) main>.stats{position:fixed;z-index:59;top:calc(65px + env(safe-area-inset-top));left:8px;right:8px;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:none;border:0}
+body.game-shell:has(#town:not([hidden])) .stats>div{min-width:0;padding:6px 3px;border-radius:10px;font-size:clamp(8px,2.1vw,11px);background:#102c2ce8;border:1px solid #e6c77e7c}
+body.game-shell:has(#town:not([hidden])) .stats strong{font-size:clamp(12px,3.3vw,19px);color:#ffe09d}
+body.game-shell:has(#town:not([hidden])) .game-screens{display:block;margin:0;padding:0;border:0;background:transparent}
+body.game-shell:has(#town:not([hidden])) #town{display:block!important;position:relative;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+body.game-shell:has(#town:not([hidden])) #town .landscape{position:relative;inset:auto;margin:0;border:0;border-radius:0;box-shadow:none;overflow:hidden}
+body.game-shell:has(#town:not([hidden])) #town #map.hud-map{min-height:calc(100dvh - 70px - env(safe-area-inset-bottom));border-radius:0;box-shadow:none}
+body.game-shell:has(#town:not([hidden])) #town .city-hero{position:fixed;top:calc(127px + env(safe-area-inset-top));left:10px;right:10px;z-index:55;margin:0;padding:0;background:transparent;pointer-events:none}
+body.game-shell:has(#town:not([hidden])) #town .city-picker{max-width:290px;margin:auto;padding:5px 8px;pointer-events:auto;background:#0b292be8}
+body.game-shell:has(#town:not([hidden])) #town .development{position:fixed;z-index:55;bottom:calc(79px + env(safe-area-inset-bottom));left:9px;right:9px;max-width:580px;margin:0 auto;padding:7px 11px;background:#102e2be8;box-shadow:0 3px 15px #0009;backdrop-filter:blur(7px)}
+body.game-shell:has(#town:not([hidden])) #town .development-heading{font-size:11px}
+body.game-shell:has(#town:not([hidden])) #town .development-heading p{margin:0}
+body.game-shell:has(#town:not([hidden])) #town .development progress{height:6px}
+body.game-shell:has(#town:not([hidden])) #town #details{position:fixed;z-index:70;bottom:calc(135px + env(safe-area-inset-bottom));left:9px;right:9px;max-width:580px;margin:0 auto;padding:10px;border-radius:14px;box-shadow:0 6px 24px #000b;max-height:34dvh;overflow-y:auto}
+body.game-shell:has(#town:not([hidden])) #town #details p{font-size:12px;margin:0 0 7px}
+body.game-shell:has(#town:not([hidden])) #town #details button{font-size:12px;padding:8px;margin:3px}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building{width:26%;height:13%;min-height:72px}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="0"]{top:26%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="1"]{top:23%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="2"]{top:29%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="3"]{top:42%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="4"]{top:41%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="5"]{top:45%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="6"]{top:60%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="7"]{top:61%}
+body.game-shell:has(#town:not([hidden])) #town #map .city-building[data-building="8"]{top:62%}
+body.game-shell:has(#town:not([hidden])) .game-nav{background:linear-gradient(#173c35,#061d1e);border-top:2px solid #d5ad62;box-shadow:0 -4px 20px #000a}
+@media(max-height:700px){body.game-shell:has(#town:not([hidden])) #town #details{max-height:23dvh}body.game-shell:has(#town:not([hidden])) #town .city-hero{top:calc(114px + env(safe-area-inset-top))}}
